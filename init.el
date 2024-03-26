@@ -35,36 +35,51 @@
 ;; ============================================================================
 ;;; Modeline
 ;; ============================================================================
+(setq mode-line-buffer-identification-keymap nil)
 (setq-default ; modeline need setq-default
  mode-line-format
  '("%e"
    mode-line-front-space
-   "%* "
+   ;; mode-line-modified
+   "%*"
+   " "
    mode-line-buffer-identification
-   " ⌞"
+   " "
    (:eval
-    (string-replace ; short major mode
-     "-" " "
-     (string-replace ; shortend major mode
-      "-" " "
-      (string-replace
-       "emacs-" ""
-       (string-replace
-        "org-" ""
-        (string-replace
-         "-buffer" ""
-         (string-replace
-          "-mode" ""
-          ;; (dolist (modepart '("emacs-" "org-" "-buffer" "-mode"))
-          ;;    (string-replace
-          ;;     (modepart) ""
-          (downcase (symbol-name major-mode)))))))))
-   "⌝"
-   (vc-mode vc-mode) ; git branch
-   "%n"              ; narrowed?
+    (propertize
+     (concat
+      "⌞"
+      (string-replace ; short major mode
+       "-" " "
+       (replace-regexp-in-string
+        "^org-" ""
+        (replace-regexp-in-string
+         "^emacs-" ""
+         (replace-regexp-in-string
+          "-buffer$" ""
+          (replace-regexp-in-string
+           "-mode$" ""
+           (downcase (symbol-name major-mode)))))))
+      "⌝")
+     'help-echo  (symbol-name major-mode)
+     'mouse-face 'mode-line-highlight))
    (:eval
     (when (mode-line-window-selected-p) ; only active window
       (list
+       (if (eq vc-mode nil)
+           ""
+         (replace-regexp-in-string ; else
+          "^ Git" " "
+          vc-mode))
+       (when (buffer-narrowed-p)
+         (list
+          " "
+          (propertize
+           "[n]"
+           'help-echo "Narrowed, mouse-1: widen"
+           'local-map (make-mode-line-mouse-map
+                       'mouse-1 #'mode-line-widen)
+           'mouse-face 'mode-line-highlight)))
        mode-line-misc-info
        " "
        (propertize ; gap for alignment.
@@ -74,13 +89,6 @@
        " "
        mode-line-percent-position
        mode-line-position-column-format)))))
-;; ----------------------------------------------------------------------------
-;; Remove "Git" from vc-mode.
-;; ----------------------------------------------------------------------------
-;; Configuring vc-mode can't be done inside (setq-default mode-line-format...)
-(setcdr
- (assq 'vc-mode mode-line-format)
- '((:eval (string-replace " Git" " " vc-mode))))
 
 ;; ============================================================================
 ;;; Vanilla variables
@@ -235,6 +243,7 @@
 ;; ============================================================================
 (require 'package)
 (setq
+ load-prefer-newer t ; use .el if newer than .elc. Fewer temporary compile warnings
  package-archives
  '(("org"   . "https://orgmode.org/elpa/")
    ("elpa"  . "https://elpa.gnu.org/packages/")
@@ -243,6 +252,10 @@
 ;; ----------------------------------------------------------------------------
 ;; Update packages automatically
 ;; ----------------------------------------------------------------------------
+(use-package auto-compile
+  :ensure t
+  :defer nil
+  :config (auto-compile-on-load-mode))
 (use-package auto-package-update
   :ensure t
   :init
@@ -621,6 +634,7 @@
     "oc"  '(org-capture                            :which-key "Capture")
     "od"  '(org-deadline                           :which-key "Deadline")
     "oe"  '(org-export-dispatch                    :which-key "Export")
+    "og"  '(counsel-org-goto-all                   :which-key "Goto task")
     "ol"  '(org-insert-link                        :which-key "Ins. link")
     "on"  '(org-add-note                           :which-key "Add note")
     "oo"  '(org-open-at-point                      :which-key "Open link")
@@ -717,26 +731,23 @@
    evil-visual-state-cursor      '(hollow     "#fff"))
   (set-face-attribute 'region nil :background "#000")
   (evil-mode 1)
-  :config
+  :bind
   ;; ----------------------------------------------------------------------------
   ;; Global keys!!! (minor mode maps will overwrite)
   ;; ----------------------------------------------------------------------------
-  (bind-keys
-   ("<escape>"  . keyboard-escape-quit)
+  (("<escape>"  . keyboard-escape-quit)
    ("<next>"    . evil-scroll-down)
-   ("<prior>"   . evil-scroll-up))
-  ;; ----------------------------------------------------------------------------
-  ;; Operator state keys!!!
-  ;; ----------------------------------------------------------------------------
-  (bind-keys
+   ("<prior>"   . evil-scroll-up)
+   ;; ----------------------------------------------------------------------------
+   ;; Operator state keys!!!
+   ;; ----------------------------------------------------------------------------
    :map
    evil-operator-state-map
    ;; Bad things happen if I hit "å" (next to "ø") in operator state without this
-   ("å"         . keyboard-escape-quit))
-  ;; ----------------------------------------------------------------------------
-  ;; Motion state keys!!! (normal, visual and motion)
-  ;; ----------------------------------------------------------------------------
-  (bind-keys
+   ("å"         . keyboard-escape-quit)
+   ;; ----------------------------------------------------------------------------
+   ;; Motion state keys!!! (normal, visual and motion)
+   ;; ----------------------------------------------------------------------------
    :map
    evil-motion-state-map
    ("<down>"    . evil-next-visual-line)     ; up/down keys navigate wrapped lines while
@@ -747,29 +758,26 @@
    ("C-½"       . tab-bar-mode)
    ("C-<tab>"   . tab-next)
    ("C-S-<tab>" . tab-previous)
-   ;; ("gc"        . evilnc-comment-operator) ; evil-nerd-commenter required
    ("æ"         . evil-forward-paragraph)
    ("Æ"         . evil-backward-paragraph)
    ("ø"         . evil-end-of-line)
    ("Ø"         . evil-first-non-blank)
    ("å"         . my/org-agenda-custom)
-   ("Å"         . org-agenda))
-  ;; ----------------------------------------------------------------------------
-  ;; Normal state keys!!!
-  ;; ----------------------------------------------------------------------------
-  (bind-keys
+   ("Å"         . org-agenda)
+   ;; ----------------------------------------------------------------------------
+   ;; Normal state keys!!!
+   ;; ----------------------------------------------------------------------------
    :map
    evil-normal-state-map
    ;; "/" is not easily available on my keyboard so I use "cl" for substitute.
    ;; This also free up "s" for surround in visual state.
    ;; I find myself primarely using isearch and swiper for searching though.
    ("s"         . evil-ex-search-forward)
-   ("S"         . evil-ex-search-backward))
-  ;; ----------------------------------------------------------------------------
-  ;; Insert state keys!!!
-  ;; ----------------------------------------------------------------------------
-  ;; I come from Emacs so I like to access some navigation in insert state.
-  (bind-keys
+   ("S"         . evil-ex-search-backward)
+   ;; ----------------------------------------------------------------------------
+   ;; Insert state keys!!!
+   ;; ----------------------------------------------------------------------------
+   ;; I come from Emacs so I like to access some navigation in insert state.
    :map
    evil-insert-state-map
    ("C-g"       . evil-normal-state)
@@ -791,10 +799,11 @@
    ("C-ø"       . move-end-of-line)
    ("C-Ø"       . evil-first-non-blank)
    ("C-0"       . evil-beginning-of-line))
+  :config
   ;; ----------------------------------------------------------------------------
   ;; Keys in maps depending on state!!!
   ;; ----------------------------------------------------------------------------
-  ;; Ibuffer don't have a hook so I can't use (bind-keys...)
+  ;; Ibuffer don't have a hook
   (evil-define-key
     'emacs ibuffer-mode-map
     (kbd "´") 'evil-window-next
@@ -894,16 +903,16 @@
    org-todo-keywords
    '((type     "NEXT(n!/!)" "TODO(t!/!)" "|")
      (type "|" "HOLD(h@/!)" "DONE(d!/!)"))
-   org-priority-faces ; This affects rendering in agenda.
-   '((?A . (:height 0.8 :slant nil))
-     (?B . (:height 0.8 :slant nil))
-     (?C . (:height 0.8 :slant nil)))
-   org-default-priority ?C
    org-list-allow-alphabetical t
    org-list-demote-modify-bullet
    '(("+" . "*")
      ("*" . "-")
      ("-" . "+"))
+   org-default-priority ?C
+   org-priority-faces ; This affects rendering in agenda
+   '((?A . (:height 0.8 :slant nil))
+     (?B . (:height 0.8 :slant nil))
+     (?C . (:height 0.8 :slant nil)))
    org-tags-column -75 ; minus aligns right
    org-tag-alist
    '(("bg"       . ?b)
@@ -915,9 +924,9 @@
      ("phone"    . ?p)
      ("work"     . ?w)
      ;; Special keyword tags
-     ("crypt"    . ?C)
-     ("ordered"  . ?O)
-     ("noexport" . ?X))
+     ("CRYPT"    . ?C)
+     ("ORDERED"  . ?O)
+     ("NOEXPORT" . ?X))
    org-cycle-hide-block-startup t
    org-confirm-babel-evaluate nil
    ;; ----------------------------------------------------------------------------
@@ -928,7 +937,7 @@
    org-log-refile      'time
    org-log-reschedule t
    org-log-note-headings
-   '((state       . "State %6s from %-9S %t") ; Align timestamps (even with capture).
+   '((state       . "State %6s from %-9S %t") ; Align timestamps (with capture).
      (note        . "Note                        %t")
      (refile      . "Refiled                     %t")
      (done        . "Closing note                %t")
@@ -940,8 +949,8 @@
    ;; ----------------------------------------------------------------------------
    ;; Capture
    ;; ----------------------------------------------------------------------------
-   org-capture-templates ; the backtick is only there to concat
-   `(("i" "Idea" entry ; Almost everything is captured with "i"
+   org-capture-templates
+   `(("i" "Idea" entry ; backtick to concat
       (file ,(concat org-directory "/inbox.org"))
       ,(concat
         "* NEXT %^{Idea} %^G\n"
@@ -985,6 +994,8 @@
    ;; ----------------------------------------------------------------------------
    ;; Agenda
    ;; ----------------------------------------------------------------------------
+   ;; This is a system to organize and supress information about tasks.
+   ;; It's not primarily a calendar. It's all about task management.
    org-agenda-window-setup 'current-window
    org-archive-location (concat org-directory "/archive.org::* Archive")
    org-refile-targets
@@ -993,7 +1004,7 @@
                           (concat org-directory "/inbox.org")
                           (concat org-directory "/bgbog/bg.org"))
    org-agenda-format-date "  [%F %a]"
-   org-agenda-block-separator ?⎺
+   org-agenda-block-separator ?⎺ ; also separate "a" appended agenda
    org-agenda-custom-commands
    '(("c" "Custom agenda setup"
       ((todo "NEXT"
@@ -1015,8 +1026,8 @@
                  'timestamp))))
        (todo "HOLD"
              ;; HOLD for third party action pending (include timestamped).
-             ((org-agenda-block-separator nil)
-              (org-agenda-overriding-header "") ; share heading with the item above.
+             ((org-agenda-overriding-header "") ; share heading with the item above.
+              (org-agenda-block-separator nil) ; don't separate
               (org-agenda-skip-function
                '(org-agenda-skip-entry-if
                  'regexp org-priority-regexp)))))))
@@ -1027,7 +1038,7 @@
      (tags     . "  %-6c%-12e")
      (search   . "  %-6c%-12e"))
    org-agenda-time-grid nil
-   org-agenda-current-time-string ""
+   org-agenda-current-time-string nil
    org-agenda-start-with-log-mode t
    org-agenda-skip-scheduled-if-done t
    org-agenda-skip-deadline-if-done t
@@ -1095,6 +1106,8 @@
   ;; Org faces
   ;; ----------------------------------------------------------------------------
   (set-face-attribute
+   'org-document-title            nil :height 1.25 :foreground "#f90" :weight 'bold)
+  (set-face-attribute
    'org-level-1                   nil :height 1.0  :foreground "#f90" :weight 'bold)
   (set-face-attribute
    'org-level-2                   nil :height 1.0  :foreground "#f90" :weight 'bold)
@@ -1113,9 +1126,11 @@
   (set-face-attribute
    'org-headline-done             nil              :foreground "#0f9")
   (set-face-attribute
-   'org-todo                      nil :height 0.8  :foreground "#f09")
+   'org-document-info-keyword     nil :height 0.8  :foreground "#0f9")
   (set-face-attribute
    'org-done                      nil :height 0.8  :foreground "#9f0")
+  (set-face-attribute
+   'org-todo                      nil :height 0.8  :foreground "#f09")
   (set-face-attribute
    'org-link                      nil              :foreground "#09f")
   (set-face-attribute
@@ -1127,17 +1142,15 @@
   (set-face-attribute
    'org-block-begin-line          nil :height 0.8  :foreground "#09f")
   (set-face-attribute
-   'org-block                     nil              :foreground "#bba")
+   'org-block-end-line            nil              :foreground "#09f")
   (set-face-attribute
-   'org-block-end-line            nil :height 0.8  :foreground "#09f")
+   'org-block                     nil              :foreground "#bba")
   (set-face-attribute
    'org-ellipsis                  nil :height 0.8  :foreground "#0f9" :weight 'normal :underline nil)
   (set-face-attribute
-   'org-meta-line                 nil :height 0.8)
+   'org-document-info-keyword     nil :height 0.8  :foreground "#0f9" :weight 'normal)
   (set-face-attribute
    'org-special-keyword           nil :height 0.8  :foreground "#0f9" :weight 'normal)
-  (set-face-attribute
-   'org-document-info-keyword     nil :height 0.8  :foreground "#0f9" :weight 'normal)
   (set-face-attribute
    'org-checkbox                  nil :height 0.8  :foreground "#0f9" :background "#221" :box nil)
   (set-face-attribute
@@ -1146,6 +1159,8 @@
    'org-formula                   nil :height 0.8  :foreground "#0f9")
   (set-face-attribute
    'org-table                     nil :height 0.8  :foreground "#0f9")
+  (set-face-attribute
+   'org-meta-line                 nil :height 0.8)
   ;; ----------------------------------------------------------------------------
   ;; Agenda faces
   ;; ----------------------------------------------------------------------------
@@ -1204,7 +1219,8 @@
         ("#+begin_export" . ?✎)
         ("#+end_export"   . ?✐)
         ("#+begin_src"    . ?✎)
-        ("#+end_src"      . ?✐)))
+        ("#+end_src"      . ?✐))
+      prettify-symbols-unprettify-at-point t)
      (prettify-symbols-mode 1)))
   ;; ----------------------------------------------------------------------------
   ;; Bullets
@@ -1277,7 +1293,7 @@
 (kill-buffer "*scratch*")
 (scratch-buffer)
 ;; Render font colors correctly in org buffers loaded by agenda.
-(sit-for .01)
+(sit-for .01) ; A short pause is needed for some reason
 (add-hook 'after-init-hook  #'my/org-agenda-custom)
 
 ;; ============================================================================
