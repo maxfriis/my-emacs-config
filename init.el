@@ -271,12 +271,9 @@
 ;; Open init files
 ;; ----------------------------------------------------------------------------
 (defun my/open-init-files ()
-  "Open config files early-init.el and init.el"
+  "Open config file init.el"
   (interactive)
-  (delete-other-windows)
-  (find-file (locate-user-emacs-file "early-init.el"))
-  (tab-bar-mode 1)
-  (tab-new)
+  (find-file (locate-user-emacs-file "early-init.el")) ; to easily switch
   (find-file (locate-user-emacs-file "init.el")))
 ;; ----------------------------------------------------------------------------
 ;; Open notes file
@@ -286,18 +283,12 @@
   (interactive)
   (find-file (concat org-agenda-directory "note.org")))
 ;; ----------------------------------------------------------------------------
-;; Open plan file
-;; ----------------------------------------------------------------------------
-(defun my/open-plan-file ()
-  "Open my project file plan.org"
-  (interactive)
-  (find-file (concat org-agenda-directory "plan.org")))
-;; ----------------------------------------------------------------------------
 ;; Open agenda file
 ;; ----------------------------------------------------------------------------
 (defun my/open-agenda-file ()
   "Open my agenda file agenda.org"
   (interactive)
+  (find-file (concat org-agenda-directory "plan.org")) ; to easily switch
   (find-file (concat org-agenda-directory "agenda.org")))
 ;; ----------------------------------------------------------------------------
 ;; Custom agenda
@@ -730,13 +721,19 @@
              '(org-agenda-skip-entry-if
                'regexp org-priority-regexp)))))))
  org-agenda-prefix-format
- '((agenda   . "  %-6c%-12t%?-11s")
-   (timeline . "  %-6c%-12t%?-11s")
+ '((agenda   . "  %-6c%-12t%?-6s")
+   (timeline . "  %-6c%-12t%?-6s")
    (todo     . "  %-6c%-12e")
    (tags     . "  %-6c%-12e")
    (search   . "  %-6c%-12e"))
+ org-agenda-scheduled-leaders
+ '("☐" "☐%3dx")
+ org-agenda-deadline-leaders
+ '("☒" "☒%3dd" "☒%3dx")
+ org-agenda-bulk-mark-char ":"
+ org-agenda-breadcrumbs-separator ":"
  org-agenda-time-grid nil
- org-agenda-start-with-log-mode t
+ ;; org-agenda-start-with-log-mode t
  org-agenda-skip-scheduled-if-done t
  org-agenda-skip-deadline-if-done t
  org-agenda-skip-deadline-prewarning-if-scheduled t
@@ -896,7 +893,6 @@
   "ff"  '(counsel-find-file                      :which-key "Find")
   "fi"  '(my/open-init-files                     :which-key "Init")
   "fP"  '(find-file-at-point                     :which-key "At point")
-  "fp"  '(my/open-plan-file                      :which-key "Plan file")
   "fn"  '(my/open-note-file                      :which-key "Note file")
   "fr"  '(recentf-open-files                     :which-key "Recent")
   "fs"  '(basic-save-buffer                      :which-key "Save")
