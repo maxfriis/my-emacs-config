@@ -45,12 +45,17 @@ I don't use a package for my modeline either.
 It consist of a window number, some information about writable and modified status and the buffer and major mode name.
 
 The active window have some more information.
-This is about git status and weather the buffer is narrowed.
-Besides that the active window have the relative position and column number after a gap.
+The information is git status and whether the buffer is narrowed.
+Besides that the active window have the relative vertical position and column number after a gap.
+
+* Vanilla variables
+
+Here I set variables that are used by vanilla Emacs or a native package.
+I also activate a few native global minor modes.
 
 * Custom functions
 
-I keep these very simple.
+I keep these functions very simple.
 Emacs usually provide what I need without me having to write a function.
 
 I have a few functions that simply open some key files with find-file.
@@ -77,11 +82,11 @@ All this should make it fairly easy to convert my config to use use-package or s
 
 * Evil
 
-This is tre first of the 3 big packages (evil, org and general) I will comment on.
+This is the first of the 3 big packages (evil, org and general) I will comment on.
 
-** Layered vs. modal
+** Layered versus modal bindings
 
-Emacs comes with a complex but very powerful set of /layered/ keybindings (=<ctrl>=, =<meta>=, =<shift>= or combinations).
+Emacs comes with a complex but very powerful set of /layered/ keybindings (using =<ctrl>=, =<meta>=, =<shift>= or combinations of these).
 An alternative is the evil package with Vim's /modal/ keybindings combined with some layering.
 I prefer modal bindings and try to minimize the use of layers.
 
@@ -93,11 +98,12 @@ In normal state this model is changed to something no other editor I know have p
 The cursor is considered on characters rather than between them.
 
 I have chosen to use a modification of evil where the cursor is between characters in normal state.
-This has the advantage of fewer keys being used (no "=a=") at little to no cost in efficiency.
+This has the advantage of fewer keys being used (e.g. no need for =a=) at little to no cost in efficiency.
+You might want to rebind some keys but I just leave them be.
 
 ** Two ways of pasting
 
-I will try to illustrate this with a case study about pasting.
+I will try to illustrate this with a case study on pasting.
 Vim's cursor on character model requires two ways of pasting.
 One is layered with a <shift> and really counts as two keys pressed.
 You can mimic this behavior by using a motion with paste in the cursor between characters model.
@@ -107,21 +113,21 @@ This does not mean that Vim's way of doing things is inferior.
 You should minimize "correction-motions", so you can go directly for Vim's "verb" -> "noun" approach as often as you can.
 On the other hand you end up with two paste commands where only one is really necessary.
 This adds complexity to the keybindings and you will have to be a power user to get any significant advantage from this.
-As you get used to the less complex keybindings you will need to use less "correction-motions".
+As you get used to the less complex keybindings you will develop foresight to use less "correction-motions".
 
 ** Casual use
 
 As a more casual or inexperienced user, one paste command is preferable.
 This is especially true if you dislike layers and try to minimize their use.
-I very much dislike having to hold down two keys at once as if I was using vanilla Emacs.
+I very much dislike having to hold down two keys at once as if I were using vanilla Emacs.
 
-In my configuration the between-characters behavior is isolated in [[https://www.dr-qubit.org/Evil_cursor_model.html][evil-cursor-model.el]] that I have slightly modified.
+In my configuration the between characters behavior is isolated in [[https://www.dr-qubit.org/Evil_cursor_model.html][evil-cursor-model.el]] which I have slightly modified.
 Standard evil behavior is easy to achieve by simply not loading it.
 
 * Misc. packages
 
 I use a large number of packages.
-Honorable mentions are vertico, corfu, ace-window, recursive-narrow and magit.
+Besides evil, org and general honorable mentions are vertico, corfu, ace-window, recursive-narrow and magit.
 
 * Org-mode
 
@@ -132,10 +138,11 @@ I extend this with the native prettify.el package and a few hooks.
 
 I restrict myself to only 4 todo-states (NEXT, TODO, HOLD and DONE).
 Besides those I use refile and an unrestricted number of categories to identify the type of todo item.
-The only state I feel I need to explain is HOLD which is an inactive state that means pending third party action.
-Some might miss a cancel option but I cancel items by archiving them in an active state.
+The only state I feel I need to explain is HOLD which is an inactive state that can be translated to "pending third party action".
+Some might miss a canceled option but I cancel items by archiving them in an active state.
 
-I carefully configure my capture and custom agenda but will not elaborate further on them here.
+I carefully configure my custom agenda and capture but will not elaborate further on them here.
+I humbly claim that my code is probably worth a read, if customizing your agenda has your interest.
 
 * General
 
@@ -147,7 +154,7 @@ Inspired by Spacemacs I use =<SPC>= as my leader key and part of the structure i
 
 * Keybindings
 
-I dislike the use of layers, even though I don't use my computer enough to develop an emacs pinky problem.
+I dislike the use of layers, even though I don't use my editor enough to develop an Emacs pinky problem.
 I like to have all my keybindings in a section rather than distributed out among my packages.
 I find it more useful to spot collisions by gathering these bindings in one place.
 Use-package might be able to defer stuff based on :bind but I don't use use-package.
@@ -157,4 +164,8 @@ A few evil bindings specific to the change in cursor model are modified inside e
 * Package faces
 
 Here I specify faces used by packages.
-I typically use (with-eval-after-load...) and this can be used to identify what package the faces are used by.
+I typically use (with-eval-after-load...) and this can be used to identify in what package the face is introduced.
+
+* Vanilla hooks
+
+I round my configuration of with a few hooks that is only tied to native packages.
