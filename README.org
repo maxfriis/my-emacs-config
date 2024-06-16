@@ -13,7 +13,8 @@ Last I clean up some vanilla default modes.
 I don't use a theme package.
 I simply change faces if I don't like them.
 
-For text I restrict myself to use 8 colors:
+I restrict myself to use 8 colors.
+Examples of their use are:
 | Color | Use            |   | Color | Use            |   | Color | Use             |
 |-------+----------------+---+-------+----------------+---+-------+-----------------|
 | #bba  | default text   |   | #09f  | link/timestamp |   | #0f9  | comment/tags    |
@@ -22,25 +23,26 @@ For text I restrict myself to use 8 colors:
 |-------+----------------+---+-------+----------------+---+-------+-----------------|
 Unspecified faces are handled by the vanilla theme.
 
-When I configure evil I add 8 colors reserved for the cursor and depending on the evil state.
+When I configure evil I add 8 colors reserved for the cursor.
+I tax the eyes a bit with extreme colors to help keeping track of the evil state and cursor placement.
 | Color | State    |   | Color | State   |   | Color | State  |
 |-------+----------+---+-------+---------+---+-------+--------|
-| #00f  | Motion   |   | #ff0  | Insert  |   | #fff  | Visual |
-| #0f0  | Normal   |   | #f0f  | Replace |   |       |        |
-| #f00  | Operator |   | #0ff  | Emacs   |   | #000  | Region |
+| #f00  | Operator |   | #0ff  | Emacs   |   | #fff  | Visual |
+| #0f0  | Normal   |   | #f0f  | Replace |   | #000  | Region |
+| #00f  | Motion   |   | #ff0  | Insert  |   |       |        |
 |-------+----------+---+-------+---------+---+-------+--------|
 Operator state is red to alert.
 Normal state has the opposite green color.
 Insert state is the last trafic light color (yellow) and use a bar.
-Replace state have opposite color of insert state and use a hbar.
+Replace state has the opposite color of insert state and use an hbar.
 Emacs and motion states have the remaining rgb colors.
 "Input" states have the "brighter" colors (with 2 f's) and bars in common.
-The visual state is hollow and can be filled with the region color.
+The visual state is hollow and might be filled with the region color.
 
 * Modeline
 
 I don't use a package for my modeline either.
-It consist of a window number, some information about writable and modified status, buffer and major mode name.
+It consist of a window number, some information about writable and modified status and the buffer and major mode name.
 
 The active window have some more information.
 This is about git status and weather the buffer is narrowed.
@@ -59,17 +61,17 @@ Last I code some window manipulation, a git stage/commit and a save/quit without
 
 I use package.el and (require 'xyz) to install and activate packages.
 I used to use use-package but that seem to increase the number of garbage collections significantly (about 5 fold for me).
-It is not clear to me that gains from loading packages latter (:defer) is worth this cost.
+It is not clear to me that gains from controlling when to load packages (:defer) is worth this cost.
 Even if it is I prefer the simple solution where everything is loaded.
 That might make debugging easier.
 You rarely have to ask yourself is or isn't this or that loaded and when did I load it?
 
-Use-package also have some other advantages like updating packages directly from a git repo, but I don't use that.
-I still use some of the structure that is one of the advantages of using use-package.
+Use-package/straight also have some other advantages like updating packages directly from a git repo, but I don't use that.
+I preserve some of the structure that is one of the advantages of using use-package.
 That means that I will set variables associated with a package just before I require it.
 This would typically be part of an :init or :custom section in use-package.
-Hooks (usually in :hook) and mode activations (in :config or sometimes :init?!) I do right after require.
-Faces and keybindings (:bind) I do at the end of the configuration in sections dedicated to those.
+Hooks (usually in :hook) and mode activations (:config or sometimes :init?! Fortunately I no longer need to understand this) I do right after require.
+I do keybindings (:bind) and faces at the end of the configuration in dedicated sections.
 
 All this should make it fairly easy to convert my config to use use-package or straight.
 
@@ -79,7 +81,7 @@ This is tre first of the 3 big packages (evil, org and general) I will comment o
 
 ** Layered vs. modal
 
-Emacs comes with a complex but very powerful set of /layered/ keybindings (<ctrl>, <meta> or <shift>).
+Emacs comes with a complex but very powerful set of /layered/ keybindings (=<ctrl>=, =<meta>=, =<shift>= or combinations).
 An alternative is the evil package with Vim's /modal/ keybindings combined with some layering.
 I prefer modal bindings and try to minimize the use of layers.
 
@@ -91,7 +93,7 @@ In normal state this model is changed to something no other editor I know have p
 The cursor is considered on characters rather than between them.
 
 I have chosen to use a modification of evil where the cursor is between characters in normal state.
-This has the advantage of fewer keys being used (no "a") at little to no cost in efficiency.
+This has the advantage of fewer keys being used (no "=a=") at little to no cost in efficiency.
 
 ** Two ways of pasting
 
@@ -116,7 +118,7 @@ I very much dislike having to hold down two keys at once as if I was using vanil
 In my configuration the between-characters behavior is isolated in [[https://www.dr-qubit.org/Evil_cursor_model.html][evil-cursor-model.el]] that I have slightly modified.
 Standard evil behavior is easy to achieve by simply not loading it.
 
-* Notable packages
+* Misc. packages
 
 I use a large number of packages.
 Honorable mentions are vertico, corfu, ace-window, recursive-narrow and magit.
@@ -129,25 +131,28 @@ I extend this with the native prettify.el package and a few hooks.
 ** Org-agenda
 
 I restrict myself to only 4 todo-states (NEXT, TODO, HOLD and DONE).
-Besides thouse I use refile and an unrestricted number of categories to identify the type of todo item.
+Besides those I use refile and an unrestricted number of categories to identify the type of todo item.
+The only state I feel I need to explain is HOLD which is an inactive state that means pending third party action.
+Some might miss a cancel option but I cancel items by archiving them in an active state.
 
 I carefully configure my capture and custom agenda but will not elaborate further on them here.
 
 * General
 
 As with my theme and modeline I could and perhaps should do my leader key keybindings with "-maps", but I'm not there yet.
-Prot have a nice video on it on Youtube ([[https://www.youtube.com/watch?v=gojOZ3k1mmk][Emacs: define prefix/leader key]]).
+Prot have a nice video about it on Youtube ([[https://www.youtube.com/watch?v=gojOZ3k1mmk][Emacs: define prefix/leader key]]).
 
 Anyways I use general.el to handle my leader key bindings.
-Inspired by Spacemacs I use <SPC> as my leader key and part of the structure in my bindings are also inspired by this project.
+Inspired by Spacemacs I use =<SPC>= as my leader key and part of the structure in my bindings are also inspired by this project.
 
 * Keybindings
 
 I dislike the use of layers, even though I don't use my computer enough to develop an emacs pinky problem.
 I like to have all my keybindings in a section rather than distributed out among my packages.
-I find it more useful to spot conflicts by gathering these bindings in one place.
+I find it more useful to spot collisions by gathering these bindings in one place.
 Use-package might be able to defer stuff based on :bind but I don't use use-package.
-A few bindings are done inside evil-cursor-model.el.
+
+A few evil bindings specific to the change in cursor model are modified inside evil-cursor-model.el.
 
 * Package faces
 
