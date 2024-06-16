@@ -14,25 +14,25 @@ I don't use a theme package.
 I simply change faces if I don't like them.
 
 For text I restrict myself to use 8 colors:
-| Color | Use            | Color | Use            | Color | Use             |
-|-------+----------------+-------+----------------+-------+-----------------|
-| #bba  | default text   | #09f  | link/timestamp | #0f9  | comment/tags    |
-| #332  | shadow/hl-line | #9f0  | success/done   | #f90  | warning/heading |
-| #221  | background     | #f09  | error/todo     | #90f  | not used        |
-|-------+----------------+-------+----------------+-------+-----------------|
+| Color | Use            |   | Color | Use            |   | Color | Use             |
+|-------+----------------+---+-------+----------------+---+-------+-----------------|
+| #bba  | default text   |   | #09f  | link/timestamp |   | #0f9  | comment/tags    |
+| #332  | shadow/hl-line |   | #9f0  | success/done   |   | #f90  | warning/heading |
+| #221  | background     |   | #f09  | error/todo     |   | #90f  | not used        |
+|-------+----------------+---+-------+----------------+---+-------+-----------------|
 Unspecified faces are handled by the vanilla theme.
 
 When I configure evil I add 8 colors reserved for the cursor and depending on the evil state.
-| Color | State    | Color | State   | Color | State  |
-|-------+----------+-------+---------+-------+--------|
-| #f00  | Operator | #0ff  | Emacs   | #fff  | Visual |
-| #0f0  | Normal   | #f0f  | Replace |       |        |
-| #00f  | Motion   | #ff0  | Insert  | #000  | Region |
-|-------+----------+-------+---------+-------+--------|
+| Color | State    |   | Color | State   |   | Color | State  |
+|-------+----------+---+-------+---------+---+-------+--------|
+| #00f  | Motion   |   | #ff0  | Insert  |   | #fff  | Visual |
+| #0f0  | Normal   |   | #f0f  | Replace |   |       |        |
+| #f00  | Operator |   | #0ff  | Emacs   |   | #000  | Region |
+|-------+----------+---+-------+---------+---+-------+--------|
 Operator state is red to alert.
 Normal state has the opposite green color.
 Insert state is the last trafic light color (yellow) and use a bar.
-Replace state have to opposite color of insert state and use a hbar.
+Replace state have opposite color of insert state and use a hbar.
 Emacs and motion states have the remaining rgb colors.
 "Input" states have the "brighter" colors (with 2 f's) and bars in common.
 The visual state is hollow and can be filled with the region color.
@@ -55,7 +55,7 @@ I have a few functions that simply open some key files with find-file.
 Then I have one to open my custom agenda and one does my idea capture.
 Last I code some window manipulation, a git stage/commit and a save/quit without a prompt.
 
-* Packages
+* Package.el
 
 I use package.el and (require 'xyz) to install and activate packages.
 I used to use use-package but that seem to increase the number of garbage collections significantly (about 5 fold for me).
@@ -71,11 +71,11 @@ This would typically be part of an :init or :custom section in use-package.
 Hooks (usually in :hook) and mode activations (in :config or sometimes :init?!) I do right after require.
 Faces and keybindings (:bind) I do at the end of the configuration in sections dedicated to those.
 
-All this should make it fairly easy to convert my config to use use-package or straight-use-package.
+All this should make it fairly easy to convert my config to use use-package or straight.
 
 * Evil
 
-This is one of the 3 big packages (evil, org and general) I will comment on.
+This is tre first of the 3 big packages (evil, org and general) I will comment on.
 
 ** Layered vs. modal
 
@@ -91,7 +91,7 @@ In normal state this model is changed to something no other editor I know have p
 The cursor is considered on characters rather than between them.
 
 I have chosen to use a modification of evil where the cursor is between characters in normal state.
-This has the advantage of fewer keys being used at little to no cost in efficiency.
+This has the advantage of fewer keys being used (no "a") at little to no cost in efficiency.
 
 ** Two ways of pasting
 
@@ -109,43 +109,47 @@ As you get used to the less complex keybindings you will need to use less "corre
 
 ** Casual use
 
-As a more casual or inexperienced user one paste command is preferable.
+As a more casual or inexperienced user, one paste command is preferable.
 This is especially true if you dislike layers and try to minimize their use.
 I very much dislike having to hold down two keys at once as if I was using vanilla Emacs.
 
-In my configuration the between-characters behavior is isolated in a separate file and standard evil behavior is easy to achieve by simply not loading it.
+In my configuration the between-characters behavior is isolated in [[https://www.dr-qubit.org/Evil_cursor_model.html][evil-cursor-model.el]] that I have slightly modified.
+Standard evil behavior is easy to achieve by simply not loading it.
 
 * Notable packages
 
 I use a large number of packages.
-Notable examples are vertico, corfu, ace-window, recursive-narrow and magit.
+Honorable mentions are vertico, corfu, ace-window, recursive-narrow and magit.
 
 * Org-mode
 
-I customize this with a large set of variables, the prettify package and a few hooks.
+I customize this with a large set of variables.
+I extend this with the native prettify.el package and a few hooks.
 
 ** Org-agenda
 
-I restrict myself to only 4 todo-states (NEXT, TODO, HOLD and DONE) but an unlimited number of categories that are displayed in my agenda.
+I restrict myself to only 4 todo-states (NEXT, TODO, HOLD and DONE).
+Besides thouse I use refile and an unrestricted number of categories to identify the type of todo item.
+
 I carefully configure my capture and custom agenda but will not elaborate further on them here.
-The code is easy to read.
 
 * General
 
 As with my theme and modeline I could and perhaps should do my leader key keybindings with "-maps", but I'm not there yet.
-Prot does have a nice video on it on Youtube ([[https://www.youtube.com/watch?v=gojOZ3k1mmk][Emacs: define prefix/leader key]]).
+Prot have a nice video on it on Youtube ([[https://www.youtube.com/watch?v=gojOZ3k1mmk][Emacs: define prefix/leader key]]).
 
 Anyways I use general.el to handle my leader key bindings.
 Inspired by Spacemacs I use <SPC> as my leader key and part of the structure in my bindings are also inspired by this project.
 
 * Keybindings
 
-I dislike the use of layers, even though I don't use my computer enough to get an emacs pinky problem.
-I like to have my keybindings together in a section rather than distributed out among my packages and this is where I have them.
-I find it more useful to spot conflicts by gathering the bindings in one place.
-Use-package might be able to defer stuff based on :bind but I don't use use-package and don't have to distribute my bindings all over my configuration file.
+I dislike the use of layers, even though I don't use my computer enough to develop an emacs pinky problem.
+I like to have all my keybindings in a section rather than distributed out among my packages.
+I find it more useful to spot conflicts by gathering these bindings in one place.
+Use-package might be able to defer stuff based on :bind but I don't use use-package.
 A few bindings are done inside evil-cursor-model.el.
 
 * Package faces
 
 Here I specify faces used by packages.
+I typically use (with-eval-after-load...) and this can be used to identify what package the faces are used by.
