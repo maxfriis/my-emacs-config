@@ -1,0 +1,151 @@
+#+title: My Emacs configuration
+#+options: toc:nil
+
+* Early init
+
+Here I set some variables that influence the startup process.
+After this I maximize the frame and set the default font.
+The reason I do this early is to avoid a resizing window and white screen to blink on startup.
+Last I clean up some vanilla default modes.
+
+* Theme
+
+I don't use a theme package.
+I simply change faces if I don't like them.
+
+For text I restrict myself to use 8 colors:
+| Color | Use            | Color | Use            | Color | Use             |
+|-------+----------------+-------+----------------+-------+-----------------|
+| #bba  | default text   | #09f  | link/timestamp | #0f9  | comment/tags    |
+| #332  | shadow/hl-line | #9f0  | success/done   | #f90  | warning/heading |
+| #221  | background     | #f09  | error/todo     | #90f  | not used        |
+|-------+----------------+-------+----------------+-------+-----------------|
+Unspecified faces are handled by the vanilla theme.
+
+When I configure evil I add 8 colors reserved for the cursor and depending on the evil state.
+| Color | State    | Color | State   | Color | State  |
+|-------+----------+-------+---------+-------+--------|
+| #f00  | Operator | #0ff  | Emacs   | #fff  | Visual |
+| #0f0  | Normal   | #f0f  | Replace |       |        |
+| #00f  | Motion   | #ff0  | Insert  | #000  | Region |
+|-------+----------+-------+---------+-------+--------|
+Operator state is red to alert.
+Normal state has the opposite green color.
+Insert state is the last trafic light color (yellow) and use a bar.
+Replace state have to opposite color of insert state and use a hbar.
+Emacs and motion states have the remaining rgb colors.
+"Input" states have the "brighter" colors (with 2 f's) and bars in common.
+The visual state is hollow and can be filled with the region color.
+
+* Modeline
+
+I don't use a package for my modeline either.
+It consist of a window number, some information about writable and modified status, buffer and major mode name.
+
+The active window have some more information.
+This is about git status and weather the buffer is narrowed.
+Besides that the active window have the relative position and column number after a gap.
+
+* Custom functions
+
+I keep these very simple.
+Emacs usually provide what I need without me having to write a function.
+
+I have a few functions that simply open some key files with find-file.
+Then I have one to open my custom agenda and one does my idea capture.
+Last I code some window manipulation, a git stage/commit and a save/quit without a prompt.
+
+* Packages
+
+I use package.el and (require 'xyz) to install and activate packages.
+I used to use use-package but that seem to increase the number of garbage collections significantly (about 5 fold for me).
+It is not clear to me that gains from loading packages latter (:defer) is worth this cost.
+Even if it is I prefer the simple solution where everything is loaded.
+That might make debugging easier.
+You rarely have to ask yourself is or isn't this or that loaded and when did I load it?
+
+Use-package also have some other advantages like updating packages directly from a git repo, but I don't use that.
+I still use some of the structure that is one of the advantages of using use-package.
+That means that I will set variables associated with a package just before I require it.
+This would typically be part of an :init or :custom section in use-package.
+Hooks (usually in :hook) and mode activations (in :config or sometimes :init?!) I do right after require.
+Faces and keybindings (:bind) I do at the end of the configuration in sections dedicated to those.
+
+All this should make it fairly easy to convert my config to use use-package or straight-use-package.
+
+* Evil
+
+This is one of the 3 big packages (evil, org and general) I will comment on.
+
+** Layered vs. modal
+
+Emacs comes with a complex but very powerful set of /layered/ keybindings (<ctrl>, <meta> or <shift>).
+An alternative is the evil package with Vim's /modal/ keybindings combined with some layering.
+I prefer modal bindings and try to minimize the use of layers.
+
+** Cursor model (my sacrilege)
+
+Besides the modal approach Vim has a unique cursor model.
+When in insert state it works with the standard cursor between characters approach that all other editors use.
+In normal state this model is changed to something no other editor I know have picked up on.
+The cursor is considered on characters rather than between them.
+
+I have chosen to use a modification of evil where the cursor is between characters in normal state.
+This has the advantage of fewer keys being used at little to no cost in efficiency.
+
+** Two ways of pasting
+
+I will try to illustrate this with a case study about pasting.
+Vim's cursor on character model requires two ways of pasting.
+One is layered with a <shift> and really counts as two keys pressed.
+You can mimic this behavior by using a motion with paste in the cursor between characters model.
+This means that from a strict efficiency perspective it is not clear that anything is gained from two paste commands.
+
+This does not mean that Vim's way of doing things is inferior.
+You should minimize "correction-motions", so you can go directly for Vim's "verb" -> "noun" approach as often as you can.
+On the other hand you end up with two paste commands where only one is really necessary.
+This adds complexity to the keybindings and you will have to be a power user to get any significant advantage from this.
+As you get used to the less complex keybindings you will need to use less "correction-motions".
+
+** Casual use
+
+As a more casual or inexperienced user one paste command is preferable.
+This is especially true if you dislike layers and try to minimize their use.
+I very much dislike having to hold down two keys at once as if I was using vanilla Emacs.
+
+In my configuration the between-characters behavior is isolated in a separate file and standard evil behavior is easy to achieve by simply not loading it.
+
+* Notable packages
+
+I use a large number of packages.
+Notable examples are vertico, corfu, ace-window, recursive-narrow and magit.
+
+* Org-mode
+
+I customize this with a large set of variables, the prettify package and a few hooks.
+
+** Org-agenda
+
+I restrict myself to only 4 todo-states (NEXT, TODO, HOLD and DONE) but an unlimited number of categories that are displayed in my agenda.
+I carefully configure my capture and custom agenda but will not elaborate further on them here.
+The code is easy to read.
+
+* General
+
+As with my theme and modeline I could and perhaps should do my leader key keybindings with "-maps", but I'm not there yet.
+Prot does have a nice video on it on Youtube ([[https://www.youtube.com/watch?v=gojOZ3k1mmk][Emacs: define prefix/leader key]]).
+
+Anyways I use general.el to handle my leader key bindings.
+Inspired by Spacemacs I use <SPC> as my leader key and part of the structure in my bindings are also inspired by this project.
+
+* Keybindings
+
+I dislike the use of layers, even though I don't use my computer enough to get an emacs pinky problem.
+I like to have my keybindings together in a section rather than distributed out among my packages and this is where I have them.
+I find it more useful to spot conflicts by gathering the bindings in one place.
+Use-package might be able to defer stuff based on :bind but I don't use use-package and don't have to distribute my bindings all over my configuration file.
+A few bindings are done inside evil-cursor-model.el.
+
+* Package faces
+
+Here I specify faces used by packages.
