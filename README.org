@@ -36,17 +36,20 @@ Normal state has the opposite green color.
 Insert state is the last trafic light color (yellow) and use a bar.
 Replace state has the opposite color of insert state and use an hbar.
 Emacs and motion states have the remaining rgb colors.
+
 "Input" states have the "brighter" colors (with 2 f's) and bars in common.
 The visual state is hollow and might be filled with the region color.
 
 * Modeline
 
 I don't use a package for my modeline either.
-It consist of a window number, some information about writable and modified status and the buffer and major mode name.
+It consist of a window number, information about writable/modified status, the buffer name and the major mode.
 
 The active window have some more information.
 The information is git status and whether the buffer is narrowed.
 Besides that the active window have the relative vertical position and column number after a gap.
+
+Prot has a Youtube video on how to make your own modeline: [[https://www.youtube.com/watch?v=Qf_DLPIA9Cs][Emacs: write custom mode line]].
 
 * Vanilla variables
 
@@ -75,7 +78,7 @@ Use-package/straight also have some other advantages like updating packages dire
 I preserve some of the structure that is one of the advantages of using use-package.
 That means that I will set variables associated with a package just before I require it.
 This would typically be part of an :init or :custom section in use-package.
-Hooks (usually in :hook) and mode activations (:config or sometimes :init?! Fortunately I no longer need to understand this) I do right after require.
+Hooks (in :hook) and mode activations (:config or sometimes :init?!) I do right after require.
 I do keybindings (:bind) and faces at the end of the configuration in dedicated sections.
 
 All this should make it fairly easy to convert my config to use use-package or straight.
@@ -99,7 +102,9 @@ The cursor is considered on characters rather than between them.
 
 I have chosen to use a modification of evil where the cursor is between characters in normal state.
 This has the advantage of fewer keys being used (e.g. no need for =a=) at little to no cost in efficiency.
-You might want to rebind some keys but I just leave them be.
+
+You might want to rebind some keys but with few exceptions I just leave the evil bindings be.
+I do swap =p= and =P=.
 
 ** Two ways of pasting
 
@@ -144,10 +149,10 @@ Some might miss a canceled option but I cancel items by archiving them in an act
 I carefully configure my custom agenda and capture but will not elaborate further on them here.
 I humbly claim that my code is probably worth a read, if customizing your agenda has your interest.
 
-* General
+* General.el
 
 As with my theme and modeline I could and perhaps should do my leader key keybindings with "-maps", but I'm not there yet.
-Prot have a nice video about it on Youtube ([[https://www.youtube.com/watch?v=gojOZ3k1mmk][Emacs: define prefix/leader key]]).
+Prot has a nice Youtube video about it: [[https://www.youtube.com/watch?v=gojOZ3k1mmk][Emacs: define prefix/leader key]].
 
 Anyways I use general.el to handle my leader key bindings.
 Inspired by Spacemacs I use =<SPC>= as my leader key and part of the structure in my bindings are also inspired by this project.
