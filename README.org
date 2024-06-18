@@ -87,9 +87,14 @@ I do keybindings (:bind or :command) and faces (:custom-face) at the end of the 
 
 All this should make it fairly easy to convert my config to use use-package or straight.
 
-* Evil
+** Misc. packages
 
-This is the first of the 3 big packages (evil, org and general) I will comment on.
+I use a large number of packages.
+Besides evil, org and general honorable mentions are vertico, corfu, ace-window, recursive-narrow and magit.
+
+* Evil.el
+
+This is the first of the 3 packages (evil, org and general) I will comment on.
 
 ** Layered versus modal bindings
 
@@ -134,21 +139,17 @@ I very much dislike holding down two keys at once just as if I were using vanill
 In my configuration the between characters behavior is isolated in evil-cursor-model.el which I have slightly modified compared to [[https://www.dr-qubit.org/Evil_cursor_model.html][the author's version]].
 Standard evil behavior is easy to achieve by simply not loading that file.
 
-* Misc. packages
-
-I use a large number of packages.
-Besides evil, org and general honorable mentions are vertico, corfu, ace-window, recursive-narrow and magit.
-
-* Org-mode
+* Org.el
 
 I customize this native package with a large set of variables.
 I extend it with a few external packages, the native prettify.el and a few hooks.
 
 ** Org-agenda
 
-I restrict myself to only 4 todo-states (NEXT, TODO, HOLD and DONE).
+I restrict myself to the 4 todo-states NEXT, TODO, HOLD and DONE.
 The only state I feel I need to explain is HOLD which is an inactive state that can be translated to "pending third party action".
 Besides the states I use refile and an unrestricted number of categories for todo items.
+When I have a project consisting of multiple items I introduce a new category with capture.
 Some might want a canceled state, but I cancel items by archiving them in an active state.
 
 I carefully configure my custom agenda and capture but will not elaborate further on them here.
@@ -162,6 +163,11 @@ Prot has a nice Youtube video about it: [[https://www.youtube.com/watch?v=gojOZ3
 For now I use general.el to handle my leader keybindings.
 Inspired by Spacemacs I use =<SPC>= as my leader key and part of the structure in my leader keybindings are also inspired by this project.
 
+* Package faces
+
+Here I specify faces used by packages.
+I typically use (with-eval-after-load...) and this can be used to identify in what package the face is introduced.
+
 * Keybindings
 
 I like to have all my keybindings in a section rather than distributed out among my packages.
@@ -169,12 +175,3 @@ I find it more useful to spot collisions by gathering these bindings in one plac
 Use-package might be able to defer stuff based on :bind but I don't use use-package.
 
 A few evil bindings specific to the change in cursor model are modified inside evil-cursor-model.el.
-
-* Package faces
-
-Here I specify faces used by packages.
-I typically use (with-eval-after-load...) and this can be used to identify in what package the face is introduced.
-
-* Vanilla hooks
-
-I end my configuration of with a few hooks that are not tied to external packages.

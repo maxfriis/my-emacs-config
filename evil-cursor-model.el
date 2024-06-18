@@ -2,16 +2,15 @@
 ;; #+title: evil-cursor-model.el
 
 ;; ============================================================================
-;; Use Emacs' cursor-between-characters model of cursor positioning in
-;; `evil-mode' instead of Vim's normal-mode cursor-at-characters model.
-;; ============================================================================
-
-;; ============================================================================
 ;; Creative Commons Attribution-ShareAlike 4.0 International License
-;; https://creativecommons.org/licenses/by-sa/4.0/
+;; [[https://creativecommons.org/licenses/by-sa/4.0/]]
 ;; ============================================================================
 
-;; ----------------------------------------------------------------------------
+;; (require 'evil)
+;; ============================================================================
+;; Use Emacs' cursor-between-characters model of cursor positioning in
+;; `evil-mode' instead of Vim's normal-mode cursor-on-characters model.
+;; ============================================================================
 ;; cursor-related `evil-mode' settings
 ;; ----------------------------------------------------------------------------
 (setq
@@ -19,7 +18,6 @@
  evil-move-beyond-eol t
  evil-highlight-closing-paren-at-point-states nil)
 ;; (setq evil-cross-lines t) ; "f" and "t" will work cross lines
-
 ;; ----------------------------------------------------------------------------
 ;; paste and motion command rebindings
 ;; ----------------------------------------------------------------------------
@@ -40,7 +38,7 @@
   "%"  #'evil-jump-item-before)
 
 ;; ============================================================================
-;; --- evil commands implementing Emacs' cursor model ---
+;; evil commands implementing Emacs' cursor model
 ;; ============================================================================
 (evil-define-motion evil-find-char-after (count char)
   "Move point immediately after the next COUNT'th occurrence of CHAR.
@@ -56,6 +54,7 @@ Movement is restricted to the current line unless `evil-cross-lines' is non-nil.
     (evil-find-char count char)
     (forward-char))
   (setq evil-last-find (list #'evil-find-char-after char (> count 0))))
+
 
 (defun evil-forward-after-end (thing &optional count)
   "Move forward to end of THING.
@@ -162,7 +161,7 @@ If the end position is at the beginning of a line, then:
  :after #'ad-evil-ex-search-adjust-offset)
 
 ;; ----------------------------------------------------------------------------
-;; make `evil-jump-item' move point just after matching delimeter if it jumps forward
+;; `evil-jump-item' move point after matching delimeter if it jumps forward
 ;; ----------------------------------------------------------------------------
 (evil-define-motion evil-jump-item-before (count)
   "Find the next item in this line immediately before

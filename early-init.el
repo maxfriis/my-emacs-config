@@ -10,7 +10,7 @@
 (setq
  gc-cons-threshold (* 50 1024 1024)
  gc-cons-percentage 0.5
- read-process-output-max (* 1024 1024)
+ read-process-output-max (* 16 1024 1024)
  inhibit-startup-message t
  inhibit-compacting-font-caches t
  frame-inhibit-implied-resize t) ; Resizing based on font is expensive
@@ -18,17 +18,10 @@
 ;; ============================================================================
 ;;; Maximize and dark background
 ;; ============================================================================
-(add-to-list
- 'default-frame-alist
- '(fullscreen . maximized))
-(if (eq 0 (user-uid)) ; Different background color as root
-    (set-face-attribute
-     'default
-     nil :height 160  :foreground "#bba" :background "#311" :font "Ubuntu Mono")
-  ;; else
-  (set-face-attribute
-   'default
-   nil :height 160  :foreground "#bba" :background "#221" :font "Ubuntu Mono"))
+(setq
+ default-frame-alist
+ '((fullscreen . maximized)
+   (background-color . "#221")))
 
 ;; ============================================================================
 ;;; Cleanup vanilla defaults
