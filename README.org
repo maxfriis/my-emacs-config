@@ -4,16 +4,20 @@
 * Early init
 
 Here I set some variables that influence the startup process.
-After this I maximize the frame and set the default font.
-The reason I do this early is to avoid a resizing window and white screen to blink on startup.
+The reason I maximize the frame and set the background color early is to avoid a resizing window and white screen to blink on startup.
 Last I clean up some vanilla default modes.
+
+Emacs will run fine without the early-init but will have ugly defaults.
 
 * Theme
 
 I don't use a theme package.
 I simply change faces if I don't like them.
 
-I restrict myself to use 8 colors.
+I use (set-face-attribute...) because stuff set by custom.el is hard to change for packages I might load in the future.
+It is bad to set defaults that are hard to change (red text is hard to read on a red background).
+
+I restrict myself to use 8 warm dark theme colors.
 Examples of their use are:
 | Color | Use            |   | Color | Use            |   | Color | Use             |
 |-------+----------------+---+-------+----------------+---+-------+-----------------|
@@ -67,19 +71,19 @@ Last I code some window manipulation, a git stage/commit and a save/quit without
 
 * Package.el
 
-I use package.el and (require 'xyz) to install and activate packages.
+I use package.el and (require 'xyz) to install and load packages.
 I used to use use-package but that seem to increase the number of garbage collections significantly (about 5 fold for me).
 It is not clear to me that gains from controlling when to load packages (:defer) is worth this cost.
-Even if it is I prefer the simple solution where everything is loaded.
-That might make debugging easier.
-You rarely have to ask yourself is or isn't this or that loaded and when did I load it?
+Deferring might also make debugging harder.
+You might have to ask yourself is or isn't this or that loaded, when did it happen and is that what is causing the problem right now?
+It's easier and cleaner to just have everything loaded.
 
 Use-package/straight also have some other advantages like updating packages directly from a git repo, but I don't use that.
-I preserve some of the structure that is one of the advantages of using use-package.
+I preserve some of the structure that is also one of the features of use-package.
 That means that I will set variables associated with a package just before I require it.
 This would typically be part of an :init or :custom section in use-package.
-Hooks (in :hook) and mode activations (:config or sometimes :init?!) I do right after require.
-I do keybindings (:bind) and faces at the end of the configuration in dedicated sections.
+Hooks (:hook or :config) and mode activations (:init?! or :config) I do right after require.
+I do keybindings (:bind or :command) and faces (:custom-face) at the end of the configuration in dedicated sections.
 
 All this should make it fairly easy to convert my config to use use-package or straight.
 
@@ -100,34 +104,35 @@ When in insert state it works with the standard cursor between characters approa
 In normal state this model is changed to something no other editor I know have picked up on.
 The cursor is considered on characters rather than between them.
 
-I have chosen to use a modification of evil where the cursor is between characters in normal state.
+I chose to use a modification of evil where the cursor is between characters in normal state.
 This has the advantage of fewer keys being used (e.g. no need for =a=) at little to no cost in efficiency.
 
 You might want to rebind some keys but with few exceptions I just leave the evil bindings be.
-I do swap =p= and =P=.
+I do swap the two paste bindings =p= and =P= to avoid using the capitalized one.
 
 ** Two ways of pasting
 
 I will try to illustrate this with a case study on pasting.
 Vim's cursor on character model requires two ways of pasting.
-One is layered with a <shift> and really counts as two keys pressed.
-You can mimic this behavior by using a motion with paste in the cursor between characters model.
-This means that from a strict efficiency perspective it is not clear that anything is gained from two paste commands.
+One is layered with =<shift>= and really counts as two keystrokes.
+You can mimic this behavior by using a "correction-motion" before paste in the cursor between characters model.
+This means that from a strict efficiency perspective it is not clear what is gained from two paste commands.
 
 This does not mean that Vim's way of doing things is inferior.
 You should minimize "correction-motions", so you can go directly for Vim's "verb" -> "noun" approach as often as you can.
-On the other hand you end up with two paste commands where only one is really necessary.
-This adds complexity to the keybindings and you will have to be a power user to get any significant advantage from this.
-As you get used to the less complex keybindings you will develop foresight to use less "correction-motions".
+On the other hand you end up with the more complex two paste commands where only one is really necessary.
+The more complex keybindings will only be an advantage to a power user.
+As you get used to the less complex bindings you will develop foresight to use less "correction-motions".
 
 ** Casual use
 
 As a more casual or inexperienced user, one paste command is preferable.
-This is especially true if you dislike layers and try to minimize their use.
-I very much dislike having to hold down two keys at once as if I were using vanilla Emacs.
+The cursor model will be more consistent both on it's own but also with other programs.
+If you dislike layers and try to minimize their use, you gain a lot from not needing capitalized bindings.
+I very much dislike holding down two keys at once just as if I were using vanilla Emacs (take that Vim out of the box lovers).
 
-In my configuration the between characters behavior is isolated in [[https://www.dr-qubit.org/Evil_cursor_model.html][evil-cursor-model.el]] which I have slightly modified.
-Standard evil behavior is easy to achieve by simply not loading it.
+In my configuration the between characters behavior is isolated in evil-cursor-model.el which I have slightly modified compared to [[https://www.dr-qubit.org/Evil_cursor_model.html][the author's version]].
+Standard evil behavior is easy to achieve by simply not loading that file.
 
 * Misc. packages
 
@@ -136,30 +141,29 @@ Besides evil, org and general honorable mentions are vertico, corfu, ace-window,
 
 * Org-mode
 
-I customize this with a large set of variables.
-I extend this with the native prettify.el package and a few hooks.
+I customize this native package with a large set of variables.
+I extend it with a few external packages, the native prettify.el and a few hooks.
 
 ** Org-agenda
 
 I restrict myself to only 4 todo-states (NEXT, TODO, HOLD and DONE).
-Besides those I use refile and an unrestricted number of categories to identify the type of todo item.
 The only state I feel I need to explain is HOLD which is an inactive state that can be translated to "pending third party action".
-Some might miss a canceled option but I cancel items by archiving them in an active state.
+Besides the states I use refile and an unrestricted number of categories for todo items.
+Some might want a canceled state, but I cancel items by archiving them in an active state.
 
 I carefully configure my custom agenda and capture but will not elaborate further on them here.
-I humbly claim that my code is probably worth a read, if customizing your agenda has your interest.
+I humbly claim that my code is probably worth a read, if you want to customize your agenda.
 
 * General.el
 
 As with my theme and modeline I could and perhaps should do my leader key keybindings with "-maps", but I'm not there yet.
 Prot has a nice Youtube video about it: [[https://www.youtube.com/watch?v=gojOZ3k1mmk][Emacs: define prefix/leader key]].
 
-Anyways I use general.el to handle my leader key bindings.
-Inspired by Spacemacs I use =<SPC>= as my leader key and part of the structure in my bindings are also inspired by this project.
+For now I use general.el to handle my leader keybindings.
+Inspired by Spacemacs I use =<SPC>= as my leader key and part of the structure in my leader keybindings are also inspired by this project.
 
 * Keybindings
 
-I dislike the use of layers, even though I don't use my editor enough to develop an Emacs pinky problem.
 I like to have all my keybindings in a section rather than distributed out among my packages.
 I find it more useful to spot collisions by gathering these bindings in one place.
 Use-package might be able to defer stuff based on :bind but I don't use use-package.
@@ -173,4 +177,4 @@ I typically use (with-eval-after-load...) and this can be used to identify in wh
 
 * Vanilla hooks
 
-I round my configuration of with a few hooks that is only tied to native packages.
+I end my configuration of with a few hooks that are not tied to external packages.
