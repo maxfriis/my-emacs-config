@@ -14,8 +14,8 @@ Emacs will run fine without the early-init but will have ugly defaults.
 I don't use a theme package.
 I simply change faces if I don't like them.
 
-I use (set-face-attribute...) because stuff set by custom.el is hard to change for packages I might load in the future.
-It is bad to set defaults that are hard to change (red text is hard to read on a red background).
+I use (set-face-attribute...) because stuff set by (custom-set-faces...) is hard to change for packages I might load in the future (red text can be hard to read on a red background).
+I don't like or use custom.el.
 
 I restrict myself to use 8 warm dark theme colors.
 Examples of their use are:
