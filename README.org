@@ -195,3 +195,11 @@ I find it more useful to spot collisions by gathering these bindings in one plac
 Use-package might be able to defer stuff based on :bind but I don't use use-package.
 
 A few evil bindings specific to the change in cursor model are rebound inside evil-cursor-model.el.
+
+* Clone
+
+If you have an empty ~/.emacs.d directory and have git installed you can clone this configuration with:
+#+begin_src bash
+  git clone https://github.com/maxfriis/my-emacs-config ~/.emacs.d
+#+end_src
+After that you simply start emacs and it should install all the packages and create a minimal directory structure for agenda.
