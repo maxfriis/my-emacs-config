@@ -1,7 +1,6 @@
 ;; -*- lexical-binding: t; -*-
 ;; #+title: evil-cursor-model.el
 
-
 ;; ============================================================================
 ;; Creative Commons Attribution-ShareAlike 4.0 International License
 ;; [[https://creativecommons.org/licenses/by-sa/4.0/]]

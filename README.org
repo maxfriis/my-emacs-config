@@ -4,10 +4,10 @@
 * Early init
 
 Here I set some variables that influence the startup process.
-The reason I maximize the frame and set the background color early is to avoid a resizing window and white screen blink on startup.
-Last I clean up some vanilla default modes.
+This both about performance but also about seeing defaults I don't end up using.
+E.g. I don't want a white background to blink on startup because I use a dark theme.
 
-Emacs will run without the early-init but will have a slower startup and ugly defaults.
+Emacs will run without the early-init but will have a slower startup and some vanilla defaults.
 
 * Theme
 
