@@ -11,16 +11,11 @@
  gc-cons-threshold (* 50 1024 1024)
  gc-cons-percentage 0.5
  read-process-output-max (* 16 1024 1024)
- mode-line-format nil
  inhibit-startup-message t
  inhibit-compacting-font-caches t
  frame-inhibit-implied-resize t
- frame-title-format
- '((:eval
-    (if (buffer-file-name)
-        (abbreviate-file-name (buffer-file-name))
-      ;; else
-      "%b"))))
+ frame-title-format "GNU Emacs"
+ mode-line-format nil)
 
 ;; ============================================================================
 ;;; Maximize and dark background

@@ -23,7 +23,7 @@
   ;; else
   (set-face-attribute
    'default
-   nil :height 160  :foreground "#bba" :font "Ubuntu Mono")) ; :background "#221"
+   nil :height 160  :foreground "#bba" :background "#221" :font "Ubuntu Mono"))
 (set-face-attribute
  'fixed-pitch
  nil                                 :font "Ubuntu Mono")
@@ -130,11 +130,19 @@
 ;; ============================================================================
 ;;; Other vanilla stuff
 ;; ============================================================================
+;; Variables
+;; ----------------------------------------------------------------------------
 (setq-default ; buffer-local variables
  indent-tabs-mode nil
  display-line-numbers-width 3)
 (setq
  tab-width 4
+ frame-title-format
+ '((:eval
+    (if (buffer-file-name)
+        (abbreviate-file-name (buffer-file-name))
+      ;; else
+      "%b")))
  warning-minimum-level :error
  visible-bell t
  use-dialog-box nil
@@ -1066,7 +1074,9 @@
   "q"   '(:ignore t                              :which-key "Quit")
   "qq"  '(my/save-all-kill-emacs-no-prompt       :which-key "Save & kill")
   "qs"  '(save-buffers-kill-emacs                :which-key "Prompt&save")
-  "r"   '(:ignore t                              :which-key "r")
+  "r"   '(:ignore t                              :which-key "Registers")
+  "rl"  '(consult-register-load                  :which-key "Load")
+  "rr"  '(consult-register-store                 :which-key "Store")
   "s"   '(:ignore t                              :which-key "Search")
   "so"  '(consult-outline                        :which-key "Outline")
   "sO"  '(occur                                  :which-key "Occur")
