@@ -4,17 +4,28 @@
 * Early init
 
 Here I set some variables that influence the startup process.
-The reason I maximize the frame and set the background color early is to avoid a resizing window and white screen to blink on startup.
+The reason I maximize the frame and set the background color early is to avoid a resizing window and white screen blink on startup.
 Last I clean up some vanilla default modes.
 
-Emacs will run fine without the early-init but will have ugly defaults.
+Emacs will run without the early-init but will have a slower startup and ugly defaults.
+
+* Modeline
+
+I don't use a package for my modeline.
+It consist of a window number, information about writable/modified status, the buffer name and the major mode.
+
+The active window have some more information.
+The information is git status and whether the buffer is narrowed.
+Besides that the active window have the relative vertical position and column number after a gap.
+
+Prot has a Youtube video on how to make your own modeline: [[https://www.youtube.com/watch?v=Qf_DLPIA9Cs][Emacs: write custom mode line]].
 
 * Theme
 
-I don't use a theme package.
+I don't use a theme package either.
 I simply change faces if I don't like them.
 
-I use (set-face-attribute...) because stuff set by (custom-set-faces...) is hard to change for packages I might load in the future (red text can be hard to read on a red background).
+I use (set-face-attribute...) because stuff set by (custom-set-faces...) is hard to change for packages I might load in the future (red text is hard to read on a red background).
 I don't like or use custom.el.
 
 I restrict myself to use 8 warm dark theme colors.
@@ -44,21 +55,10 @@ Emacs and motion states have the remaining rgb colors.
 "Input" states have the "brighter" colors (with 2 f's) and bars in common.
 The visual state is hollow and might be filled with the region color.
 
-* Modeline
-
-I don't use a package for my modeline either.
-It consist of a window number, information about writable/modified status, the buffer name and the major mode.
-
-The active window have some more information.
-The information is git status and whether the buffer is narrowed.
-Besides that the active window have the relative vertical position and column number after a gap.
-
-Prot has a Youtube video on how to make your own modeline: [[https://www.youtube.com/watch?v=Qf_DLPIA9Cs][Emacs: write custom mode line]].
-
-* Vanilla variables
+* Other vanilla stuff
 
 Here I set variables that are used by vanilla Emacs or a native package.
-I also activate a few native global minor modes.
+I also activate a few global minor modes and add some hooks.
 
 * Custom functions
 
@@ -87,14 +87,14 @@ I do keybindings (:bind or :command) and faces (:custom-face) at the end of the 
 
 All this should make it fairly easy to convert my config to use use-package or straight.
 
-** Misc. packages
+** Honorable mentions
 
-I use a large number of packages.
-Besides evil, org and general honorable mentions are vertico, corfu, ace-window, recursive-narrow and magit.
+I will only comment on the 3 packages evil, org and general.
+Honorable mentions are vertico, corfu, ace-window, recursive-narrow and magit but I use many more.
 
 * Evil.el
 
-This is the first of the 3 packages (evil, org and general) I will comment on.
+Evil has become the foundation of my use of Emacs.
 
 ** Layered versus modal bindings
 
@@ -125,18 +125,20 @@ This means that from a strict efficiency perspective it is not clear what is gai
 
 This does not mean that Vim's way of doing things is inferior.
 You should minimize "correction-motions", so you can go directly for Vim's "verb" -> "noun" approach as often as you can.
-On the other hand you end up with the more complex two paste commands where only one is really necessary.
-The more complex keybindings will only be an advantage to a power user.
+On the other hand you end up with the more complex two commands where only one is really necessary.
+The complex keybindings can only be an advantage to a power user.
 As you get used to the less complex bindings you will develop foresight to use less "correction-motions".
 
 ** Casual use
 
 As a more casual or inexperienced user, one paste command is preferable.
-The cursor model will be more consistent both on it's own but also with other programs.
-If you dislike layers and try to minimize their use, you gain a lot from not needing capitalized bindings.
-I very much dislike holding down two keys at once just as if I were using vanilla Emacs (take that Vim out of the box lovers).
+My configuration can work as a great introduction to evil keybindings.
 
-In my configuration the between characters behavior is isolated in evil-cursor-model.el which I have slightly modified compared to [[https://www.dr-qubit.org/Evil_cursor_model.html][the author's version]].
+The cursor model will be more consistent both with it's own insert state but also with other programs.
+If you dislike layers and try to minimize their use, you gain a lot from not needing capitalized bindings.
+I very much dislike holding down two keys at once just as if I were using vanilla Emacs (take that, Vim out of the box lovers).
+
+In my configuration the between characters behavior is isolated in evil-cursor-model.el, which I have slightly modified compared to [[https://www.dr-qubit.org/Evil_cursor_model.html][the author's original version]].
 Standard evil behavior is easy to achieve by simply not loading that file.
 
 * Org.el
@@ -147,13 +149,30 @@ I extend it with a few external packages, the native prettify.el and a few hooks
 ** Org-agenda
 
 I restrict myself to the 4 todo-states NEXT, TODO, HOLD and DONE.
-The only state I feel I need to explain is HOLD which is an inactive state that can be translated to "pending third party action".
-Besides the states I use refile and an unrestricted number of categories for todo items.
-When I have a project consisting of multiple items I introduce a new category with capture.
+HOLD is an inactive state that can be translated to "pending third party action".
+The other states are self explanatory.
 Some might want a canceled state, but I cancel items by archiving them in an active state.
 
-I carefully configure my custom agenda and capture but will not elaborate further on them here.
-I humbly claim that my code is probably worth a read, if you want to customize your agenda.
+Besides the states I use refile and an unrestricted number of categories for todo items.
+When I have a project I introduce a new category with a capture.
+
+I configure my custom agenda to have 4 sections:
+
+1. I have a potentially empty section without a headline where I display my NEXT items.
+   When I capture ideas they will go in my inbox as a NEXT item.
+   I can change an item's state, tags, schedule and then refile it from here.
+   The idea is that this section should usually be empty because NEXT items are meant to be handled asap.
+2. Then I display this week's agenda with active todo-state items that have an active timestamp.
+   Items from the first section can potentially be repeated here if they are timestamped.
+3. Not all TODO items have or even should have a timestamp.
+   In this section I pile up items that have not been dealt a time slot yet.
+   Some will never have a time slot like e.g. a project with multiple tasks associated.
+   I can follow the progress of subtasks here with a cookie.
+   Last I also display items on HOLD in this section.
+4. The final section like the first is usually empty.
+   This is where I can append a search by tags or whatever the agenda menu offers.
+The main two capture templates is a simple idea capture and an item with a category that I can refile to.
+That is all I need for my agenda.
 
 * General.el
 
@@ -166,7 +185,8 @@ Inspired by Spacemacs I use =<SPC>= as my leader key and part of the structure i
 * Package faces
 
 Here I specify faces used by packages.
-I typically use (with-eval-after-load...) and this can be used to identify in what package the face is introduced.
+I typically use (with-eval-after-load...) and this can be used to identify in what package the face was introduced.
+I never (defface...) any faces myself.
 
 * Keybindings
 
@@ -174,4 +194,4 @@ I like to have all my keybindings in a section rather than distributed out among
 I find it more useful to spot collisions by gathering these bindings in one place.
 Use-package might be able to defer stuff based on :bind but I don't use use-package.
 
-A few evil bindings specific to the change in cursor model are modified inside evil-cursor-model.el.
+A few evil bindings specific to the change in cursor model are rebound inside evil-cursor-model.el.

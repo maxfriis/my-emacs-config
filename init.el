@@ -128,6 +128,93 @@
    ;; ("'[a-z][a-zA-Z-]+"   . font-lock-constant-face)
 
 ;; ============================================================================
+;;; Other vanilla stuff
+;; ============================================================================
+(setq-default ; buffer-local variables
+ indent-tabs-mode nil
+ display-line-numbers-width 3)
+(setq
+ tab-width 4
+ warning-minimum-level :error
+ visible-bell t
+ use-dialog-box nil
+ use-short-answers t
+ initial-scratch-message nil
+ large-file-warning-threshold nil
+ custom-file "/dev/null"
+ trash-directory "~/.local/share/Trash/files"
+ delete-by-moving-to-trash t
+ recentf-exclude
+ '("\\`~/org/agenda/.*\\.org\\'" "\\`~/\\.emacs\\.d/.*")
+ shell-default-shell 'eshell ; I use a terminal outside emacs when needed
+ eshell-ls-initial-args
+ '("-agho")
+ ;; ----------------------------------------------------------------------------
+ ;; Dired
+ ;; ----------------------------------------------------------------------------
+ global-auto-revert-non-file-buffers t ; update dired buffer
+ auto-revert-verbose nil
+ dired-kill-when-opening-new-dired-buffer t
+ dired-listing-switches "-agho --group-directories-first"
+ dired-dwim-target t
+ dired-recursive-copies 'always
+ dired-omit-verbose nil
+ dired-omit-files "\\`[#\\.]" ; "a" to toggle
+ ;; ----------------------------------------------------------------------------
+ ;; Incremental search (I rarely use evil for search)
+ ;; ----------------------------------------------------------------------------
+ isearch-lazy-count t
+ lazy-count-prefix-format "%s/%s "
+ lazy-count-suffix-format nil
+ ;; ----------------------------------------------------------------------------
+ ;; Tab bar
+ ;; ----------------------------------------------------------------------------
+ tab-bar-show 1
+ tab-bar-close-button-show      nil
+ tab-bar-new-button             nil
+ tab-bar-close-last-tab-choice 'tab-bar-mode
+ tab-bar-close-tab-select      'recent
+ tab-bar-new-tab-to            'right
+ tab-bar-new-tab-choice        "*scratch*"
+ tab-bar-separator             " "
+ tab-bar-menu-bar-button       "☰"
+ tab-bar-format
+ '(tab-bar-format-menu-bar tab-bar-format-tabs tab-bar-separator)
+ ;; ----------------------------------------------------------------------------
+ ;; Display
+ ;; ----------------------------------------------------------------------------
+ display-time-format "[%Y-%m-%d %a %H:%M]"
+ display-line-numbers-type 'relative
+ display-buffer-alist
+ '(("^\\*.*\\*$" ; popup buffers not associated to a file
+    (display-buffer-reuse-mode-window
+     display-buffer-below-selected)
+    (body-function . select-window))))
+;; ----------------------------------------------------------------------------
+;; Global minor modes
+;; ----------------------------------------------------------------------------
+(global-display-line-numbers-mode 1)
+(global-hl-line-mode 1)
+(global-auto-revert-mode 1)
+(recentf-mode 1)
+;; ----------------------------------------------------------------------------
+;; Hooks
+;; ----------------------------------------------------------------------------
+(add-hook 'dired-mode-hook  #'dired-hide-details-mode) ; toggle with "("
+(add-hook 'dired-mode-hook  #'dired-omit-mode)         ; toggle with "a"
+(add-hook 'text-mode-hook   #'visual-line-mode)
+(add-hook 'before-save-hook #'whitespace-cleanup)
+(add-hook
+ 'emacs-startup-hook
+ (lambda ()
+   (message
+    "Emacs ready in %s with %d garbage collections."
+    (format
+     "%.1f seconds"
+     (float-time (time-subtract after-init-time before-init-time)))
+    gcs-done)))
+
+;; ============================================================================
 ;;; Modeline
 ;; ============================================================================
 (setq
@@ -195,90 +282,14 @@
        mode-line-position-column-format)))))
 
 ;; ============================================================================
-;;; Vanilla variables
-;; ============================================================================
-(setq-default ; buffer-local variables
- indent-tabs-mode nil
- display-line-numbers-width 3)
-(setq
- tab-width 4
- frame-title-format
- '((:eval
-    (if (buffer-file-name)
-        (abbreviate-file-name (buffer-file-name))
-      ;; else
-      "%b")))
- warning-minimum-level :error
- visible-bell t
- use-dialog-box nil
- use-short-answers t
- initial-scratch-message nil
- large-file-warning-threshold nil
- custom-file "/dev/null"
- trash-directory "~/.local/share/Trash/files"
- delete-by-moving-to-trash t
- recentf-exclude
- '("\\`~/org/agenda/.*\\.org\\'" "\\`~/\\.emacs\\.d/.*")
- shell-default-shell 'eshell ; I use a terminal outside emacs when needed
- eshell-ls-initial-args
- '("-agho")
- ;; ----------------------------------------------------------------------------
- ;; Dired
- ;; ----------------------------------------------------------------------------
- global-auto-revert-non-file-buffers t ; update dired buffer
- auto-revert-verbose nil
- dired-kill-when-opening-new-dired-buffer t
- dired-listing-switches "-agho --group-directories-first"
- dired-dwim-target t
- dired-recursive-copies 'always
- dired-omit-verbose nil
- dired-omit-files "\\`[#\\.]" ; "a" to toggle
- ;; ----------------------------------------------------------------------------
- ;; Incremental search (I rarely use evil for search)
- ;; ----------------------------------------------------------------------------
- isearch-lazy-count t
- lazy-count-prefix-format "%s/%s "
- lazy-count-suffix-format nil
- ;; ----------------------------------------------------------------------------
- ;; Tab bar
- ;; ----------------------------------------------------------------------------
- tab-bar-show 1
- tab-bar-close-button-show      nil
- tab-bar-new-button             nil
- tab-bar-close-last-tab-choice 'tab-bar-mode
- tab-bar-close-tab-select      'recent
- tab-bar-new-tab-to            'right
- tab-bar-new-tab-choice        "*scratch*"
- tab-bar-separator             " "
- tab-bar-menu-bar-button       "☰"
- tab-bar-format
- '(tab-bar-format-menu-bar tab-bar-format-tabs tab-bar-separator)
- ;; ----------------------------------------------------------------------------
- ;; Display
- ;; ----------------------------------------------------------------------------
- display-time-format "[%Y-%m-%d %a %H:%M]"
- display-line-numbers-type 'relative
- display-buffer-alist
- '(("^\\*.*\\*$" ; popup buffers not associated to a file
-    (display-buffer-reuse-mode-window
-     display-buffer-below-selected)
-    (body-function . select-window))))
-;; ----------------------------------------------------------------------------
-;; Vanilla global modes
-;; ----------------------------------------------------------------------------
-(global-display-line-numbers-mode 1)
-(global-hl-line-mode 1)
-(global-auto-revert-mode 1)
-(recentf-mode 1)
-
-;; ============================================================================
-;;; My custom functions
+;;; Custom functions
 ;; ============================================================================
 ;; Open init files
 ;; ----------------------------------------------------------------------------
 (defun my/open-init-file ()
   "Open config file init.el"
   (interactive)
+  (find-file (locate-user-emacs-file "README.org"))
   (find-file (locate-user-emacs-file "evil-cursor-model.el"))
   (find-file (locate-user-emacs-file "early-init.el"))
   (find-file (locate-user-emacs-file "init.el")))
@@ -381,7 +392,7 @@
         recursive-narrow centered-cursor-mode visual-fill-column mixed-pitch
         undo-tree keycast indent-guide counsel helpful flycheck writegood-mode
         magit which-key general super-save backup-each-save auto-package-update))
-(require 'package)
+;; (require 'package)
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents))
@@ -421,8 +432,8 @@
 ;; | Color | State    | Color | State   | Color | State  |
 ;; |-------+----------+-------+---------+-------+--------|
 ;; | #f00  | Operator | #0ff  | Emacs   | #fff  | Visual |
-;; | #0f0  | Normal   | #f0f  | Replace |       |        |
-;; | #00f  | Motion   | #ff0  | Insert  | #000  | Region |
+;; | #0f0  | Normal   | #f0f  | Replace | #000  | Region |
+;; | #00f  | Motion   | #ff0  | Insert  |       |        |
 ;; |-------+----------+-------+---------+-------+--------|
 ;; Operator state is red to alert. Normal state has the opposite green color.
 ;; Insert state is the last trafic light color (yellow) and use a bar.
@@ -509,7 +520,7 @@
   (make-directory org-agenda-directory))
 ;; Need at least one agenda file. Can't just be a directory
 (unless (file-exists-p (concat org-directory "inbox.org"))
-  (make-empty-file (concat org-directory "inbox.org")))
+  (make-empty-file     (concat org-directory "inbox.org")))
 ;; Create agenda.org with two refile targets
 (unless (file-exists-p (concat org-agenda-directory "agenda.org"))
   (find-file (concat org-agenda-directory "agenda.org"))
@@ -529,11 +540,11 @@
   (switch-to-buffer "*scratch*"))
 ;; Create additional capture files
 (unless (file-exists-p (concat org-agenda-directory "plan.org"))
-  (make-empty-file (concat org-agenda-directory "plan.org")))
+  (make-empty-file     (concat org-agenda-directory "plan.org")))
 (unless (file-exists-p (concat org-agenda-directory "note.org"))
-  (make-empty-file (concat org-agenda-directory "note.org")))
+  (make-empty-file     (concat org-agenda-directory "note.org")))
 (unless (file-exists-p (concat org-directory "archive.org"))
-  (make-empty-file (concat org-directory "archive.org")))
+  (make-empty-file     (concat org-directory "archive.org")))
 ;; ----------------------------------------------------------------------------
 ;; Variables setting up the environment
 ;; ----------------------------------------------------------------------------
@@ -821,6 +832,127 @@
   (evil-collection-org-present-setup))
 
 ;; ============================================================================
+;;; Completion
+;; ============================================================================
+;; Minibuffer
+;; ----------------------------------------------------------------------------
+(setq
+ vertico-resize nil)
+(require 'vertico)
+(vertico-mode 1)
+;; tidy typing directories
+(add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
+(with-eval-after-load 'vertico
+  (require 'marginalia)
+  (marginalia-mode 1))
+(setq
+ completion-styles
+ '(orderless)) ; other options: (basic substring flex)
+(require 'orderless) ; Fuzzy completions
+(require 'consult)   ; Combine functionality (e.g. buffers + recentf)
+(require 'embark)    ; not something I use yet
+;; ----------------------------------------------------------------------------
+;; Buffer
+;; ----------------------------------------------------------------------------
+(require 'lsp-mode)
+(setq
+ corfu-auto t
+ corfu-auto-delay 0.1
+ corfu-auto-prefix 3
+ corfu-count 5
+ corfu-quit-at-boundary 'separator)
+(require 'corfu)
+(global-corfu-mode 1)
+(corfu-history-mode 1)
+
+;; ============================================================================
+;;; Help
+;; ============================================================================
+(require 'counsel)
+(require 'helpful)
+(bind-key [remap describe-function] 'counsel-describe-function)
+(bind-key [remap describe-variable] 'counsel-describe-variable)
+(bind-key [remap describe-command]  'helpful-command)
+(bind-key [remap describe-key]      'helpful-key)
+;; ----------------------------------------------------------------------------
+;; Writing tips
+;; ----------------------------------------------------------------------------
+(require 'flycheck)
+(add-hook 'org-mode-hook #'flyspell-mode)
+(require 'writegood-mode)
+
+;; ============================================================================
+;;; Thumbnails and colors
+;; ============================================================================
+(when (display-graphic-p)
+  (require 'nerd-icons) ; all-the-icons' alignment sucks. Nerd works
+  (require 'nerd-icons-dired)
+  (add-hook 'dired-mode-hook #'nerd-icons-dired-mode)
+  (require 'nerd-icons-ibuffer)
+  (add-hook 'ibuffer-mode-hook #'nerd-icons-ibuffer-mode)
+  (require 'nerd-icons-corfu)
+  (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter)
+  (with-eval-after-load 'marginalia
+    (require 'nerd-icons-completion)
+    (nerd-icons-completion-mode 1)
+    (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup)))
+;; ----------------------------------------------------------------------------
+;; Color color-codes and delimiters
+;; ----------------------------------------------------------------------------
+(setq
+ rainbow-delimiters-max-face-count 3)
+(require 'rainbow-delimiters)
+(add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
+(require 'indent-guide)
+(require 'rainbow-mode)
+(add-hook 'prog-mode-hook #'rainbow-mode)
+
+;; ============================================================================
+;;; Misc. packages
+;; ============================================================================
+(require 'avy)
+(require 'centered-cursor-mode)
+(global-centered-cursor-mode 1)
+(require 'keycast)
+(keycast-tab-bar-mode 1)
+(add-hook 'prog-mode-hook #'indent-guide-mode)
+(setq-default
+ fill-column 90)
+(setq
+ visual-fill-column-center-text t)
+(require 'visual-fill-column)
+;; ----------------------------------------------------------------------------
+;; Font pitch
+;; ----------------------------------------------------------------------------
+(setq
+ mixed-pitch-set-height t)
+(require 'mixed-pitch)
+(dolist
+    (face
+     '(org-special-keyword org-date org-tag org-priority org-todo org-table))
+  (add-to-list 'mixed-pitch-fixed-pitch-faces face))
+;; ----------------------------------------------------------------------------
+;; Window manipulation
+;; ----------------------------------------------------------------------------
+(require 'ace-window)
+(ace-window-display-mode 1)
+(require 'transpose-frame)
+(require 'golden-ratio)
+(golden-ratio-mode 1)
+;; ----------------------------------------------------------------------------
+;; Narrow with dwim
+;; ----------------------------------------------------------------------------
+(with-eval-after-load 'org
+  (require 'recursive-narrow))
+;; ----------------------------------------------------------------------------
+;; Magit
+;; ----------------------------------------------------------------------------
+(require 'magit)
+(with-eval-after-load 'evil
+  (add-hook 'git-commit-mode-hook #'evil-insert-state)
+  (evil-set-initial-state 'magit-log-edit-mode 'insert))
+
+;; ============================================================================
 ;;; General
 ;; ============================================================================
 (setq
@@ -870,6 +1002,7 @@
   "e"   '(eval-last-sexp                         :which-key "Eval sexp")
   "f"   '(:ignore t                              :which-key "Files")
   "fS"  '(save-some-buffers                      :which-key "Save all")
+  "fR"  '(consult-recent-file                    :which-key "MiniRecent")
   "fa"  '(my/open-agenda-file                    :which-key "Agenda")
   "fd"  '(dired-jump                             :which-key "Dired")
   "ff"  '(counsel-find-file                      :which-key "Find")
@@ -887,7 +1020,7 @@
   "h"   '(:ignore t                              :which-key "Help")
   "hC"  '(helpful-command                        :which-key "Command")
   "hF"  '(counsel-describe-face                  :which-key "Face")
-  "hb"  '(counsel-descbinds                      :which-key "Bindings")
+  "hK"  '(counsel-descbinds                      :which-key "Bindings")
   "hc"  '(describe-char                          :which-key "Char")
   "hf"  '(counsel-describe-function              :which-key "Function")
   "hk"  '(helpful-key                            :which-key "Key")
@@ -978,127 +1111,6 @@
   "æ"   '(:ignore t                              :which-key "æ")
   "ø"   '(:ignore t                              :which-key "ø")
   "å"   '(:ignore t                              :which-key "å"))
-
-;; ============================================================================
-;;; Completion
-;; ============================================================================
-;; Minibuffer
-;; ----------------------------------------------------------------------------
-(setq
- vertico-resize nil)
-(require 'vertico)
-(vertico-mode 1)
-;; tidy typing directories
-(add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
-(with-eval-after-load 'vertico
-  (require 'marginalia)
-  (marginalia-mode 1))
-(setq
- completion-styles
- '(orderless)) ; other options: (basic substring flex)
-(require 'orderless) ; Fuzzy completions
-(require 'consult)   ; Combine functionality (e.g. buffers + recentf)
-(require 'embark)    ; not something I use yet
-;; ----------------------------------------------------------------------------
-;; Buffer
-;; ----------------------------------------------------------------------------
-(require 'lsp-mode)
-(setq
- corfu-auto t
- corfu-auto-delay 0.1
- corfu-auto-prefix 3
- corfu-count 5
- corfu-quit-at-boundary 'separator)
-(require 'corfu)
-(global-corfu-mode 1)
-(corfu-history-mode 1)
-
-;; ============================================================================
-;;; Help
-;; ============================================================================
-(require 'counsel)
-(require 'helpful)
-(bind-key [remap describe-function] 'counsel-describe-function)
-(bind-key [remap describe-variable] 'counsel-describe-variable)
-(bind-key [remap describe-command]  'helpful-command)
-(bind-key [remap describe-key]      'helpful-key)
-;; ----------------------------------------------------------------------------
-;; Writing tips
-;; ----------------------------------------------------------------------------
-(require 'flycheck)
-(add-hook 'org-mode-hook #'flyspell-mode)
-(require 'writegood-mode)
-
-;; ============================================================================
-;;; Misc. packages
-;; ============================================================================
-(require 'avy)
-(require 'centered-cursor-mode)
-(global-centered-cursor-mode 1)
-(require 'keycast)
-(keycast-tab-bar-mode 1)
-(add-hook 'prog-mode-hook #'indent-guide-mode)
-(setq-default
- fill-column 90)
-(setq
- visual-fill-column-center-text t)
-(require 'visual-fill-column)
-;; ----------------------------------------------------------------------------
-;; Font pitch
-;; ----------------------------------------------------------------------------
-(setq
- mixed-pitch-set-height t)
-(require 'mixed-pitch)
-(dolist
-    (face
-     '(org-special-keyword org-date org-tag org-priority org-todo org-table))
-  (add-to-list 'mixed-pitch-fixed-pitch-faces face))
-;; ----------------------------------------------------------------------------
-;; Window manipulation
-;; ----------------------------------------------------------------------------
-(require 'ace-window)
-(ace-window-display-mode 1)
-(require 'transpose-frame)
-(require 'golden-ratio)
-(golden-ratio-mode 1)
-;; ----------------------------------------------------------------------------
-;; Narrow with dwim
-;; ----------------------------------------------------------------------------
-(with-eval-after-load 'org
-  (require 'recursive-narrow))
-;; ----------------------------------------------------------------------------
-;; Magit
-;; ----------------------------------------------------------------------------
-(require 'magit)
-(with-eval-after-load 'evil
-  (add-hook 'git-commit-mode-hook #'evil-insert-state)
-  (evil-set-initial-state 'magit-log-edit-mode 'insert))
-
-;; ============================================================================
-;;; Thumbnails and colors
-;; ============================================================================
-(when (display-graphic-p)
-  (require 'nerd-icons) ; all-the-icons' alignment sucks. Nerd works
-  (require 'nerd-icons-dired)
-  (add-hook 'dired-mode-hook #'nerd-icons-dired-mode)
-  (require 'nerd-icons-ibuffer)
-  (add-hook 'ibuffer-mode-hook #'nerd-icons-ibuffer-mode)
-  (require 'nerd-icons-corfu)
-  (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter)
-  (with-eval-after-load 'marginalia
-    (require 'nerd-icons-completion)
-    (nerd-icons-completion-mode 1)
-    (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup)))
-;; ----------------------------------------------------------------------------
-;; Color color-codes and delimiters
-;; ----------------------------------------------------------------------------
-(setq
- rainbow-delimiters-max-face-count 3)
-(require 'rainbow-delimiters)
-(add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
-(require 'indent-guide)
-(require 'rainbow-mode)
-(add-hook 'prog-mode-hook #'rainbow-mode)
 
 ;; ============================================================================
 ;;; Package faces
@@ -1334,23 +1346,6 @@
   (set-face-attribute
    'indent-guide-face
    nil              :foreground "#332"))
-
-;; ============================================================================
-;;; Vanilla hooks
-;; ============================================================================
-(add-hook 'dired-mode-hook  #'dired-hide-details-mode) ; toggle with "("
-(add-hook 'dired-mode-hook  #'dired-omit-mode)         ; toggle with "a"
-(add-hook 'text-mode-hook   #'visual-line-mode)
-(add-hook 'before-save-hook #'whitespace-cleanup)
-(add-hook
- 'emacs-startup-hook
- (lambda ()
-   (message
-    "Emacs ready in %s with %d garbage collections."
-    (format
-     "%.1f seconds"
-     (float-time (time-subtract after-init-time before-init-time)))
-    gcs-done)))
 
 ;; ============================================================================
 ;;; Keybindings

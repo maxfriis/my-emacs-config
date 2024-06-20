@@ -6,11 +6,12 @@
 ;; [[https://creativecommons.org/licenses/by-sa/4.0/]]
 ;; ============================================================================
 
-;; (require 'evil)
 ;; ============================================================================
 ;; Use Emacs' cursor-between-characters model of cursor positioning in
 ;; `evil-mode' instead of Vim's normal-mode cursor-on-characters model.
 ;; ============================================================================
+;; (require 'evil)
+;; ----------------------------------------------------------------------------
 ;; cursor-related `evil-mode' settings
 ;; ----------------------------------------------------------------------------
 (setq
@@ -26,6 +27,7 @@
   "P"  #'evil-paste-after  ; "jp" or "lp" does the same thing.
   "o"  #'evil-open-above   ; swapped to be consistent with paste.
   "O"  #'evil-open-below)  ; "jo" does the same thing.
+;; "w" and "b" works as intented. Other motions need to be rebound.
 (evil-define-key 'motion 'global
   "t"  #'evil-find-char
   "T"  #'evil-find-char-to-backward

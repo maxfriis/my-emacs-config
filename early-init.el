@@ -11,16 +11,23 @@
  gc-cons-threshold (* 50 1024 1024)
  gc-cons-percentage 0.5
  read-process-output-max (* 16 1024 1024)
+ mode-line-format nil
  inhibit-startup-message t
  inhibit-compacting-font-caches t
- frame-inhibit-implied-resize t) ; Resizing based on font is expensive
+ frame-inhibit-implied-resize t
+ frame-title-format
+ '((:eval
+    (if (buffer-file-name)
+        (abbreviate-file-name (buffer-file-name))
+      ;; else
+      "%b"))))
 
 ;; ============================================================================
 ;;; Maximize and dark background
 ;; ============================================================================
 (setq
  default-frame-alist
- '((fullscreen . maximized)
+ '((fullscreen       . maximized)
    (background-color . "#221")))
 
 ;; ============================================================================
