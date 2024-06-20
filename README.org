@@ -9,20 +9,9 @@ Last I clean up some vanilla default modes.
 
 Emacs will run without the early-init but will have a slower startup and ugly defaults.
 
-* Modeline
-
-I don't use a package for my modeline.
-It consist of a window number, information about writable/modified status, the buffer name and the major mode.
-
-The active window have some more information.
-The information is git status and whether the buffer is narrowed.
-Besides that the active window have the relative vertical position and column number after a gap.
-
-Prot has a Youtube video on how to make your own modeline: [[https://www.youtube.com/watch?v=Qf_DLPIA9Cs][Emacs: write custom mode line]].
-
 * Theme
 
-I don't use a theme package either.
+I don't use a theme package.
 I simply change faces if I don't like them.
 
 I use (set-face-attribute...) because stuff set by (custom-set-faces...) is hard to change for packages I might load in the future (red text is hard to read on a red background).
@@ -59,6 +48,17 @@ The visual state is hollow and might be filled with the region color.
 
 Here I set variables that are used by vanilla Emacs or a native package.
 I also activate a few global minor modes and add some hooks.
+
+* Modeline
+
+I don't use a package for my modeline.
+It consist of a window number, information about writable/modified status, the buffer name and the major mode.
+
+The active window have some more information.
+The information is git status and whether the buffer is narrowed.
+Besides that the active window have the relative vertical position and column number after a gap.
+
+Prot has a Youtube video on how to make your own modeline: [[https://www.youtube.com/watch?v=Qf_DLPIA9Cs][Emacs: write custom mode line]].
 
 * Custom functions
 
