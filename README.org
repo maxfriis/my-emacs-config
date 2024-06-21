@@ -7,7 +7,7 @@ Here I set some variables that influence the startup process.
 This both about performance but also about seeing defaults I don't end up using.
 E.g. I don't want a white background to blink on startup because I use a dark theme.
 
-Emacs will run without the early-init but will have a slower startup and some vanilla defaults.
+Emacs will run without the early-init but will have some vanilla default modes.
 
 * Theme
 
@@ -117,7 +117,7 @@ I do swap the two paste bindings =p= and =P= to avoid using the capitalized one.
 
 ** Two ways of pasting
 
-I will try to illustrate this with a case study on pasting.
+I will try to illustrate the efficiency with a case study on pasting.
 Vim's cursor on character model requires two ways of pasting.
 One is layered with =<shift>= and really counts as two keystrokes.
 You can mimic this behavior by using a "correction-motion" before paste in the cursor between characters model.
@@ -126,7 +126,7 @@ This means that from a strict efficiency perspective it is not clear what is gai
 This does not mean that Vim's way of doing things is inferior.
 You should minimize "correction-motions", so you can go directly for Vim's "verb" -> "noun" approach as often as you can.
 On the other hand you end up with the more complex two commands where only one is really necessary.
-The complex keybindings can only be an advantage to a power user.
+The complex keybindings will only be an advantage to a power user.
 As you get used to the less complex bindings you will develop foresight to use less "correction-motions".
 
 ** Casual use
@@ -134,7 +134,7 @@ As you get used to the less complex bindings you will develop foresight to use l
 As a more casual or inexperienced user, one paste command is preferable.
 My configuration can work as a great introduction to evil keybindings.
 
-The cursor model will be more consistent both with it's own insert state but also with other programs.
+The cursor model in normal state will be more consistent both with it's insert state but also with other programs.
 If you dislike layers and try to minimize their use, you gain a lot from not needing capitalized bindings.
 I very much dislike holding down two keys at once just as if I were using vanilla Emacs (take that, Vim out of the box lovers).
 
@@ -186,15 +186,27 @@ Inspired by Spacemacs I use =<SPC>= as my leader key and part of the structure i
 
 Here I specify faces used by packages.
 I typically use (with-eval-after-load...) and this can be used to identify in what package the face was introduced.
-I never (defface...) any faces myself.
+I don't (defface...) any faces myself.
 
 * Keybindings
 
-I like to have all my keybindings in a section rather than distributed out among my packages.
+I like to have my keybindings in a section rather than distributed out among my packages.
 I find it more useful to spot collisions by gathering these bindings in one place.
 Use-package might be able to defer stuff based on :bind but I don't use use-package.
 
 A few evil bindings specific to the change in cursor model are rebound inside evil-cursor-model.el.
+
+* Youtube videos
+
+I have made a few Youtube videos on this configuration:
+
+#+begin_center
+[[https://www.youtube.com/watch?v=L9aGgAt6Hd8][A tour of my Emacs init files]]
+#+end_center
+
+#+begin_center
+[[https://www.youtube.com/watch?v=Ey0sRfGyERg][I Install my Emacs configuration]]
+#+end_center
 
 * Clone
 
