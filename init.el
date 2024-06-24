@@ -1,6 +1,7 @@
 ;; -*- lexical-binding: t; -*-
 ;; #+title: Emacs config init.el
 
+
 ;; ============================================================================
 ;;; Vanilla faces
 ;; ============================================================================
@@ -153,7 +154,7 @@
  trash-directory "~/.local/share/Trash/files"
  delete-by-moving-to-trash t
  recentf-exclude
- '("\\`~/org/agenda/.*\\.org\\'" "\\`~/\\.emacs\\.d/.*")
+ '("\\`~/org/agenda/.*\\.org\\'" "\\`~/\\.emacs\\.d/.*\\.el\\'")
  shell-default-shell 'eshell ; I use a terminal outside emacs when needed
  eshell-ls-initial-args
  '("-agho")
@@ -167,9 +168,9 @@
  dired-dwim-target t
  dired-recursive-copies 'always
  dired-omit-verbose nil
- dired-omit-files "\\`[#\\.]" ; "a" to toggle
+ dired-omit-files "\\`[#\\.].*\\'" ; "a" to toggle
  ;; ----------------------------------------------------------------------------
- ;; Incremental search (I rarely use evil for search)
+ ;; Incremental search (I use Emacs tools for search)
  ;; ----------------------------------------------------------------------------
  isearch-lazy-count t
  lazy-count-prefix-format "%s/%s "
@@ -193,8 +194,9 @@
  ;; ----------------------------------------------------------------------------
  display-time-format "[%Y-%m-%d %a %H:%M]"
  display-line-numbers-type 'relative
+ ;; Popups not associated with a file pop below the current window.
  display-buffer-alist
- '(("^\\*.*\\*$" ; popup buffers not associated to a file
+ '(("\\`\s?\\*.*\\*\s?\\'"
     (display-buffer-reuse-mode-window
      display-buffer-below-selected)
     (body-function . select-window))))
@@ -301,22 +303,6 @@
   (find-file (locate-user-emacs-file "evil-cursor-model.el"))
   (find-file (locate-user-emacs-file "early-init.el"))
   (find-file (locate-user-emacs-file "init.el")))
-;; ----------------------------------------------------------------------------
-;; Open note and date file
-;; ----------------------------------------------------------------------------
-(defun my/open-note-file ()
-  "Open my notes file note.org"
-  (interactive)
-  (find-file (concat org-agenda-directory "date.org"))
-  (find-file (concat org-agenda-directory "note.org")))
-;; ----------------------------------------------------------------------------
-;; Open agenda and plan file
-;; ----------------------------------------------------------------------------
-(defun my/open-agenda-file ()
-  "Open my agenda file agenda.org"
-  (interactive)
-  (find-file (concat org-agenda-directory "plan.org"))
-  (find-file (concat org-agenda-directory "agenda.org")))
 ;; ----------------------------------------------------------------------------
 ;; Custom agenda
 ;; ----------------------------------------------------------------------------
@@ -543,7 +529,7 @@
     "* Task [/]\n"
     ":PROPERTIES:\n"
     ":CATEGORY: Task\n"
-    ":END:"))
+    ":END:\n"))
   (save-buffer)
   (switch-to-buffer "*scratch*"))
 ;; Create additional capture files
@@ -612,7 +598,19 @@
  ;; Capture
  ;; ----------------------------------------------------------------------------
  org-capture-templates
- `(("i" "Idea" entry ; backtick to concat primarily for code readability
+ `(("c" "Category" entry
+    (file ,(concat org-agenda-directory "plan.org"))
+    ,(concat
+      "* TODO %^{Heading} [/]\n"
+      ":PROPERTIES:\n"
+      ":ARCHIVE: " org-directory "archive.org::* Log\n"
+      ":CATEGORY: %^{Category}\n"
+      ":END:\n"
+      ":LOGBOOK:\n"
+      "- State \"TODO\" from \"Capture\" %U\n"
+      ":END:\n")
+    :immediate-finish t :prepend t)
+   ("i" "Idea" entry ; backtick to concat primarily for code readability
     (file ,(concat org-directory "inbox.org"))
     ,(concat
       "* NEXT %^{Idea}\n"
@@ -638,18 +636,12 @@
       "- State \"TODO\" from \"Capture\" %U\n"
       ":END:\n"
       "%?%i"))
-   ("c" "Category" entry
-    (file ,(concat org-agenda-directory "plan.org"))
+   ("n" "Note" entry
+    (file+datetree ,(concat org-agenda-directory "note.org"))
     ,(concat
-      "* TODO %^{Heading} [/]\n"
-      ":PROPERTIES:\n"
-      ":ARCHIVE: " org-directory "archive.org::* Log\n"
-      ":CATEGORY: %^{Category}\n"
-      ":END:\n"
-      ":LOGBOOK:\n"
-      "- State \"TODO\" from \"Capture\" %U\n"
-      ":END:\n")
-    :immediate-finish t :prepend t)
+      "* %U\n"
+      "%?%i")
+    :tree-type month)
    ("x" "Clipboard" entry
     (file+olp+datetree ,(concat org-directory "archive.org") "Clipboard")
     ,(concat
@@ -658,13 +650,7 @@
       "- %U\n"
       ":END:\n"
       "%x")
-    :immediate-finish t)
-   ("n" "Note" entry
-    (file+datetree ,(concat org-agenda-directory "note.org"))
-    ,(concat
-      "* %U\n"
-      "%?%i")
-    :tree-type month))
+    :immediate-finish t))
  ;; ----------------------------------------------------------------------------
  ;; Agenda
  ;; ----------------------------------------------------------------------------
@@ -1011,11 +997,10 @@
   "f"   '(:ignore t                              :which-key "Files")
   "fS"  '(save-some-buffers                      :which-key "Save all")
   "fR"  '(consult-recent-file                    :which-key "MiniRecent")
-  "fa"  '(my/open-agenda-file                    :which-key "Agenda")
+  "fa"  '(org-cycle-agenda-files                 :which-key "Agenda")
   "fd"  '(dired-jump                             :which-key "Dired")
   "ff"  '(counsel-find-file                      :which-key "Find")
   "fi"  '(my/open-init-file                      :which-key "Init")
-  "fn"  '(my/open-note-file                      :which-key "Note")
   "fp"  '(find-file-at-point                     :which-key "At point")
   "fr"  '(recentf-open-files                     :which-key "Recent")
   "fs"  '(basic-save-buffer                      :which-key "Save")
@@ -1372,6 +1357,7 @@
  ("C-½"           . tab-bar-mode)
  ("C-<tab>"       . tab-next)
  ("C-S-<tab>"     . tab-previous)
+ ("C-a"           . org-cycle-agenda-files)
  ("M-p"           . consult-yank-pop) ; paste with kill-ring dialog
  ;; ----------------------------------------------------------------------------
  ;; Operator state keys!!!
