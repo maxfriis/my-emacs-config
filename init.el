@@ -1,7 +1,6 @@
 ;; -*- lexical-binding: t; -*-
 ;; #+title: Emacs config init.el
 
-
 ;; ============================================================================
 ;;; Vanilla faces
 ;; ============================================================================
@@ -67,24 +66,6 @@
 (set-face-attribute
  'font-lock-string-face
  nil              :foreground "#0f9")
-;; font-lock-bracket-face
-;; font-lock-comment-delimiter-face
-;; font-lock-delimiter-face
-;; font-lock-doc-face
-;; font-lock-doc-markup-face
-;; font-lock-escape-face
-;; font-lock-function-call-face
-;; font-lock-misc-punctuation-face
-;; font-lock-negation-char-face
-;; font-lock-number-face
-;; font-lock-operator-face
-;; font-lock-preprocessor-face
-;; font-lock-property-name-face
-;; font-lock-property-use-face
-;; font-lock-punctuation-face
-;; font-lock-type-face
-;; font-lock-variable-use-face
-;; font-lock-warning-face
 ;; ----------------------------------------------------------------------------
 ;; Decorations
 ;; ----------------------------------------------------------------------------
@@ -304,6 +285,22 @@
   (find-file (locate-user-emacs-file "early-init.el"))
   (find-file (locate-user-emacs-file "init.el")))
 ;; ----------------------------------------------------------------------------
+;; Open note and date file
+;; ----------------------------------------------------------------------------
+(defun my/open-note-file ()
+  "Open my notes file note.org"
+  (interactive)
+  (find-file (concat org-agenda-directory "date.org"))
+  (find-file (concat org-agenda-directory "note.org")))
+;; ----------------------------------------------------------------------------
+;; Open agenda and plan file
+;; ----------------------------------------------------------------------------
+(defun my/open-agenda-file ()
+  "Open my agenda file agenda.org"
+  (interactive)
+  (find-file (concat org-agenda-directory "plan.org"))
+  (find-file (concat org-agenda-directory "agenda.org")))
+;; ----------------------------------------------------------------------------
 ;; Custom agenda
 ;; ----------------------------------------------------------------------------
 (defun my/org-agenda-custom ()
@@ -370,7 +367,7 @@
   (kill-emacs))
 
 ;; ============================================================================
-;;; Packages
+;;; Package.el
 ;; ============================================================================
 (setq
  load-prefer-newer t ; use .el if newer than .elc
@@ -418,7 +415,7 @@
 (add-hook 'after-save-hook #'backup-each-save)
 
 ;; ============================================================================
-;;; Evil
+;;; Evil.el
 ;; ============================================================================
 ;; Cursors are special. I combine f and 0 to color all types.
 ;; I tax the eyes a bit to follow the cursor/point and the evil states.
@@ -499,7 +496,7 @@
   (evil-org-agenda-set-keys))
 
 ;; ============================================================================
-;;; Org
+;;; Org.el
 ;; ============================================================================
 ;; Create org agenda directories and files unless they exist
 ;; ----------------------------------------------------------------------------
@@ -598,7 +595,7 @@
  ;; Capture
  ;; ----------------------------------------------------------------------------
  org-capture-templates
- `(("c" "Category" entry
+ `(("c" "Category" entry ; backtick to "concat" primarily for code readability
     (file ,(concat org-agenda-directory "plan.org"))
     ,(concat
       "* TODO %^{Heading} [/]\n"
@@ -610,7 +607,7 @@
       "- State \"TODO\" from \"Capture\" %U\n"
       ":END:\n")
     :immediate-finish t :prepend t)
-   ("i" "Idea" entry ; backtick to concat primarily for code readability
+   ("i" "Idea" entry
     (file ,(concat org-directory "inbox.org"))
     ,(concat
       "* NEXT %^{Idea}\n"
@@ -669,30 +666,38 @@
  org-agenda-custom-commands
  '(("c" "Custom agenda setup"
     ((todo "NEXT"
-           ;; all NEXT (including timestamped and priority)
+           ;; NEXT including timestamped.
            ((org-agenda-overriding-header "")))
-     (todo "TODO|HOLD|DONE"
-           ;; prioritized TODO, HOLD or even DONE.
-           ((org-agenda-overriding-header "")
-            (org-agenda-skip-function
-             '(org-agenda-skip-entry-if
-               'notregexp org-priority-regexp))))
-     (agenda "" ((org-agenda-span 'week))) ; might repeat items from above
+     (agenda "" ((org-agenda-span 'week)))
      (todo "TODO"
-           ;; not every TODO has or even should have a timestamp
+           ;; TODOs with [/] cookies are special. Often it's projects.
            ((org-agenda-overriding-header "No timestamp TODO or HOLD:")
             (org-agenda-skip-function
              '(org-agenda-skip-entry-if
-               'regexp org-priority-regexp
+               'notregexp "\\[[0-9]+/[0-9]+\\]"
                ;; or
                'timestamp))))
-     (todo "HOLD"
-           ;; HOLD for third party action pending (include timestamped)
+     (todo "TODO"
+           ;; Not every TODO has or even should have a timestamp.
            ((org-agenda-overriding-header "") ; share heading with the item above
             (org-agenda-block-separator nil)  ; don't separate
             (org-agenda-skip-function
              '(org-agenda-skip-entry-if
-               'regexp org-priority-regexp)))))))
+               'regexp "\\[[0-9]+/[0-9]+\\]"
+               ;; or
+               'timestamp))))
+     ;; Inactive states will not show in agenda:
+     (todo "HOLD"
+           ;; HOLD for third party action pending (include timestamped).
+           ((org-agenda-overriding-header "")
+            (org-agenda-block-separator nil)))
+     (todo "DONE"
+           ;; Prioritized DONE (include timestamped).
+           ((org-agenda-overriding-header "")
+            (org-agenda-block-separator nil)
+            (org-agenda-skip-function
+             '(org-agenda-skip-entry-if
+               'notregexp org-priority-regexp)))))))
  org-agenda-time-grid nil
  org-agenda-prefix-format
  '((agenda   . "  %-6c%-12t%?-6s")
@@ -947,7 +952,7 @@
   (evil-set-initial-state 'magit-log-edit-mode 'insert))
 
 ;; ============================================================================
-;;; General
+;;; General.el
 ;; ============================================================================
 (setq
  which-key-idle-delay 0)
@@ -1034,6 +1039,7 @@
   "o."  '(org-time-stamp                         :which-key "Timestamp")
   "oA"  '(org-archive-subtree-default            :which-key "Archive")
   "oE"  '(org-latex-export-to-pdf                :which-key "Latex pdf")
+  "oF"  '(org-agenda-file-to-front               :which-key "Agenda file")
   "oG"  '(org-goto                               :which-key "Goto")
   "oI"  '(org-clock-in                           :which-key "Clock in")
   "oL"  '(org-store-link                         :which-key "Store link")
