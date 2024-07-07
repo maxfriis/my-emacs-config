@@ -8,7 +8,7 @@
 ;; 8 `colors': #??? combining f, 9 and 0, and some warm grayish colors.
 ;; |------+----------------+------+----------------+------+-----------------|
 ;; | #bba | default text   | #09f | link/timestamp | #0f9 | comment/tags    |
-;; | #332 | shadow/hl-line | #9f0 | success/done   | #f90 | warning/heading |
+;; | #432 | shadow/hl-line | #9f0 | success/done   | #f90 | warning/heading |
 ;; | #221 | background     | #f09 | error/todo     | #90f | not used        |
 ;; |------+----------------+------+----------------+------+-----------------|
 ;; Dark, warm, simple, systematic, predictable and aesthetically pleasing.
@@ -41,10 +41,10 @@
  nil              :foreground "#9f0")
 (set-face-attribute
  'shadow
- nil              :foreground "#332")
+ nil              :foreground "#432")
 (set-face-attribute
  'match
- nil                                 :background "#332")
+ nil                                 :background "#432")
 ;; ----------------------------------------------------------------------------
 ;; font-lock faces
 ;; ----------------------------------------------------------------------------
@@ -71,34 +71,34 @@
 ;; ----------------------------------------------------------------------------
 (set-face-attribute
  'highlight
- nil                                 :background "#332")
+ nil                                 :background "#432")
 (set-face-attribute
  'vertical-border
- nil              :foreground "#332")
+ nil              :foreground "#432")
 (set-face-attribute
  'fringe
- nil              :foreground "#332" :background "#221")
+ nil              :foreground "#432" :background "#221")
 (set-face-attribute
  'line-number
- nil :height 0.8  :foreground "#332" :background "#221")
+ nil :height 0.8  :foreground "#432" :background "#221")
 (set-face-attribute
  'line-number-current-line
- nil              :foreground "#221" :background "#332")
+ nil              :foreground "#221" :background "#432")
 (set-face-attribute
  'mode-line
- nil :height 0.8  :foreground "#221" :background "#332" :box nil)
+ nil :height 0.8  :foreground "#221" :background "#432" :box nil)
 (set-face-attribute
  'mode-line-inactive
- nil              :foreground "#332" :background "#221" :box nil :overline t)
+ nil              :foreground "#432" :background "#221" :box nil :overline t)
 (set-face-attribute
  'tab-bar
- nil :height 0.8  :foreground "#332" :background "#221" :weight 'bold :inherit 'default)
+ nil :height 0.8  :foreground "#432" :background "#221" :weight 'bold :inherit 'default)
 (set-face-attribute
  'tab-bar-tab
- nil              :foreground "#221" :background "#332" :box nil)
+ nil              :foreground "#221" :background "#432" :box nil)
 (set-face-attribute
  'tab-bar-tab-inactive
- nil              :foreground "#332" :background "#221" :box nil)
+ nil              :foreground "#432" :background "#221" :box nil)
 ;; ----------------------------------------------------------------------------
 ;; Define more keywords
 ;; ----------------------------------------------------------------------------
@@ -107,7 +107,73 @@
  '(("add-hook"           . font-lock-keyword-face)
    ("add-to-list"        . font-lock-keyword-face)
    ("set-face-attribute" . font-lock-keyword-face)))
-   ;; ("'[a-z][a-zA-Z-]+"   . font-lock-constant-face)
+
+;; ============================================================================
+;;; Modeline
+;; ============================================================================
+(setq
+ mode-line-buffer-identification-keymap nil)
+;; mode-line-format is buffer-local so it need setq-default
+(setq-default
+ mode-line-format
+ '("%e"
+   mode-line-front-space
+   mode-line-modified
+   " "
+   mode-line-buffer-identification
+   " "
+   ;; shorter major mode name
+   (:eval
+    (propertize
+     (concat
+      "⌞"
+      (string-replace
+       "-" " "
+       (replace-regexp-in-string
+        "\\`org-" ""
+        (replace-regexp-in-string
+         "\\`emacs-" ""
+         (replace-regexp-in-string
+          "-buffer\\'" ""
+          (replace-regexp-in-string
+           "-mode\\'" ""
+           (downcase (symbol-name major-mode)))))))
+      "⌝")
+     'help-echo (concat
+                 (symbol-name major-mode)
+                 ", mouse-1: Toggle last 2 buffers")
+     'local-map (make-mode-line-mouse-map
+                 'mouse-1 #'mode-line-other-buffer)
+     'mouse-face 'mode-line-highlight))
+   ;; only the active window from here on
+   (:eval
+    (when (mode-line-window-selected-p)
+      (list
+       (if (eq vc-mode nil) ; version control
+           ""
+         ;; else
+         (replace-regexp-in-string
+          "\\` Git" " "
+          vc-mode))
+       (when (buffer-narrowed-p)
+         (list
+          " "
+          (propertize
+           "[n]"
+           'help-echo "Narrowed, mouse-1: widen"
+           'local-map (make-mode-line-mouse-map
+                       'mouse-1 #'mode-line-widen)
+           'mouse-face 'mode-line-highlight)))
+       mode-line-misc-info
+       " "
+       ;; gap for alignment
+       (propertize
+        " "
+        'display '((space :align-to (- (+ right right-fringe right-margin) 8)))
+        'face    'mode-line-inactive)
+       " "
+       mode-line-percent-position
+       mode-line-position-column-format)))))
 
 ;; ============================================================================
 ;;; Other vanilla stuff
@@ -204,73 +270,6 @@
      "%.1f seconds"
      (float-time (time-subtract after-init-time before-init-time)))
     gcs-done)))
-
-;; ============================================================================
-;;; Modeline
-;; ============================================================================
-(setq
- mode-line-buffer-identification-keymap nil)
-;; mode-line-format is buffer-local so it need setq-default
-(setq-default
- mode-line-format
- '("%e"
-   mode-line-front-space
-   mode-line-modified
-   " "
-   mode-line-buffer-identification
-   " "
-   ;; shorter major mode name
-   (:eval
-    (propertize
-     (concat
-      "⌞"
-      (string-replace
-       "-" " "
-       (replace-regexp-in-string
-        "\\`org-" ""
-        (replace-regexp-in-string
-         "\\`emacs-" ""
-         (replace-regexp-in-string
-          "-buffer\\'" ""
-          (replace-regexp-in-string
-           "-mode\\'" ""
-           (downcase (symbol-name major-mode)))))))
-      "⌝")
-     'help-echo (concat
-                 (symbol-name major-mode)
-                 ", mouse-1: Toggle last 2 buffers")
-     'local-map (make-mode-line-mouse-map
-                 'mouse-1 #'mode-line-other-buffer)
-     'mouse-face 'mode-line-highlight))
-   ;; only the active window from here on
-   (:eval
-    (when (mode-line-window-selected-p)
-      (list
-       (if (eq vc-mode nil) ; version control
-           ""
-         ;; else
-         (replace-regexp-in-string
-          "\\` Git" " "
-          vc-mode))
-       (when (buffer-narrowed-p)
-         (list
-          " "
-          (propertize
-           "[n]"
-           'help-echo "Narrowed, mouse-1: widen"
-           'local-map (make-mode-line-mouse-map
-                       'mouse-1 #'mode-line-widen)
-           'mouse-face 'mode-line-highlight)))
-       mode-line-misc-info
-       " "
-       ;; gap for alignment
-       (propertize
-        " "
-        'display '((space :align-to (- (+ right right-fringe right-margin) 8)))
-        'face    'mode-line-inactive)
-       " "
-       mode-line-percent-position
-       mode-line-position-column-format)))))
 
 ;; ============================================================================
 ;;; Custom functions
@@ -383,7 +382,8 @@
         recursive-narrow centered-cursor-mode visual-fill-column mixed-pitch
         undo-tree keycast indent-guide counsel helpful flycheck writegood-mode
         magit which-key general super-save backup-each-save auto-package-update))
-;; (require 'package)
+(unless (package-installed-p 'package)
+  (require 'package))
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents))
@@ -760,6 +760,8 @@
    ("\\.pdf\\'"     . "evince %s") ; open pdf outside Emacs
    (directory       . emacs)
    (auto-mode       . emacs)))
+(unless (package-installed-p 'org)
+  (require 'org))
 ;; ----------------------------------------------------------------------------
 ;; A pictogram is often better than a word
 ;; ----------------------------------------------------------------------------
@@ -862,6 +864,7 @@
  corfu-quit-at-boundary 'separator)
 (require 'corfu)
 (global-corfu-mode 1)
+(corfu-echo-mode 1)
 (corfu-history-mode 1)
 
 ;; ============================================================================
@@ -1234,7 +1237,7 @@
    nil              :foreground "#bba")
   (set-face-attribute
    'org-agenda-clocking
-   nil              :foreground "#0f9" :background "#332")
+   nil              :foreground "#0f9" :background "#432")
   (set-face-attribute
    'org-agenda-date
    nil              :foreground "#09f" :background "#221" :box nil :weight 'normal)
@@ -1268,7 +1271,7 @@
 (with-eval-after-load 'org-superstar
   (set-face-attribute
    'org-superstar-leading
-   nil :height 0.8  :foreground "#332") ; the dots marking the deapt
+   nil :height 0.8  :foreground "#432") ; the dots marking the deapt
   (set-face-attribute
    'org-superstar-item
    nil :height 0.8  :foreground "#f90")) ; the bullet face
@@ -1289,7 +1292,7 @@
     nil :height 0.8  :foreground "#f90" :background "#f09" :weight 'bold)
    (set-face-attribute
     'org-habit-overdue-future-face
-    nil :height 0.8                     :background "#332")
+    nil :height 0.8                     :background "#432")
    (set-face-attribute
     'org-habit-ready-face
     nil :height 0.8  :foreground "#f90" :background "#9f0" :weight 'bold)
@@ -1298,10 +1301,10 @@
     nil :height 0.8                     :background "#9f0")
    (set-face-attribute
     'org-habit-clear-face
-    nil :height 0.8  :foreground "#f90" :background "#332" :weight 'bold)
+    nil :height 0.8  :foreground "#f90" :background "#432" :weight 'bold)
    (set-face-attribute
     'org-habit-clear-future-face
-    nil :height 0.8                     :background "#332")))
+    nil :height 0.8                     :background "#432")))
 ;; ----------------------------------------------------------------------------
 ;; Misc. other faces
 ;; ----------------------------------------------------------------------------
@@ -1327,14 +1330,14 @@
 (with-eval-after-load 'corfu
   (set-face-attribute
    'corfu-default
-   nil              :foreground "#332" :background "#221")
+   nil              :foreground "#432" :background "#221")
   (set-face-attribute
    'corfu-current
-   nil              :foreground "#221" :background "#332"))
+   nil              :foreground "#221" :background "#432"))
 (with-eval-after-load 'keycast
   (set-face-attribute
    'keycast-key
-   nil :height 0.8  :foreground "#221" :background "#332" :box nil))
+   nil :height 0.8  :foreground "#221" :background "#432" :box nil))
 (with-eval-after-load 'ace-window
   (set-face-attribute
    'aw-leading-char-face
@@ -1342,11 +1345,11 @@
 (with-eval-after-load 'counsel
   (set-face-attribute
    'ivy-current-match ; counsel use this face
-   nil              :foreground "#9f0" :background "#332"))
+   nil              :foreground "#9f0" :background "#432"))
 (with-eval-after-load 'indent-guide
   (set-face-attribute
    'indent-guide-face
-   nil              :foreground "#332"))
+   nil              :foreground "#432"))
 
 ;; ============================================================================
 ;;; Keybindings
