@@ -5,18 +5,18 @@
 ;;; Vanilla faces
 ;; ============================================================================
 ;; 3 `sizes': small (4/5=0.8), normal (1.0) and large (5/4=1.25).
-;; 8 `colors': #??? combining f, 9 and 0, and some warm grayish colors.
+;; 8 `colors': #??? combining f, a and 0, and some grayish/brownish colors.
 ;; |------+----------------+------+----------------+------+-----------------|
-;; | #bba | default text   | #09f | link/timestamp | #0f9 | comment/tags    |
-;; | #432 | shadow/hl-line | #9f0 | success/done   | #f90 | warning/heading |
-;; | #221 | background     | #f09 | error/todo     | #90f | not used        |
+;; | #bba | default text   | #0af | link/timestamp | #0fa | comment/tags    |
+;; | #432 | shadow/hl-line | #af0 | success/done   | #fa0 | warning/heading |
+;; | #221 | background     | #f0a | error/todo     | #a0f | not used        |
 ;; |------+----------------+------+----------------+------+-----------------|
 ;; Dark, warm, simple, systematic, predictable and aesthetically pleasing.
 ;; ----------------------------------------------------------------------------
 ;; When I configure `evil' I add 8 colors reserved for the cursor and depending
 ;; on the evil state. Unspecified faces are handled by the vanilla theme.
 ;; ----------------------------------------------------------------------------
-(if (eq 0 (user-uid)) ; Different background color as root
+(if (eq (user-uid) 0) ; Different background color as root
     (set-face-attribute
      'default
      nil :height 160  :foreground "#bba" :background "#311" :font "Ubuntu Mono")
@@ -32,13 +32,13 @@
  nil :height 160                     :font "Ubuntu")
 (set-face-attribute
  'error
- nil              :foreground "#f09" :underline t)
+ nil              :foreground "#f0a" :underline t)
 (set-face-attribute
  'warning
- nil              :foreground "#f90")
+ nil              :foreground "#fa0")
 (set-face-attribute
  'success
- nil              :foreground "#9f0")
+ nil              :foreground "#af0")
 (set-face-attribute
  'shadow
  nil              :foreground "#432")
@@ -50,22 +50,22 @@
 ;; ----------------------------------------------------------------------------
 (set-face-attribute
  'font-lock-builtin-face
- nil              :foreground "#9f0")
+ nil              :foreground "#af0")
 (set-face-attribute
  'font-lock-comment-face
- nil              :foreground "#0f9")
+ nil              :foreground "#0fa")
 (set-face-attribute
  'font-lock-constant-face
- nil              :foreground "#f90")
+ nil              :foreground "#fa0")
 (set-face-attribute
  'font-lock-function-name-face
- nil              :foreground "#9f0")
+ nil              :foreground "#af0")
 (set-face-attribute
  'font-lock-keyword-face
- nil              :foreground "#09f")
+ nil              :foreground "#0af")
 (set-face-attribute
  'font-lock-string-face
- nil              :foreground "#0f9")
+ nil              :foreground "#0fa")
 ;; ----------------------------------------------------------------------------
 ;; Decorations
 ;; ----------------------------------------------------------------------------
@@ -116,8 +116,8 @@
 ;; mode-line-format is buffer-local so it need setq-default
 (setq-default
  mode-line-format
- '("%e"
-   mode-line-front-space
+ '(mode-line-front-space
+   "%e "
    mode-line-modified
    " "
    mode-line-buffer-identification
@@ -308,7 +308,7 @@
   (org-agenda nil "c")
   (delete-other-windows)
   ;; If the point start on the agenda heading move to today's date
-  (unless (eq ?\s (char-after))
+  (unless (eq (char-after) ?\s)
     (org-agenda-goto-today)))
 ;; ----------------------------------------------------------------------------
 ;; Capture idea
@@ -572,6 +572,7 @@
    ("CRYPT"    . ?C)
    ("ORDERED"  . ?O)
    ("NOEXPORT" . ?X))
+ org-startup-folded 'show2levels
  org-cycle-hide-block-startup t
  org-confirm-babel-evaluate nil
  ;; ----------------------------------------------------------------------------
@@ -1122,88 +1123,88 @@
 (with-eval-after-load 'org
   (set-face-attribute
    'org-document-title
-   nil :height 1.25 :foreground "#f90" :weight 'bold)
+   nil :height 1.25 :foreground "#fa0" :weight 'bold)
   (set-face-attribute
    'org-level-1
-   nil :height 1.0  :foreground "#f90" :weight 'bold)
+   nil :height 1.0  :foreground "#fa0" :weight 'bold)
   (set-face-attribute
    'org-level-2
-   nil :height 1.0  :foreground "#f90" :weight 'bold)
+   nil :height 1.0  :foreground "#fa0" :weight 'bold)
   (set-face-attribute
    'org-level-3
-   nil :height 1.0  :foreground "#f90" :weight 'bold)
+   nil :height 1.0  :foreground "#fa0" :weight 'bold)
   (set-face-attribute
    'org-level-4
-   nil :height 1.0  :foreground "#f90" :weight 'bold)
+   nil :height 1.0  :foreground "#fa0" :weight 'bold)
   (set-face-attribute
    'org-level-5
-   nil :height 1.0  :foreground "#f90" :weight 'bold)
+   nil :height 1.0  :foreground "#fa0" :weight 'bold)
   (set-face-attribute
    'org-level-6
-   nil :height 1.0  :foreground "#f90" :weight 'bold)
+   nil :height 1.0  :foreground "#fa0" :weight 'bold)
   (set-face-attribute
    'org-level-7
-   nil :height 1.0  :foreground "#f90" :weight 'bold)
+   nil :height 1.0  :foreground "#fa0" :weight 'bold)
   (set-face-attribute
    'org-level-8
-   nil :height 1.0  :foreground "#f90" :weight 'bold)
+   nil :height 1.0  :foreground "#fa0" :weight 'bold)
   (set-face-attribute
    'org-todo
-   nil :height 0.8  :foreground "#f09")
+   nil :height 0.8  :foreground "#f0a")
   (set-face-attribute
    'org-done
-   nil :height 0.8  :foreground "#9f0")
+   nil :height 0.8  :foreground "#af0")
   (set-face-attribute
    'org-headline-done
-   nil              :foreground "#0f9")
+   nil              :foreground "#0fa")
   (set-face-attribute
    'org-ellipsis
-   nil :height 0.8  :foreground "#0f9" :weight 'normal :underline nil)
+   nil :height 0.8  :foreground "#0fa" :weight 'normal :underline nil)
   (set-face-attribute
    'org-document-info-keyword
-   nil :height 0.8  :foreground "#0f9" :weight 'normal)
+   nil :height 0.8  :foreground "#0fa" :weight 'normal)
   (set-face-attribute
    'org-special-keyword
-   nil :height 0.8  :foreground "#0f9" :weight 'normal)
+   nil :height 0.8  :foreground "#0fa" :weight 'normal)
   (set-face-attribute
    'org-checkbox
-   nil :height 0.8  :foreground "#0f9" :background "#221" :box nil)
+   nil :height 0.8  :foreground "#0fa" :background "#221" :box nil)
   (set-face-attribute
    'org-tag
-   nil              :foreground "#0f9" :weight 'normal)
+   nil              :foreground "#0fa" :weight 'normal)
   (set-face-attribute
    'org-formula
-   nil :height 0.8  :foreground "#0f9")
+   nil :height 0.8  :foreground "#0fa")
   (set-face-attribute
    'org-code
-   nil :height 0.8  :foreground "#0f9")
+   nil :height 0.8  :foreground "#0fa")
   (set-face-attribute
    'org-verbatim
-   nil :height 0.8  :foreground "#0f9")
+   nil :height 0.8  :foreground "#0fa")
   (set-face-attribute
    'org-table
-   nil :height 0.8  :foreground "#0f9")
+   nil :height 0.8  :foreground "#0fa")
   (set-face-attribute
    'org-block
    nil              :foreground "#bba")
   (set-face-attribute
    'org-block-begin-line
-   nil :height 0.8  :foreground "#09f")
+   nil :height 0.8  :foreground "#0af")
   (set-face-attribute
    'org-block-end-line
-   nil              :foreground "#09f")
+   nil              :foreground "#0af")
   (set-face-attribute
    'org-drawer
-   nil :height 0.8  :foreground "#09f")
+   nil :height 0.8  :foreground "#0af")
   (set-face-attribute
    'org-footnote
-   nil :height 0.8  :foreground "#09f" :underline nil)
+   nil :height 0.8  :foreground "#0af" :underline nil)
   (set-face-attribute
    'org-date
-   nil :height 0.8  :foreground "#09f" :underline nil)
+   nil :height 0.8  :foreground "#0af" :underline nil)
   (set-face-attribute
    'org-link
-   nil              :foreground "#09f")
+   nil              :foreground "#0af")
   (set-face-attribute
    'org-meta-line
    nil :height 0.8))
@@ -1213,58 +1214,58 @@
 (with-eval-after-load 'org-agenda
   (set-face-attribute
    'header-line
-   nil :height 1.25 :foreground "#f90" :background "#221" :weight 'bold)
+   nil :height 1.25 :foreground "#fa0" :background "#221" :weight 'bold)
   (set-face-attribute
    'org-agenda-structure
-   nil :height 1.0  :foreground "#f90" :background "#221" :box nil :weight 'bold)
+   nil :height 1.0  :foreground "#fa0" :background "#221" :box nil :weight 'bold)
   (set-face-attribute
    'org-column
    nil                                 :background "#221")
   (set-face-attribute
    'org-warning
-   nil              :foreground "#f09")
+   nil              :foreground "#f0a")
   (set-face-attribute
    'org-agenda-done
-   nil              :foreground "#0f9" :slant 'normal)
+   nil              :foreground "#0fa" :slant 'normal)
   (set-face-attribute
    'org-time-grid
-   nil              :foreground "#0f9")
+   nil              :foreground "#0fa")
   (set-face-attribute
    'calendar-weekday-header
-   nil              :foreground "#0f9")
+   nil              :foreground "#0fa")
   (set-face-attribute
    'org-agenda-calendar-event
    nil              :foreground "#bba")
   (set-face-attribute
    'org-agenda-clocking
-   nil              :foreground "#0f9" :background "#432")
+   nil              :foreground "#0fa" :background "#432")
   (set-face-attribute
    'org-agenda-date
-   nil              :foreground "#09f" :background "#221" :box nil :weight 'normal)
+   nil              :foreground "#0af" :background "#221" :box nil :weight 'normal)
   (set-face-attribute
    'org-agenda-date-weekend
-   nil              :foreground "#09f" :background "#221" :box nil :weight 'normal :underline nil)
+   nil              :foreground "#0af" :background "#221" :box nil :weight 'normal :underline nil)
   (set-face-attribute
    'org-agenda-date-today
-   nil              :foreground "#f90" :background "#221" :box nil :weight 'normal :slant 'normal :inverse-video nil)
+   nil              :foreground "#fa0" :background "#221" :box nil :weight 'normal :slant 'normal :inverse-video nil)
   (set-face-attribute
    'org-upcoming-distant-deadline
-   nil              :foreground "#9f0")
+   nil              :foreground "#af0")
   (set-face-attribute
    'org-upcoming-deadline
-   nil              :foreground "#9f0")
+   nil              :foreground "#af0")
   (set-face-attribute
    'org-imminent-deadline
-   nil              :foreground "#f90" :weight 'normal)
+   nil              :foreground "#fa0" :weight 'normal)
   (set-face-attribute
    'org-scheduled
-   nil              :foreground "#9f0")
+   nil              :foreground "#af0")
   (set-face-attribute
    'org-scheduled-today
-   nil              :foreground "#9f0")
+   nil              :foreground "#af0")
   (set-face-attribute
    'org-scheduled-previously
-   nil              :foreground "#f90"))
+   nil              :foreground "#fa0"))
 ;; ----------------------------------------------------------------------------
 ;; Bullets
 ;; ----------------------------------------------------------------------------
@@ -1274,7 +1275,7 @@
    nil :height 0.8  :foreground "#432") ; the dots marking the deapt
   (set-face-attribute
    'org-superstar-item
-   nil :height 0.8  :foreground "#f90")) ; the bullet face
+   nil :height 0.8  :foreground "#fa0")) ; the bullet face
 ;; ----------------------------------------------------------------------------
 ;; Habit
 ;; ----------------------------------------------------------------------------
@@ -1283,25 +1284,25 @@
  (lambda ()
    (set-face-attribute
     'org-habit-alert-face
-    nil :height 0.8  :foreground "#f09" :background "#f90" :weight 'bold)
+    nil :height 0.8  :foreground "#f0a" :background "#fa0" :weight 'bold)
    (set-face-attribute
     'org-habit-alert-future-face
-    nil :height 0.8                     :background "#f90")
+    nil :height 0.8                     :background "#fa0")
    (set-face-attribute
     'org-habit-overdue-face
-    nil :height 0.8  :foreground "#f90" :background "#f09" :weight 'bold)
+    nil :height 0.8  :foreground "#fa0" :background "#f0a" :weight 'bold)
    (set-face-attribute
     'org-habit-overdue-future-face
     nil :height 0.8                     :background "#432")
    (set-face-attribute
     'org-habit-ready-face
-    nil :height 0.8  :foreground "#f90" :background "#9f0" :weight 'bold)
+    nil :height 0.8  :foreground "#fa0" :background "#af0" :weight 'bold)
    (set-face-attribute
     'org-habit-ready-future-face
-    nil :height 0.8                     :background "#9f0")
+    nil :height 0.8                     :background "#af0")
    (set-face-attribute
     'org-habit-clear-face
-    nil :height 0.8  :foreground "#f90" :background "#432" :weight 'bold)
+    nil :height 0.8  :foreground "#fa0" :background "#432" :weight 'bold)
    (set-face-attribute
     'org-habit-clear-future-face
     nil :height 0.8                     :background "#432")))
@@ -1310,23 +1311,23 @@
 ;; ----------------------------------------------------------------------------
 (set-face-attribute
  'dired-ignored
- nil              :foreground "#0f9")
+ nil              :foreground "#0fa")
 (set-face-attribute ; matching parenthesis get cursor colors
  'show-paren-match
  nil              :foreground "#bba" :background "#000" :weight 'bold)
 (with-eval-after-load 'rainbow-delimiters
   (set-face-attribute
    'rainbow-delimiters-base-error-face
-   nil              :foreground "#bba" :background "#f09" :weight 'bold :underline t)
+   nil              :foreground "#bba" :background "#f0a" :weight 'bold :underline t)
   (set-face-attribute
    'rainbow-delimiters-depth-1-face
-   nil              :foreground "#9f0")
+   nil              :foreground "#af0")
   (set-face-attribute
    'rainbow-delimiters-depth-2-face
-   nil              :foreground "#09f")
+   nil              :foreground "#0af")
   (set-face-attribute
    'rainbow-delimiters-depth-3-face
-   nil              :foreground "#f09"))
+   nil              :foreground "#f0a"))
 (with-eval-after-load 'corfu
   (set-face-attribute
    'corfu-default
@@ -1341,11 +1342,11 @@
 (with-eval-after-load 'ace-window
   (set-face-attribute
    'aw-leading-char-face
-   nil :height 1.0  :foreground "#f90"))
+   nil :height 1.0  :foreground "#fa0"))
 (with-eval-after-load 'counsel
   (set-face-attribute
    'ivy-current-match ; counsel use this face
-   nil              :foreground "#9f0" :background "#432"))
+   nil              :foreground "#af0" :background "#432"))
 (with-eval-after-load 'indent-guide
   (set-face-attribute
    'indent-guide-face

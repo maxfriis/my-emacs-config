@@ -14,16 +14,16 @@ Emacs will run without the early-init but will have some vanilla default modes.
 I don't use a theme package.
 I simply change faces if I don't like them.
 
-I use (set-face-attribute...) because stuff set by (custom-set-faces...) is hard to change for packages I might load in the future (red text is hard to read on a red background).
+I use (set-face-attribute...) because (custom-set-faces...) is hard to change for packages I might load in the future (red text is hard to read on a red background).
 I don't like or use custom.el.
 
-I restrict myself to use 8 warm dark theme colors.
+I restrict myself to use 8 dark theme colors.
 Examples of their use are:
 | Color | Use            |   | Color | Use            |   | Color | Use             |
 |-------+----------------+---+-------+----------------+---+-------+-----------------|
-| #bba  | default text   |   | #09f  | link/timestamp |   | #0f9  | comment/tags    |
-| #332  | shadow/hl-line |   | #9f0  | success/done   |   | #f90  | warning/heading |
-| #221  | background     |   | #f09  | error/todo     |   | #90f  | not used        |
+| #bba  | default text   |   | #0af  | link/timestamp |   | #0fa  | comment/tags    |
+| #432  | shadow/hl-line |   | #af0  | success/done   |   | #fa0  | warning/heading |
+| #221  | background     |   | #f0a  | error/todo     |   | #a0f  | not used        |
 |-------+----------------+---+-------+----------------+---+-------+-----------------|
 Unspecified faces are handled by the vanilla theme.
 
@@ -74,12 +74,17 @@ Last I code some window manipulation, a git stage/commit and a save/quit without
 I use package.el and (require 'xyz) to install and load packages.
 I used to use use-package but that seem to increase the number of garbage collections significantly (about 5 fold for me).
 It is not clear to me that gains from controlling when to load packages (:defer) is worth this cost.
-Deferring might also make debugging harder.
+
+I think deferring also makes little sense combined with Emacs server/client.
+If I was bothered by a slow startup time I would make a daemon on boot and use emacsclient.
+With that setup use-package's defers might hurt performance if everything is not loaded in the daemon.
+
+Deferring can also make debugging harder.
 You might have to ask yourself is or isn't this or that loaded, when did it happen and is that what is causing the problem right now?
 It's easier and cleaner to just have everything loaded.
 
 Use-package/straight also have some other advantages like updating packages directly from a git repo, but I don't use that.
-I preserve some of the structure that is also one of the features of use-package.
+I preserve some of the structure that is also a feature of use-package.
 That means that I will set variables associated with a package just before I require it.
 This would typically be part of an :init or :custom section in use-package.
 Hooks (:hook or :config) and mode activations (:init?! or :config) I do right after require.
@@ -160,9 +165,9 @@ I configure my custom agenda to have 4 sections:
 
 1. I have a potentially empty section without a headline where I display my NEXT items.
    When I capture ideas they will go in my inbox as a NEXT item.
-   I can change an item's state, tags, schedule and then refile it from here.
-   The idea is that this section should usually be empty because NEXT items are meant to be handled asap.
-2. Then I display this week's agenda with active todo-state items that have an active timestamp.
+   NEXT items are unblocked tasks that take less than 5 minutes meant to be handled asap.
+   Organizing an item into my agenda is such a task.
+2. After this I display this week's agenda with active todo-state items that have an active timestamp.
    Items from the first section can potentially be repeated here if they are timestamped.
 3. Not all TODO items have or even should have a timestamp.
    In this section I pile up items that have not been dealt a time slot yet.
@@ -170,7 +175,7 @@ I configure my custom agenda to have 4 sections:
    I can follow the progress of subtasks here with a cookie.
    Last I also display items on HOLD in this section.
 4. The final section like the first is usually empty.
-   This is where I can append a search by tags or whatever the agenda menu offers.
+   This is where I can append a search or whatever the agenda menu offers.
 The main two capture templates is a simple idea capture and an item with a category that I can refile to.
 That is all I need for my agenda.
 
@@ -201,11 +206,15 @@ A few evil bindings specific to the change in cursor model are rebound inside ev
 I have made a few Youtube videos on this configuration:
 
 #+begin_center
+[[https://www.youtube.com/watch?v=Ey0sRfGyERg][I Install my Emacs configuration]]
+#+end_center
+
+#+begin_center
 [[https://www.youtube.com/watch?v=L9aGgAt6Hd8][A tour of my Emacs init files]]
 #+end_center
 
 #+begin_center
-[[https://www.youtube.com/watch?v=Ey0sRfGyERg][I Install my Emacs configuration]]
+[[https://www.youtube.com/watch?v=5ziOMpT4EwE][My Emacs org-agenda and capture setup]]
 #+end_center
 
 * Clone
