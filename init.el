@@ -7,9 +7,9 @@
 ;; 3 `sizes': small (4/5=0.8), normal (1.0) and large (5/4=1.25).
 ;; 8 `colors': #??? combining f, a and 0, and some grayish/brownish colors.
 ;; |------+----------------+------+----------------+------+-----------------|
-;; | #bba | default text   | #0af | link/timestamp | #0fa | comment/tags    |
-;; | #432 | shadow/hl-line | #af0 | success/done   | #fa0 | warning/heading |
-;; | #221 | background     | #f0a | error/todo     | #a0f | not used        |
+;; | #bba | default text   | #0bf | link/timestamp | #0fb | comment/tags    |
+;; | #432 | shadow/hl-line | #bf0 | success/done   | #fb0 | warning/heading |
+;; | #221 | background     | #f0b | error/todo     | #b0f | not used        |
 ;; |------+----------------+------+----------------+------+-----------------|
 ;; Dark, warm, simple, systematic, predictable and aesthetically pleasing.
 ;; ----------------------------------------------------------------------------
@@ -19,26 +19,26 @@
 (if (eq (user-uid) 0) ; Different background color as root
     (set-face-attribute
      'default
-     nil :height 160  :foreground "#bba" :background "#311" :font "Ubuntu Mono")
+     nil :height 200  :foreground "#bba" :background "#311" :font "Ubuntu Mono")
   ;; else
   (set-face-attribute
    'default
-   nil :height 160  :foreground "#bba" :background "#221" :font "Ubuntu Mono"))
+   nil :height 200  :foreground "#bba" :background "#221" :font "Ubuntu Mono"))
 (set-face-attribute
  'fixed-pitch
  nil                                 :font "Ubuntu Mono")
 (set-face-attribute
  'variable-pitch
- nil :height 160                     :font "Ubuntu")
+ nil :height 200                     :font "Ubuntu")
 (set-face-attribute
  'error
- nil              :foreground "#f0a" :underline t)
+ nil              :foreground "#f0b" :underline t)
 (set-face-attribute
  'warning
- nil              :foreground "#fa0")
+ nil              :foreground "#fb0")
 (set-face-attribute
  'success
- nil              :foreground "#af0")
+ nil              :foreground "#bf0")
 (set-face-attribute
  'shadow
  nil              :foreground "#432")
@@ -50,22 +50,25 @@
 ;; ----------------------------------------------------------------------------
 (set-face-attribute
  'font-lock-builtin-face
- nil              :foreground "#af0")
+ nil              :foreground "#bf0")
 (set-face-attribute
  'font-lock-comment-face
- nil              :foreground "#0fa")
+ nil              :foreground "#0fb")
 (set-face-attribute
  'font-lock-constant-face
- nil              :foreground "#fa0")
+ nil              :foreground "#fb0")
 (set-face-attribute
  'font-lock-function-name-face
- nil              :foreground "#af0")
+ nil              :foreground "#bf0")
 (set-face-attribute
  'font-lock-keyword-face
- nil              :foreground "#0af")
+ nil              :foreground "#0bf")
 (set-face-attribute
  'font-lock-string-face
- nil              :foreground "#0fa")
+ nil              :foreground "#0fb")
+(set-face-attribute
+ 'font-lock-warning-face
+ nil              :underline nil)
 ;; ----------------------------------------------------------------------------
 ;; Decorations
 ;; ----------------------------------------------------------------------------
@@ -92,13 +95,32 @@
  nil              :foreground "#432" :background "#221" :box nil :overline t)
 (set-face-attribute
  'tab-bar
- nil :height 0.8  :foreground "#432" :background "#221" :weight 'bold :inherit 'default)
+ nil :height 0.8  :foreground "#432" :background "#221" :weight 'bold :box nil :inherit 'default)
 (set-face-attribute
  'tab-bar-tab
- nil              :foreground "#221" :background "#432" :box nil)
+ nil              :foreground "#221" :background "#432" :box t)
 (set-face-attribute
  'tab-bar-tab-inactive
  nil              :foreground "#432" :background "#221" :box nil)
+(with-eval-after-load 'tab-line
+  (set-face-attribute
+   'tab-line
+   nil              :foreground "#432" :background "#221" :overline t :box nil)
+  (set-face-attribute
+   'tab-line-tab ;; active tab in another window
+   nil              :inherit 'tab-line :box nil)
+  (set-face-attribute
+   'tab-line-tab-current
+   nil              :foreground "#221" :background "#432" :box nil)
+  (set-face-attribute
+   'tab-line-tab-modified
+   nil              :foreground "#221" :background "#432" :box nil)
+  (set-face-attribute
+   'tab-line-tab-inactive
+   nil              :foreground "#432" :background "#221" :box nil)
+  (set-face-attribute
+   'tab-line-highlight ;; mouseover
+   nil              :foreground "#bba" :background "#221" :box nil))
 ;; ----------------------------------------------------------------------------
 ;; Define more keywords
 ;; ----------------------------------------------------------------------------
@@ -117,12 +139,12 @@
 (setq-default
  mode-line-format
  '(mode-line-front-space
-   "%e "
+   " "
    mode-line-modified
    " "
    mode-line-buffer-identification
    " "
-   ;; shorter major mode name
+   ;; short major mode name
    (:eval
     (propertize
      (concat
@@ -141,9 +163,9 @@
       "⌝")
      'help-echo (concat
                  (symbol-name major-mode)
-                 ", mouse-1: Toggle last 2 buffers")
+                 ", mouse-1: Transpose frame")
      'local-map (make-mode-line-mouse-map
-                 'mouse-1 #'mode-line-other-buffer)
+                 'mouse-1 #'transpose-frame)
      'mouse-face 'mode-line-highlight))
    ;; only the active window from here on
    (:eval
@@ -201,7 +223,11 @@
  trash-directory "~/.local/share/Trash/files"
  delete-by-moving-to-trash t
  recentf-exclude
- '("\\`~/org/agenda/.*\\.org\\'" "\\`~/\\.emacs\\.d/.*\\.el\\'")
+ '("\\`~/org/agenda/.*\\.org\\'"
+   "\\`~/org/inbox\\.org\\'"
+   "\\`~/\\.emacs\\.d/.*\\.el\\'"
+   "\\`~/\\.emacs\\.d/diary\\'"
+   "\\`~/\\.emacs\\.d/bookmarks\\'")
  shell-default-shell 'eshell ; I use a terminal outside emacs when needed
  eshell-ls-initial-args
  '("-agho")
@@ -219,6 +245,7 @@
  ;; ----------------------------------------------------------------------------
  ;; Incremental search (I use Emacs tools for search)
  ;; ----------------------------------------------------------------------------
+ search-whitespace-regexp ".*?"
  isearch-lazy-count t
  lazy-count-prefix-format "%s/%s "
  lazy-count-suffix-format nil
@@ -284,14 +311,6 @@
   (find-file (locate-user-emacs-file "early-init.el"))
   (find-file (locate-user-emacs-file "init.el")))
 ;; ----------------------------------------------------------------------------
-;; Open note and date file
-;; ----------------------------------------------------------------------------
-(defun my/open-note-file ()
-  "Open my notes file note.org"
-  (interactive)
-  (find-file (concat org-agenda-directory "date.org"))
-  (find-file (concat org-agenda-directory "note.org")))
-;; ----------------------------------------------------------------------------
 ;; Open agenda and plan file
 ;; ----------------------------------------------------------------------------
 (defun my/open-agenda-file ()
@@ -299,6 +318,14 @@
   (interactive)
   (find-file (concat org-agenda-directory "plan.org"))
   (find-file (concat org-agenda-directory "agenda.org")))
+;; ----------------------------------------------------------------------------
+;; Open note and date file
+;; ----------------------------------------------------------------------------
+(defun my/open-note-file ()
+  "Open my notes file note.org"
+  (interactive)
+  (find-file (concat org-agenda-directory "date.org"))
+  (find-file (concat org-agenda-directory "note.org")))
 ;; ----------------------------------------------------------------------------
 ;; Custom agenda
 ;; ----------------------------------------------------------------------------
@@ -427,11 +454,11 @@
 ;; | #00f  | Motion   | #ff0  | Insert  |       |        |
 ;; |-------+----------+-------+---------+-------+--------|
 ;; Operator state is red to alert. Normal state has the opposite green color.
-;; Insert state is the last trafic light color (yellow) and use a bar.
-;; Replace state have to opposite color of insert state and use a hbar.
-;; Emacs and motion states have the remaining rgb colors.
+;; Insert state has the remaining yellow trafic light color and use a bar.
+;; Replace state has a magenta color and use a horizontal hbar cursor.
+;; Emacs and motion states have the remaining cyan and blue extreme rgb colors.
 ;; "Input" states have the "brighter" colors (with 2 f's) and bars in common.
-;; The visual state is hollow and can be filled with the region color.
+;; The visual state has a white hollow cursor and regions are black.
 ;; ----------------------------------------------------------------------------
 (set-face-attribute
  'region
@@ -448,8 +475,8 @@
  evil-ex-search-persistent-highlight nil
  evil-shift-round t
  evil-undo-system 'undo-tree
- evil-want-integration t
  evil-want-keybinding nil ; evil-collection need this
+ evil-want-integration t
  evil-want-C-u-scroll t   ; in the motion states
  vim-style-remap-Y-to-y$ t)
 ;; ----------------------------------------------------------------------------
@@ -514,7 +541,7 @@
   (make-empty-file     (concat org-directory "inbox.org")))
 ;; Create agenda.org with two refile targets
 (unless (file-exists-p (concat org-agenda-directory "agenda.org"))
-  (find-file (concat org-agenda-directory "agenda.org"))
+  (find-file           (concat org-agenda-directory "agenda.org"))
   (insert
    (concat
     "#+title: Main agenda file\n"
@@ -529,7 +556,7 @@
     ":END:\n"))
   (save-buffer)
   (switch-to-buffer "*scratch*"))
-;; Create additional capture files
+;; Create additional empty capture files
 (unless (file-exists-p (concat org-agenda-directory "plan.org"))
   (make-empty-file     (concat org-agenda-directory "plan.org")))
 (unless (file-exists-p (concat org-agenda-directory "note.org"))
@@ -562,6 +589,7 @@
  org-tag-alist
  '(("bg"       . ?b)
    ("comp"     . ?c)
+   ("emacs"    . ?e)
    ("fam"      . ?f)
    ("home"     . ?h)
    ("idea"     . ?i)
@@ -667,19 +695,18 @@
  org-agenda-custom-commands
  '(("c" "Custom agenda setup"
     ((todo "NEXT"
-           ;; NEXT including timestamped.
+           ;; max 5 min task above agenda
            ((org-agenda-overriding-header "")))
-     (agenda "" ((org-agenda-span 'week)))
+     (agenda ""
+             ((org-agenda-span 'week)))
      (todo "TODO"
-           ;; TODOs with [/] cookies are special. Often it's projects.
+           ;; TODOs with [/] cookies.
            ((org-agenda-overriding-header "No timestamp TODO or HOLD:")
             (org-agenda-skip-function
              '(org-agenda-skip-entry-if
-               'notregexp "\\[[0-9]+/[0-9]+\\]"
-               ;; or
-               'timestamp))))
+               'notregexp "\\[[0-9]+/[0-9]+\\]"))))
      (todo "TODO"
-           ;; Not every TODO has or even should have a timestamp.
+           ;; Not every TODO has or should have a timestamp.
            ((org-agenda-overriding-header "") ; share heading with the item above
             (org-agenda-block-separator nil)  ; don't separate
             (org-agenda-skip-function
@@ -687,18 +714,22 @@
                'regexp "\\[[0-9]+/[0-9]+\\]"
                ;; or
                'timestamp))))
-     ;; Inactive states will not show in agenda:
+     ;; Inactive states
      (todo "HOLD"
-           ;; HOLD for third party action pending (include timestamped).
+           ;; HOLD for third party action pending.
            ((org-agenda-overriding-header "")
             (org-agenda-block-separator nil)))
      (todo "DONE"
-           ;; Prioritized DONE (include timestamped).
+           ;; Prioritized DONE.
            ((org-agenda-overriding-header "")
             (org-agenda-block-separator nil)
             (org-agenda-skip-function
              '(org-agenda-skip-entry-if
-               'notregexp org-priority-regexp)))))))
+               'notregexp org-priority-regexp))))))
+   ("u" "Untagged TODOs"
+    ;; Useful for adding tags
+    tags-todo "-{.*}"
+    ((org-agenda-overriding-header "Untagged TODOs"))))
  org-agenda-time-grid nil
  org-agenda-prefix-format
  '((agenda   . "  %-6c%-12t%?-6s")
@@ -1006,10 +1037,11 @@
   "f"   '(:ignore t                              :which-key "Files")
   "fS"  '(save-some-buffers                      :which-key "Save all")
   "fR"  '(consult-recent-file                    :which-key "MiniRecent")
-  "fa"  '(org-cycle-agenda-files                 :which-key "Agenda")
+  "fa"  '(my/open-agenda-file                    :which-key "Agenda")
   "fd"  '(dired-jump                             :which-key "Dired")
   "ff"  '(counsel-find-file                      :which-key "Find")
   "fi"  '(my/open-init-file                      :which-key "Init")
+  "fn"  '(my/open-note-file                      :which-key "Notes")
   "fp"  '(find-file-at-point                     :which-key "At point")
   "fr"  '(recentf-open-files                     :which-key "Recent")
   "fs"  '(basic-save-buffer                      :which-key "Save")
@@ -1108,8 +1140,9 @@
   "x"   '(:ignore t                              :which-key "Text")
   "xC"  '(evil-upcase                            :which-key "Upcase")
   "xc"  '(evil-downcase                          :which-key "Downcase")
-  "xs"  '(just-one-space                         :which-key "One space")
+  "xs"  '(transpose-chars                        :which-key "Swap chars")
   "xu"  '(insert-char                            :which-key "Unicode")
+  "xx"  '(just-one-space                         :which-key "One space")
   "y"   '(:ignore t                              :which-key "y")
   "z"   '(global-text-scale-adjust               :which-key "Zoom")
   ;; Danish
@@ -1123,88 +1156,88 @@
 (with-eval-after-load 'org
   (set-face-attribute
    'org-document-title
-   nil :height 1.25 :foreground "#fa0" :weight 'bold)
+   nil :height 1.25 :foreground "#fb0" :weight 'bold)
   (set-face-attribute
    'org-level-1
-   nil :height 1.0  :foreground "#fa0" :weight 'bold)
+   nil :height 1.0  :foreground "#fb0" :weight 'bold)
   (set-face-attribute
    'org-level-2
-   nil :height 1.0  :foreground "#fa0" :weight 'bold)
+   nil :height 1.0  :foreground "#fb0" :weight 'bold)
   (set-face-attribute
    'org-level-3
-   nil :height 1.0  :foreground "#fa0" :weight 'bold)
+   nil :height 1.0  :foreground "#fb0" :weight 'bold)
   (set-face-attribute
    'org-level-4
-   nil :height 1.0  :foreground "#fa0" :weight 'bold)
+   nil :height 1.0  :foreground "#fb0" :weight 'bold)
   (set-face-attribute
    'org-level-5
-   nil :height 1.0  :foreground "#fa0" :weight 'bold)
+   nil :height 1.0  :foreground "#fb0" :weight 'bold)
   (set-face-attribute
    'org-level-6
-   nil :height 1.0  :foreground "#fa0" :weight 'bold)
+   nil :height 1.0  :foreground "#fb0" :weight 'bold)
   (set-face-attribute
    'org-level-7
-   nil :height 1.0  :foreground "#fa0" :weight 'bold)
+   nil :height 1.0  :foreground "#fb0" :weight 'bold)
   (set-face-attribute
    'org-level-8
-   nil :height 1.0  :foreground "#fa0" :weight 'bold)
+   nil :height 1.0  :foreground "#fb0" :weight 'bold)
   (set-face-attribute
    'org-todo
-   nil :height 0.8  :foreground "#f0a")
+   nil :height 0.8  :foreground "#f0b")
   (set-face-attribute
    'org-done
-   nil :height 0.8  :foreground "#af0")
+   nil :height 0.8  :foreground "#bf0")
   (set-face-attribute
    'org-headline-done
-   nil              :foreground "#0fa")
+   nil              :foreground "#0fb")
   (set-face-attribute
    'org-ellipsis
-   nil :height 0.8  :foreground "#0fa" :weight 'normal :underline nil)
+   nil :height 0.8  :foreground "#0fb" :weight 'normal :underline nil)
   (set-face-attribute
    'org-document-info-keyword
-   nil :height 0.8  :foreground "#0fa" :weight 'normal)
+   nil :height 0.8  :foreground "#0fb" :weight 'normal)
   (set-face-attribute
    'org-special-keyword
-   nil :height 0.8  :foreground "#0fa" :weight 'normal)
+   nil :height 0.8  :foreground "#0fb" :weight 'normal)
   (set-face-attribute
    'org-checkbox
-   nil :height 0.8  :foreground "#0fa" :background "#221" :box nil)
+   nil :height 0.8  :foreground "#0fb" :background "#221" :box nil)
   (set-face-attribute
    'org-tag
-   nil              :foreground "#0fa" :weight 'normal)
+   nil              :foreground "#0fb" :weight 'normal)
   (set-face-attribute
    'org-formula
-   nil :height 0.8  :foreground "#0fa")
+   nil :height 0.8  :foreground "#0fb")
   (set-face-attribute
    'org-code
-   nil :height 0.8  :foreground "#0fa")
+   nil :height 0.8  :foreground "#0fb")
   (set-face-attribute
    'org-verbatim
-   nil :height 0.8  :foreground "#0fa")
+   nil :height 0.8  :foreground "#0fb")
   (set-face-attribute
    'org-table
-   nil :height 0.8  :foreground "#0fa")
+   nil :height 0.8  :foreground "#0fb")
   (set-face-attribute
    'org-block
    nil              :foreground "#bba")
   (set-face-attribute
    'org-block-begin-line
-   nil :height 0.8  :foreground "#0af")
+   nil :height 0.8  :foreground "#0bf")
   (set-face-attribute
    'org-block-end-line
-   nil              :foreground "#0af")
+   nil              :foreground "#0bf")
   (set-face-attribute
    'org-drawer
-   nil :height 0.8  :foreground "#0af")
+   nil :height 0.8  :foreground "#0bf")
   (set-face-attribute
    'org-footnote
-   nil :height 0.8  :foreground "#0af" :underline nil)
+   nil :height 0.8  :foreground "#0bf" :underline nil)
   (set-face-attribute
    'org-date
-   nil :height 0.8  :foreground "#0af" :underline nil)
+   nil :height 0.8  :foreground "#0bf" :underline nil)
   (set-face-attribute
    'org-link
-   nil              :foreground "#0af")
+   nil              :foreground "#0bf")
   (set-face-attribute
    'org-meta-line
    nil :height 0.8))
@@ -1214,58 +1247,58 @@
 (with-eval-after-load 'org-agenda
   (set-face-attribute
    'header-line
-   nil :height 1.25 :foreground "#fa0" :background "#221" :weight 'bold)
+   nil :height 1.25 :foreground "#fb0" :background "#221" :weight 'bold)
   (set-face-attribute
    'org-agenda-structure
-   nil :height 1.0  :foreground "#fa0" :background "#221" :box nil :weight 'bold)
+   nil :height 1.0  :foreground "#fb0" :background "#221" :box nil :weight 'bold)
   (set-face-attribute
    'org-column
    nil                                 :background "#221")
   (set-face-attribute
    'org-warning
-   nil              :foreground "#f0a")
+   nil              :foreground "#f0b")
   (set-face-attribute
    'org-agenda-done
-   nil              :foreground "#0fa" :slant 'normal)
+   nil              :foreground "#0fb" :slant 'normal)
   (set-face-attribute
    'org-time-grid
-   nil              :foreground "#0fa")
+   nil              :foreground "#0fb")
   (set-face-attribute
    'calendar-weekday-header
-   nil              :foreground "#0fa")
+   nil              :foreground "#0fb")
   (set-face-attribute
    'org-agenda-calendar-event
    nil              :foreground "#bba")
   (set-face-attribute
    'org-agenda-clocking
-   nil              :foreground "#0fa" :background "#432")
+   nil              :foreground "#0fb" :background "#432")
   (set-face-attribute
    'org-agenda-date
-   nil              :foreground "#0af" :background "#221" :box nil :weight 'normal)
+   nil              :foreground "#0bf" :background "#221" :box nil :weight 'normal)
   (set-face-attribute
    'org-agenda-date-weekend
-   nil              :foreground "#0af" :background "#221" :box nil :weight 'normal :underline nil)
+   nil              :foreground "#0bf" :background "#221" :box nil :weight 'normal :underline nil)
   (set-face-attribute
    'org-agenda-date-today
-   nil              :foreground "#fa0" :background "#221" :box nil :weight 'normal :slant 'normal :inverse-video nil)
+   nil              :foreground "#fb0" :background "#221" :box nil :weight 'normal :slant 'normal :inverse-video nil)
   (set-face-attribute
    'org-upcoming-distant-deadline
-   nil              :foreground "#af0")
+   nil              :foreground "#bf0")
   (set-face-attribute
    'org-upcoming-deadline
-   nil              :foreground "#af0")
+   nil              :foreground "#bf0")
   (set-face-attribute
    'org-imminent-deadline
-   nil              :foreground "#fa0" :weight 'normal)
+   nil              :foreground "#fb0" :weight 'normal)
   (set-face-attribute
    'org-scheduled
-   nil              :foreground "#af0")
+   nil              :foreground "#bf0")
   (set-face-attribute
    'org-scheduled-today
-   nil              :foreground "#af0")
+   nil              :foreground "#bf0")
   (set-face-attribute
    'org-scheduled-previously
-   nil              :foreground "#fa0"))
+   nil              :foreground "#fb0"))
 ;; ----------------------------------------------------------------------------
 ;; Bullets
 ;; ----------------------------------------------------------------------------
@@ -1275,7 +1308,7 @@
    nil :height 0.8  :foreground "#432") ; the dots marking the deapt
   (set-face-attribute
    'org-superstar-item
-   nil :height 0.8  :foreground "#fa0")) ; the bullet face
+   nil :height 0.8  :foreground "#fb0")) ; the bullet face
 ;; ----------------------------------------------------------------------------
 ;; Habit
 ;; ----------------------------------------------------------------------------
@@ -1284,25 +1317,25 @@
  (lambda ()
    (set-face-attribute
     'org-habit-alert-face
-    nil :height 0.8  :foreground "#f0a" :background "#fa0" :weight 'bold)
+    nil :height 0.8  :foreground "#f0b" :background "#fb0" :weight 'bold)
    (set-face-attribute
     'org-habit-alert-future-face
-    nil :height 0.8                     :background "#fa0")
+    nil :height 0.8                     :background "#fb0")
    (set-face-attribute
     'org-habit-overdue-face
-    nil :height 0.8  :foreground "#fa0" :background "#f0a" :weight 'bold)
+    nil :height 0.8  :foreground "#fb0" :background "#f0b" :weight 'bold)
    (set-face-attribute
     'org-habit-overdue-future-face
     nil :height 0.8                     :background "#432")
    (set-face-attribute
     'org-habit-ready-face
-    nil :height 0.8  :foreground "#fa0" :background "#af0" :weight 'bold)
+    nil :height 0.8  :foreground "#fb0" :background "#bf0" :weight 'bold)
    (set-face-attribute
     'org-habit-ready-future-face
-    nil :height 0.8                     :background "#af0")
+    nil :height 0.8                     :background "#bf0")
    (set-face-attribute
     'org-habit-clear-face
-    nil :height 0.8  :foreground "#fa0" :background "#432" :weight 'bold)
+    nil :height 0.8  :foreground "#fb0" :background "#432" :weight 'bold)
    (set-face-attribute
     'org-habit-clear-future-face
     nil :height 0.8                     :background "#432")))
@@ -1311,23 +1344,23 @@
 ;; ----------------------------------------------------------------------------
 (set-face-attribute
  'dired-ignored
- nil              :foreground "#0fa")
+ nil              :foreground "#0fb")
 (set-face-attribute ; matching parenthesis get cursor colors
  'show-paren-match
  nil              :foreground "#bba" :background "#000" :weight 'bold)
 (with-eval-after-load 'rainbow-delimiters
   (set-face-attribute
    'rainbow-delimiters-base-error-face
-   nil              :foreground "#bba" :background "#f0a" :weight 'bold :underline t)
+   nil              :foreground "#bba" :background "#f0b" :weight 'bold :underline t)
   (set-face-attribute
    'rainbow-delimiters-depth-1-face
-   nil              :foreground "#af0")
+   nil              :foreground "#bf0")
   (set-face-attribute
    'rainbow-delimiters-depth-2-face
-   nil              :foreground "#0af")
+   nil              :foreground "#0bf")
   (set-face-attribute
    'rainbow-delimiters-depth-3-face
-   nil              :foreground "#f0a"))
+   nil              :foreground "#f0b"))
 (with-eval-after-load 'corfu
   (set-face-attribute
    'corfu-default
@@ -1338,15 +1371,15 @@
 (with-eval-after-load 'keycast
   (set-face-attribute
    'keycast-key
-   nil :height 0.8  :foreground "#221" :background "#432" :box nil))
+   nil :height 0.8  :foreground "#221" :background "#432" :box t))
 (with-eval-after-load 'ace-window
   (set-face-attribute
    'aw-leading-char-face
-   nil :height 1.0  :foreground "#fa0"))
+   nil :height 1.0  :foreground "#fb0"))
 (with-eval-after-load 'counsel
   (set-face-attribute
    'ivy-current-match ; counsel use this face
-   nil              :foreground "#af0" :background "#432"))
+   nil              :foreground "#bf0" :background "#432"))
 (with-eval-after-load 'indent-guide
   (set-face-attribute
    'indent-guide-face
@@ -1364,7 +1397,7 @@
  ("<Scroll_Lock>" . centered-cursor-mode)
  ("<next>"        . evil-scroll-down)
  ("<prior>"       . evil-scroll-up)
- ("C-½"           . tab-bar-mode)
+ ("C-½"           . tab-line-mode)
  ("C-<tab>"       . tab-next)
  ("C-S-<tab>"     . tab-previous)
  ("C-a"           . org-cycle-agenda-files)
@@ -1392,6 +1425,7 @@
  ("ø"             . evil-end-of-line)
  ("Å"             . my/org-capture-idea)
  ("å"             . my/org-agenda-custom)
+ ("C-å"           . org-cycle-agenda-files)
  ;; ----------------------------------------------------------------------------
  ;; Normal state keys!!!
  ;; ----------------------------------------------------------------------------
