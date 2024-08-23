@@ -21,9 +21,9 @@ I restrict myself to use 8 dark theme colors.
 Examples of their use are:
 | Color | Use            |   | Color | Use            |   | Color | Use             |
 |-------+----------------+---+-------+----------------+---+-------+-----------------|
-| #bba  | default text   |   | #0af  | link/timestamp |   | #0fa  | comment/tags    |
-| #432  | shadow/hl-line |   | #af0  | success/done   |   | #fa0  | warning/heading |
-| #221  | background     |   | #f0a  | error/todo     |   | #a0f  | not used        |
+| #bba  | default text   |   | #5af  | link/timestamp |   | #5fa  | comment/tags    |
+| #432  | shadow/hl-line |   | #af5  | success/done   |   | #fa5  | warning/heading |
+| #221  | background     |   | #f5a  | error/todo     |   | #a5f  | not used        |
 |-------+----------------+---+-------+----------------+---+-------+-----------------|
 Unspecified faces are handled by the vanilla theme.
 
