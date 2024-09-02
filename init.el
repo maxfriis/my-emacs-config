@@ -5,83 +5,91 @@
 ;;; Color font faces
 ;; ============================================================================
 (when (file-newer-than-file-p
-       (locate-user-emacs-file "ansi-font-faces.el")
-       (locate-user-emacs-file "ansi-font-faces.elc"))
-  (byte-compile-file (locate-user-emacs-file "ansi-font-faces.el")))
+       (locate-user-emacs-file "ansi-faces.el")
+       (locate-user-emacs-file "ansi-faces.elc"))
+  (byte-compile-file (locate-user-emacs-file "ansi-faces.el")))
 (when (file-newer-than-file-p
-       (locate-user-emacs-file "my-font-faces.el")
-       (locate-user-emacs-file "my-font-faces.elc"))
-  (byte-compile-file (locate-user-emacs-file "my-font-faces.el")))
+       (locate-user-emacs-file "my-faces.el")
+       (locate-user-emacs-file "my-faces.elc"))
+  (byte-compile-file (locate-user-emacs-file "my-faces.el")))
 (if (eq (user-uid) 0) ; Different colors as root
-    (load (locate-user-emacs-file "ansi-font-faces.elc") nil t)
+    (load (locate-user-emacs-file "ansi-faces.elc") nil t)
   ;; else
-  (load (locate-user-emacs-file "my-font-faces.elc") nil t))
+  (load (locate-user-emacs-file "my-faces.elc") nil t))
 
 ;; ============================================================================
 ;;; Modeline
 ;; ============================================================================
 (setq
  mode-line-buffer-identification-keymap nil)
-;; mode-line-format is buffer-local so it need setq-default
-(setq-default
+(setq-default ; mode-line-format is buffer-local so setq-default
  mode-line-format
  '(mode-line-front-space
-   " "
+   (:eval
+    (if (eq (user-uid) 0)
+        (list "#")
+      ;; else
+      (list " ")))
    mode-line-modified
    " "
    mode-line-buffer-identification
    " "
    ;; short major mode name
    (:eval
-    (propertize
-     (concat
-      "⌞"
-      (string-replace
-       "-" " "
-       (replace-regexp-in-string
-        "\\`org-" ""
+    (list
+     (propertize
+      (concat
+       "["
+       (string-replace
+        "-" " "
         (replace-regexp-in-string
          "\\`emacs-" ""
          (replace-regexp-in-string
-          "-buffer\\'" ""
+          "\\`org-" ""
           (replace-regexp-in-string
-           "-mode\\'" ""
-           (downcase (symbol-name major-mode)))))))
-      "⌝")
-     'help-echo (concat
-                 (symbol-name major-mode)
-                 ", mouse-1: Transpose frame")
-     'local-map (make-mode-line-mouse-map
-                 'mouse-1 #'transpose-frame)
-     'mouse-face 'mode-line-highlight))
-   ;; only the active window from here on
+           "-buffer\\'" ""
+           (replace-regexp-in-string
+            "-mode\\'" ""
+            (downcase (symbol-name major-mode)))))))
+       "]")
+      'help-echo (symbol-name major-mode)
+      'local-map (make-mode-line-mouse-map
+                  'mouse-1 #'transpose-frame)
+      'mouse-face 'mode-line-highlight)
+     (when (mode-line-window-selected-p)
+       (progn
+         (if (eq vc-mode nil) ; version control
+             ""
+           ;; else
+           (replace-regexp-in-string
+            "\\` Git" " "
+            vc-mode))
+         (when (buffer-narrowed-p)
+           (list
+            " "
+            (propertize
+             "[n]"
+             'help-echo "Narrowed, mouse-1: widen"
+             'local-map (make-mode-line-mouse-map
+                         'mouse-1 #'mode-line-widen)
+             'mouse-face 'mode-line-highlight)))
+         mode-line-misc-info))
+     " "))
+   ;; gap for alignment
    (:eval
-    (when (mode-line-window-selected-p)
-      (list
-       (if (eq vc-mode nil) ; version control
-           ""
-         ;; else
-         (replace-regexp-in-string
-          "\\` Git" " "
-          vc-mode))
-       (when (buffer-narrowed-p)
-         (list
+    (list
+     (if (mode-line-window-selected-p)
+         (propertize
           " "
-          (propertize
-           "[n]"
-           'help-echo "Narrowed, mouse-1: widen"
-           'local-map (make-mode-line-mouse-map
-                       'mouse-1 #'mode-line-widen)
-           'mouse-face 'mode-line-highlight)))
-       mode-line-misc-info
-       " "
-       ;; gap for alignment
+          'display '((space :align-to (- (+ right right-fringe right-margin) 9)))
+          'face    'mode-line-inactive)
+       ;; else
        (propertize
         " "
-        'display '((space :align-to (- (+ right right-fringe right-margin) 8)))
-        'face    'mode-line-inactive)
-       " "
-       mode-line-percent-position
+        'display '((space :align-to (- (+ right right-fringe right-margin) 5)))))
+     " "
+     mode-line-percent-position
+     (when (mode-line-window-selected-p)
        mode-line-position-column-format)))))
 
 ;; ============================================================================
@@ -106,15 +114,15 @@
  use-short-answers t
  initial-scratch-message nil
  large-file-warning-threshold nil
- custom-file "/dev/null"
+ custom-file "/dev/null" ; I don't deal with custom.el
  trash-directory "~/.local/share/Trash/files"
  delete-by-moving-to-trash t
  recentf-exclude
  '("\\`~/org/agenda/.*\\.org\\'"
    "\\`~/org/inbox\\.org\\'"
    "\\`~/\\.emacs\\.d/.*\\.el\\'"
-   "\\`~/\\.emacs\\.d/diary\\'"
-   "\\`~/\\.emacs\\.d/bookmarks\\'")
+   "\\`~/\\.emacs\\.d/bookmarks\\'"
+   "\\`~/\\.emacs\\.d/diary\\'")
  shell-default-shell 'eshell ; I use a terminal outside emacs when needed
  eshell-ls-initial-args
  '("-agho")
@@ -146,8 +154,8 @@
  tab-bar-close-tab-select      'recent
  tab-bar-new-tab-to            'right
  tab-bar-new-tab-choice        "*scratch*"
- tab-bar-separator             " "
  tab-bar-menu-bar-button       "☰"
+ tab-bar-separator             " "
  tab-bar-format
  '(tab-bar-format-menu-bar tab-bar-format-tabs tab-bar-separator)
  ;; ----------------------------------------------------------------------------
@@ -193,9 +201,6 @@
 (defun my/open-init-file ()
   "Open config file init.el"
   (interactive)
-  (find-file (locate-user-emacs-file "README.org"))
-  (find-file (locate-user-emacs-file "evil-cursor-model.el"))
-  (find-file (locate-user-emacs-file "my-faces.el"))
   (find-file (locate-user-emacs-file "early-init.el"))
   (find-file (locate-user-emacs-file "init.el")))
 ;; ----------------------------------------------------------------------------
@@ -334,13 +339,13 @@
 ;; ============================================================================
 ;; Cursors are special. I combine f and 0 to color all types.
 ;; I tax the eyes a bit to follow the cursor/point and the evil states.
-;; |-------+----------+-------+---------+-------+--------|
-;; | Color | State    | Color | State   | Color | State  |
-;; |-------+----------+-------+---------+-------+--------|
-;; | #f00  | Operator | #0ff  | Emacs   | #fff  | Visual |
-;; | #0f0  | Normal   | #f0f  | Replace | #000  | Region |
-;; | #00f  | Motion   | #ff0  | Insert  |       |        |
-;; |-------+----------+-------+---------+-------+--------|
+;; |------+----------+------+---------|
+;; | #000 | Region   | #fff | Visual  |
+;; |------+----------+------+---------|
+;; | #f00 | Operator | #0ff | Emacs   |
+;; | #0f0 | Normal   | #f0f | Replace |
+;; | #00f | Motion   | #ff0 | Insert  |
+;; |------+----------+------+---------|
 ;; Operator state is red to alert. Normal state has the opposite green color.
 ;; Insert state has the remaining yellow trafic light color and use a bar.
 ;; Replace state has a magenta color and use a horizontal hbar cursor.
