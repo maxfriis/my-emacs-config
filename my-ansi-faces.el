@@ -1,29 +1,33 @@
 ;; -*- lexical-binding: t; -*-
-;; #+title: ansi-colors.el
+;; #+title: my-ansi-faces.el
 
 ;; ============================================================================
 ;;; Vanilla faces
 ;; ============================================================================
 ;; 3 `sizes': small (4/5=0.8), normal (1.0) and large (5/4=1.25).
-;; 8 `colors': #??? combining f, a and 5, and some brownish colors.
+;; 8 `colors': #??? combining f and 0.
 ;; |------+-----------------+------+-----------------|
 ;; | #000 | background      | #fff | default text    |
 ;; |------+-----------------+------+-----------------|
-;; | #f00 | shadow/hl-line  | #f0f | error/todo      |
-;; | #0f0 | success/done    | #ff0 | warning/heading |
-;; | #00f | link/timestamp  | #0ff | comment/tag     |
+;; | #f00 | shadow/hl-line  | #0ff | comment/tag     |
+;; | #0f0 | success/done    | #f0f | error/todo      |
+;; | #00f | link/timestamp  | #ff0 | warning/heading |
 ;; |------+-----------------+------+-----------------|
-;; Unspecified faces are handled by the vanilla theme.
+;; These colors will display nicely in an 8 color terminal.
+;; Unspecified faces are handled by the dark part of the vanilla theme.
+;; ----------------------------------------------------------------------------
+;; Fonts
 ;; ----------------------------------------------------------------------------
 (set-face-attribute
  'default
- nil :foreground "#fff" :background "#000" :font "Ubuntu Mono" :height 200)
+ nil :font "Ubuntu Mono" :foreground "#fff" :background "#000" :height 180)
 (set-face-attribute
  'fixed-pitch
  nil :font "Ubuntu Mono")
 (set-face-attribute
  'variable-pitch
- nil :font "Ubuntu" :height 200)
+ nil :font "Verdana")
+;; ----------------------------------------------------------------------------
 (set-face-attribute
  'error
  nil :foreground "#f0f" :underline t)
@@ -216,6 +220,16 @@
    'org-meta-line
    nil :height 1.25))
 ;; ----------------------------------------------------------------------------
+;; Bullets
+;; ----------------------------------------------------------------------------
+(with-eval-after-load 'org-superstar
+  (set-face-attribute
+   'org-superstar-leading
+   nil :foreground "#f00" :height 0.8) ; the dots marking the deapt
+  (set-face-attribute
+   'org-superstar-item
+   nil :foreground "#ff0" :height 0.8)) ; the bullet face
+;; ----------------------------------------------------------------------------
 ;; Agenda
 ;; ----------------------------------------------------------------------------
 (with-eval-after-load 'org-agenda
@@ -274,16 +288,6 @@
    'org-scheduled-previously
    nil :foreground "#ff0"))
 ;; ----------------------------------------------------------------------------
-;; Bullets
-;; ----------------------------------------------------------------------------
-(with-eval-after-load 'org-superstar
-  (set-face-attribute
-   'org-superstar-leading
-   nil :foreground "#f00" :height 0.8) ; the dots marking the deapt
-  (set-face-attribute
-   'org-superstar-item
-   nil :foreground "#ff0" :height 0.8)) ; the bullet face
-;; ----------------------------------------------------------------------------
 ;; Habit
 ;; ----------------------------------------------------------------------------
 (with-eval-after-load 'org-habit
@@ -335,6 +339,10 @@
   (set-face-attribute
    'rainbow-delimiters-depth-3-face
    nil :foreground "#f0f"))
+(with-eval-after-load 'keycast
+  (set-face-attribute
+   'keycast-key
+   nil :foreground "#000" :background "#f00" :box t :height 0.8))
 (with-eval-after-load 'corfu
   (set-face-attribute
    'corfu-default
@@ -342,10 +350,6 @@
   (set-face-attribute
    'corfu-current
    nil :foreground "#000" :background "#f00"))
-(with-eval-after-load 'keycast
-  (set-face-attribute
-   'keycast-key
-   nil :foreground "#000" :background "#f00" :box t :height 0.8))
 (with-eval-after-load 'ace-window
   (set-face-attribute
    'aw-leading-char-face

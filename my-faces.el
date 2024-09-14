@@ -1,11 +1,11 @@
 ;; -*- lexical-binding: t; -*-
-;; #+title: Emacs theme my-faces.el
+;; #+title: my-faces.el
 
 ;; ============================================================================
 ;;; Vanilla faces
 ;; ============================================================================
 ;; 3 `sizes': small (4/5=0.8), normal (1.0) and large (5/4=1.25).
-;; 8 `colors': #??? combining f, a and 5, and grays with dimed blue colors.
+;; 8 `colors': #??? combining f, a and 5, and some grayishs colors.
 ;; |------+-----------------+------+-----------------+------+-----------------|
 ;; | #221 | background      | #bba | default text    | #432 | shadow/hl-line  |
 ;; |------+-----------------+------+-----------------+------+-----------------|
@@ -21,13 +21,13 @@
 ;; ----------------------------------------------------------------------------
 (set-face-attribute
  'default
- nil :foreground "#bba" :background "#221" :font "Ubuntu Mono" :height 200)
+ nil :font "Ubuntu Mono" :foreground "#bba" :background "#221" :height 180)
 (set-face-attribute
  'fixed-pitch
  nil :font "Ubuntu Mono")
 (set-face-attribute
  'variable-pitch
- nil :font "Ubuntu" :height 200)
+ nil :font "Verdana")
 ;; ----------------------------------------------------------------------------
 (set-face-attribute
  'error
@@ -193,6 +193,16 @@
    'org-meta-line
    nil :height 1.25))
 ;; ----------------------------------------------------------------------------
+;; Bullets
+;; ----------------------------------------------------------------------------
+(with-eval-after-load 'org-superstar
+  (set-face-attribute
+   'org-superstar-leading
+   nil :foreground "#432" :height 0.8) ; the dots marking the deapt
+  (set-face-attribute
+   'org-superstar-item
+   nil :foreground "#fa5" :height 0.8)) ; the bullet face
+;; ----------------------------------------------------------------------------
 ;; Agenda
 ;; ----------------------------------------------------------------------------
 (with-eval-after-load 'org-agenda
@@ -250,16 +260,6 @@
   (set-face-attribute
    'org-scheduled-previously
    nil :foreground "#fa5"))
-;; ----------------------------------------------------------------------------
-;; Bullets
-;; ----------------------------------------------------------------------------
-(with-eval-after-load 'org-superstar
-  (set-face-attribute
-   'org-superstar-leading
-   nil :foreground "#432" :height 0.8) ; the dots marking the deapt
-  (set-face-attribute
-   'org-superstar-item
-   nil :foreground "#fa5" :height 0.8)) ; the bullet face
 ;; ----------------------------------------------------------------------------
 ;; Habit
 ;; ----------------------------------------------------------------------------
@@ -337,10 +337,6 @@
   (set-face-attribute
    'tab-line-highlight ;; mouseover
    nil :foreground "#bba" :background "#221" :box nil))
-(with-eval-after-load 'dired
-  (set-face-attribute
-   'dired-ignored
-   nil :foreground "#5fa"))
 (with-eval-after-load 'corfu
   (set-face-attribute
    'corfu-default
@@ -348,6 +344,10 @@
   (set-face-attribute
    'corfu-current
    nil :foreground "#221" :background "#432"))
+(with-eval-after-load 'dired
+  (set-face-attribute
+   'dired-ignored
+   nil :foreground "#5fa"))
 (with-eval-after-load 'keycast
   (set-face-attribute
    'keycast-key
