@@ -2,18 +2,18 @@
 ;; #+title: Emacs config init.el
 
 ;; ============================================================================
-;;; Color font faces
+;;; Font faces (my themes)
 ;; ============================================================================
 (when (file-newer-than-file-p
-       (locate-user-emacs-file "ansi-faces.el")
-       (locate-user-emacs-file "ansi-faces.elc"))
-  (byte-compile-file (locate-user-emacs-file "ansi-faces.el")))
+       (locate-user-emacs-file "my-ansi-faces.el")
+       (locate-user-emacs-file "my-ansi-faces.elc"))
+  (byte-compile-file (locate-user-emacs-file "my-ansi-faces.el")))
 (when (file-newer-than-file-p
        (locate-user-emacs-file "my-faces.el")
        (locate-user-emacs-file "my-faces.elc"))
   (byte-compile-file (locate-user-emacs-file "my-faces.el")))
 (if (eq (user-uid) 0) ; Different colors as root
-    (load (locate-user-emacs-file "ansi-faces.elc") nil t)
+    (load (locate-user-emacs-file "my-ansi-faces.elc") nil t)
   ;; else
   (load (locate-user-emacs-file "my-faces.elc") nil t))
 
@@ -22,7 +22,7 @@
 ;; ============================================================================
 (setq
  mode-line-buffer-identification-keymap nil)
-(setq-default ; mode-line-format is buffer-local so setq-default
+(setq-default ; mode-line-format is buffer local so setq-default
  mode-line-format
  '(mode-line-front-space
    (:eval
@@ -57,7 +57,7 @@
                   'mouse-1 #'transpose-frame)
       'mouse-face 'mode-line-highlight)
      (when (mode-line-window-selected-p)
-       (progn
+       (list
          (if (eq vc-mode nil) ; version control
              ""
            ;; else
@@ -81,16 +81,16 @@
      (if (mode-line-window-selected-p)
          (propertize
           " "
-          'display '((space :align-to (- (+ right right-fringe right-margin) 9)))
+          'display '((space :align-to (- (+ right right-fringe right-margin) 8)))
           'face    'mode-line-inactive)
        ;; else
        (propertize
         " "
-        'display '((space :align-to (- (+ right right-fringe right-margin) 5)))))
-     " "
-     mode-line-percent-position
+        'display '((space :align-to (- (+ right right-fringe right-margin) 4)))))
      (when (mode-line-window-selected-p)
-       mode-line-position-column-format)))))
+       " %3c")
+     " "
+     mode-line-percent-position))))
 
 ;; ============================================================================
 ;;; Other vanilla stuff
@@ -583,7 +583,7 @@
  org-agenda-files (list (concat org-directory "inbox.org")
                         org-agenda-directory) ; all org files in the agenda dir
  org-agenda-format-date " [%F %a] "
- org-agenda-block-separator ?⎺ ; also separate appended agenda ("a")
+ org-agenda-block-separator ?﹋ ; ﹌̅‾﹉⎺ also separate appended agenda ("a")
  org-agenda-span 'month
  org-agenda-custom-commands
  '(("c" "Custom agenda setup"
