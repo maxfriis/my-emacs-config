@@ -5,11 +5,9 @@
 
 Here I set some variables that influence the startup process.
 This both about performance but also about seeing defaults I don't end up using.
-E.g. I don't want a white background to blink on startup because I use a dark theme.
+E.g. I don't want a white background to blink on startup because I prefer a dark theme.
 
-Emacs will run without the early-init but will have some vanilla default modes.
-
-* Theme
+* My font faces
 
 I don't use a theme package.
 I simply change faces if I don't like them.
@@ -19,35 +17,45 @@ I don't like or use custom.el.
 
 I restrict myself to use 8 dark theme colors.
 Examples of their use are:
-| Color | Use            |   | Color | Use            |   | Color | Use             |
-|-------+----------------+---+-------+----------------+---+-------+-----------------|
-| #bba  | default text   |   | #5af  | link/timestamp |   | #5fa  | comment/tags    |
-| #432  | shadow/hl-line |   | #af5  | success/done   |   | #fa5  | warning/heading |
-| #221  | background     |   | #f5a  | error/todo     |   | #a5f  | not used        |
-|-------+----------------+---+-------+----------------+---+-------+-----------------|
+| Color | Use             |   | Color | Use          |   | Color | Use            |
+|-------+-----------------+---+-------+--------------+---+-------+----------------|
+| #221  | background      |   | #bba  | default text |   | #432  | shadow/hl-line |
+|-------+-----------------+---+-------+--------------+---+-------+----------------|
+| #f5a  | error/todo      |   | #af5  | success/done |   | #5af  | link/timestamp |
+| #fa5  | warning/heading |   | #5fa  | comment/tags |   | #a5f  | not used       |
+|-------+-----------------+---+-------+--------------+---+-------+----------------|
 Unspecified faces are handled by the vanilla theme.
 
-When I configure evil I add 8 colors reserved for the cursor.
+When I configure evil I add 8 ansi colors reserved for the cursor.
 I tax the eyes a bit with extreme colors to help keeping track of the evil state and cursor placement.
-| Color | State    |   | Color | State   |   | Color | State  |
-|-------+----------+---+-------+---------+---+-------+--------|
-| #f00  | Operator |   | #0ff  | Emacs   |   | #fff  | Visual |
-| #0f0  | Normal   |   | #f0f  | Replace |   | #000  | Region |
-| #00f  | Motion   |   | #ff0  | Insert  |   |       |        |
-|-------+----------+---+-------+---------+---+-------+--------|
+| Color | State    |   | Color | State   |
+|-------+----------+---+-------+---------|
+| #000  | region   |   | #fff  | visual  |
+|-------+----------+---+-------+---------|
+| #f00  | operator |   | #0ff  | emacs   |
+| #0f0  | normal   |   | #f0f  | replace |
+| #00f  | motion   |   | #ff0  | insert  |
+|-------+----------+---+-------+---------|
 Operator state is red to alert.
 Normal state has the opposite green color.
 Insert state is the last trafic light color (yellow) and use a bar.
 Replace state has the opposite color of insert state and use an hbar.
 Emacs and motion states have the remaining rgb colors.
-
-"Input" states have the "brighter" colors (with 2 f's) and bars in common.
+"Input" states have colors with 2 f's and bars in common.
 The visual state is hollow and might be filled with the region color.
 
-* Other vanilla stuff
-
-Here I set variables that are used by vanilla Emacs or a native package.
-I also activate a few global minor modes and add some hooks.
+As root I use these 8 ansi colors for the theme too.
+| Color | Use            |   | Color | Use             |
+|-------+----------------+---+-------+-----------------|
+| #000  | background     |   | #fff  | default text    |
+|-------+----------------+---+-------+-----------------|
+| #f00  | shadow/hl-line |   | #0ff  | comment/tags    |
+| #0f0  | success/done   |   | #f0f  | error/todo      |
+| #00f  | link/timestamp |   | #ff0  | warning/heading |
+|-------+----------------+---+-------+-----------------|
+The conflicts are primarily that the region color only shows on the hl-line.
+Operator state is automatically converted to cyan when shown on the hl-line.
+The idea is to have something clearly indicating that I have root privileges and have a fallback theme I can use with an ansi color terminal.
 
 * Modeline
 
@@ -59,6 +67,11 @@ The information is git status and whether the buffer is narrowed.
 Besides that the active window have the relative vertical position and column number after a gap.
 
 Prot has a Youtube video on how to make your own modeline: [[https://www.youtube.com/watch?v=Qf_DLPIA9Cs][Emacs: write custom mode line]].
+
+* Other vanilla stuff
+
+Here I set variables that are used by vanilla Emacs or a native package.
+I also activate a few global minor modes and add some hooks.
 
 * Custom functions
 
@@ -82,13 +95,16 @@ With that setup use-package's defers might hurt performance if everything is not
 Deferring can also make debugging harder.
 You might have to ask yourself is or isn't this or that loaded, when did it happen and is that what is causing the problem right now?
 It's easier and cleaner to just have everything loaded.
+Note that packages sometimes defer stuff so I don't avoid this potential problem.
 
 Use-package/straight also have some other advantages like updating packages directly from a git repo, but I don't use that.
 I preserve some of the structure that is also a feature of use-package.
+
 That means that I will set variables associated with a package just before I require it.
 This would typically be part of an :init or :custom section in use-package.
 Hooks (:hook or :config) and mode activations (:init?! or :config) I do right after require.
-I do keybindings (:bind or :command) and faces (:custom-face) at the end of the configuration in dedicated sections.
+I do keybindings (:bind or :command) at the end of the configuration in a dedicated section.
+Faces (:custom-face) are handled in a separate loaded file.
 
 All this should make it fairly easy to convert my config to use use-package or straight.
 
@@ -187,12 +203,6 @@ Prot has a nice Youtube video about it: [[https://www.youtube.com/watch?v=gojOZ3
 For now I use general.el to handle my leader keybindings.
 Inspired by Spacemacs I use =<SPC>= as my leader key and part of the structure in my leader keybindings are also inspired by this project.
 
-* Package faces
-
-Here I specify faces used by packages.
-I typically use (with-eval-after-load...) and this can be used to identify in what package the face was introduced.
-I don't (defface...) any faces myself.
-
 * Keybindings
 
 I like to have my keybindings in a section rather than distributed out among my packages.
@@ -219,7 +229,7 @@ I have made a few Youtube videos on this configuration:
 
 * Clone
 
-If you have an /empty/ ~/.emacs.d directory and have git installed you can clone this configuration with:
+If you have an /empty/ or missing ~/.emacs.d directory and have git installed you can clone this configuration with:
 #+begin_src bash
   git clone https://github.com/maxfriis/my-emacs-config ~/.emacs.d
 #+end_src
