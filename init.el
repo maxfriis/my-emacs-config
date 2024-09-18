@@ -4,6 +4,7 @@
 ;; ============================================================================
 ;;; Font faces (my themes)
 ;; ============================================================================
+;; I like everything compiled
 (when (file-newer-than-file-p
        (locate-user-emacs-file "my-ansi-faces.el")
        (locate-user-emacs-file "my-ansi-faces.elc"))
@@ -12,7 +13,7 @@
        (locate-user-emacs-file "my-faces.el")
        (locate-user-emacs-file "my-faces.elc"))
   (byte-compile-file (locate-user-emacs-file "my-faces.el")))
-(if (eq (user-uid) 0) ; Different colors as root
+(if (eq (user-uid) 0) ; Different colors as super user
     (load (locate-user-emacs-file "my-ansi-faces.elc") nil t)
   ;; else
   (load (locate-user-emacs-file "my-faces.elc") nil t))
@@ -34,9 +35,9 @@
    " "
    mode-line-buffer-identification
    " "
-   ;; short major mode name
    (:eval
     (list
+     ;; short major mode name
      (propertize
       (concat
        "["
@@ -58,39 +59,41 @@
       'mouse-face 'mode-line-highlight)
      (when (mode-line-window-selected-p)
        (list
-         (if (eq vc-mode nil) ; version control
-             ""
-           ;; else
-           (replace-regexp-in-string
-            "\\` Git" " "
-            vc-mode))
-         (when (buffer-narrowed-p)
-           (list
-            " "
-            (propertize
-             "[n]"
-             'help-echo "Narrowed, mouse-1: widen"
-             'local-map (make-mode-line-mouse-map
-                         'mouse-1 #'mode-line-widen)
-             'mouse-face 'mode-line-highlight)))
-         mode-line-misc-info))
+        (unless (eq vc-mode nil) ; version control
+          (replace-regexp-in-string
+           "\\` Git" " "
+           vc-mode))
+        (when (buffer-narrowed-p)
+          (list
+           " "
+           (propertize
+            "[n]"
+            'help-echo "Narrowed, mouse-1: widen"
+            'local-map (make-mode-line-mouse-map
+                        'mouse-1 #'mode-line-widen)
+            'mouse-face 'mode-line-highlight)))
+        mode-line-misc-info))
      " "))
-   ;; gap for alignment
    (:eval
     (list
+     ;; gap for alignment
      (if (mode-line-window-selected-p)
          (propertize
           " "
-          'display '((space :align-to (- (+ right right-fringe right-margin) 8)))
+          'display '((space :align-to (- (+ right right-fringe right-margin) 7)))
           'face    'mode-line-inactive)
        ;; else
        (propertize
         " "
-        'display '((space :align-to (- (+ right right-fringe right-margin) 4)))))
-     (when (mode-line-window-selected-p)
-       " %3c")
-     " "
-     mode-line-percent-position))))
+        'display '((space :align-to (- (+ right right-fringe right-margin) 3)))))
+     ;; position information
+     (if (mode-line-window-selected-p)
+         (if global-display-line-numbers-mode
+             '(-7 "%3c %p")
+           ;; else
+           "%4l,%2c")
+       ;; else
+       '(-3 "%p"))))))
 
 ;; ============================================================================
 ;;; Other vanilla stuff
@@ -284,6 +287,16 @@
          (locate-user-emacs-file "init.elc"))
     (byte-compile-file (locate-user-emacs-file "init.el")))
   (kill-emacs))
+;; ----------------------------------------------------------------------------
+;; My faces (theme)
+;; ----------------------------------------------------------------------------
+(defun my/toggle-faces ()
+  "My default faces"
+  (interactive)
+  (if (equal (face-background 'default) "#000")
+      (load (locate-user-emacs-file "my-faces.elc") nil t)
+    ;; else
+    (load (locate-user-emacs-file "my-ansi-faces.elc") nil t)))
 
 ;; ============================================================================
 ;;; Package.el
@@ -340,11 +353,11 @@
 ;; Cursors are special. I combine f and 0 to color all types.
 ;; I tax the eyes a bit to follow the cursor/point and the evil states.
 ;; |------+----------+------+---------|
-;; | #000 | Region   | #fff | Visual  |
+;; | #000 | region   | #fff | visual  |
 ;; |------+----------+------+---------|
-;; | #f00 | Operator | #0ff | Emacs   |
-;; | #0f0 | Normal   | #f0f | Replace |
-;; | #00f | Motion   | #ff0 | Insert  |
+;; | #f00 | operator | #0ff | emacs   |
+;; | #0f0 | normal   | #f0f | replace |
+;; | #00f | motion   | #ff0 | insert  |
 ;; |------+----------+------+---------|
 ;; Operator state is red to alert. Normal state has the opposite green color.
 ;; Insert state has the remaining yellow trafic light color and use a bar.
@@ -368,8 +381,8 @@
  evil-ex-search-persistent-highlight nil
  evil-shift-round t
  evil-undo-system 'undo-tree
- evil-want-keybinding nil ; evil-collection need this
  evil-want-integration t
+ evil-want-keybinding nil ; evil-collection need this
  evil-want-C-u-scroll t   ; in the motion states
  vim-style-remap-Y-to-y$ t)
 ;; ----------------------------------------------------------------------------
@@ -934,7 +947,9 @@
   "bs"  '(scratch-buffer                         :which-key "Scratch")
   "c"   '(:ignore t                              :which-key "c")
   "d"   '(:ignore t                              :which-key "d")
-  "e"   '(eval-last-sexp                         :which-key "Eval sexp")
+  "e"   '(:ignore t                              :which-key "Eval")
+  "ee"  '(eval-expression                        :which-key "Expression")
+  "es"  '(eval-last-sexp                         :which-key "Sexp @point")
   "f"   '(:ignore t                              :which-key "Files")
   "fS"  '(save-some-buffers                      :which-key "Save all")
   "fR"  '(consult-recent-file                    :which-key "Mini recent")
@@ -1018,10 +1033,11 @@
   "tg"  '(golden-ratio-mode                      :which-key "Gold ratio")
   "th"  '(hl-line-mode                           :which-key "Hl line")
   "tk"  '(keycast-tab-bar-mode                   :which-key "Keycast")
+  "tl"  '(global-display-line-numbers-mode       :which-key "Line number")
   "tp"  '(prettify-symbols-mode                  :which-key "Prettify")
   "tr"  '(rainbow-mode                           :which-key "Rainbow")
   "ts"  '(flyspell-mode                          :which-key "Spell")
-  "tt"  '(font-lock-mode                         :which-key "Textcolor")
+  "tt"  '(my/toggle-faces                        :which-key "Theme")
   "tw"  '(writegood-mode                         :which-key "Write good")
   "u"   '(universal-argument                     :which-key "Uni arg")
   "v"   '(exchange-point-and-mark                :which-key "Swap mark")
@@ -1041,9 +1057,9 @@
   "x"   '(:ignore t                              :which-key "Text")
   "xC"  '(evil-upcase                            :which-key "Upcase")
   "xc"  '(evil-downcase                          :which-key "Downcase")
-  "xs"  '(transpose-chars                        :which-key "Swap chars")
+  "xs"  '(just-one-space                         :which-key "One space")
   "xu"  '(insert-char                            :which-key "Unicode")
-  "xx"  '(just-one-space                         :which-key "One space")
+  "xx"  '(transpose-chars                        :which-key "Swap chars")
   "y"   '(:ignore t                              :which-key "y")
   "z"   '(:ignore t                              :which-key "Zoom")
   "zl"  '(text-scale-adjust                      :which-key "Local")

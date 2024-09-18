@@ -85,7 +85,7 @@
  nil :foreground "#432" :background "#221" :height 0.8)
 (set-face-attribute
  'line-number-current-line
- nil :foreground "#221" :background "#432")
+ nil :foreground "#221" :background "#432" :weight 'bold)
 (set-face-attribute
  'mode-line
  nil :foreground "#221" :background "#432" :box nil :height 0.8)
@@ -304,7 +304,7 @@
    nil :foreground "#5af")
   (set-face-attribute
    'rainbow-delimiters-depth-2-face
-   nil :foreground "#fa5")
+   nil :foreground "#af5")
   (set-face-attribute
    'rainbow-delimiters-depth-3-face
    nil :foreground "#f5a"))

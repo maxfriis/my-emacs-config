@@ -13,7 +13,7 @@
 ;; | #0f0 | success/done    | #f0f | error/todo      |
 ;; | #00f | link/timestamp  | #ff0 | warning/heading |
 ;; |------+-----------------+------+-----------------|
-;; These colors will display nicely in an 8 color terminal.
+;; These colors will display nicely in an 8 or 16 color ansi terminal.
 ;; Unspecified faces are handled by the dark part of the vanilla theme.
 ;; ----------------------------------------------------------------------------
 ;; Fonts
@@ -84,7 +84,7 @@
  nil :foreground "#f00" :background "#000" :height 0.8)
 (set-face-attribute
  'line-number-current-line
- nil :foreground "#000" :background "#f00")
+ nil :foreground "#000" :background "#f00" :weight 'bold)
 (set-face-attribute
  'mode-line
  nil :foreground "#000" :background "#f00" :box nil :height 0.8)
@@ -335,7 +335,7 @@
    nil :foreground "#00f")
   (set-face-attribute
    'rainbow-delimiters-depth-2-face
-   nil :foreground "#ff0")
+   nil :foreground "#0f0")
   (set-face-attribute
    'rainbow-delimiters-depth-3-face
    nil :foreground "#f0f"))

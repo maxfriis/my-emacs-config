@@ -11,6 +11,7 @@
  gc-cons-threshold (* 50 1024 1024)
  gc-cons-percentage 0.5
  read-process-output-max (* 16 1024 1024)
+ package-enable-at-startup nil
  inhibit-startup-message t
  inhibit-compacting-font-caches t
  frame-inhibit-implied-resize t
@@ -23,7 +24,8 @@
 (setq
  default-frame-alist
  '((fullscreen       . maximized)
-   (background-color . "#221")))
+   (background-color . "#221")
+   (cursor-color     . "#0f0")))
 
 ;; ============================================================================
 ;;; Cleanup vanilla defaults

@@ -229,7 +229,7 @@ I have made a few Youtube videos on this configuration:
 
 * Clone
 
-If you have an /empty/ or missing ~/.emacs.d directory and have git installed you can clone this configuration with:
+If you have an /empty/ or deleted ~/.emacs.d directory and have git installed you can clone this configuration with:
 #+begin_src bash
   git clone https://github.com/maxfriis/my-emacs-config ~/.emacs.d
 #+end_src
