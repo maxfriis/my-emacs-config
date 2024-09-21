@@ -14,7 +14,7 @@
 ;; |------+-----------------+------+-----------------+------+-----------------|
 ;; Dark, warm, simple, systematic and aesthetically pleasing.
 ;; ----------------------------------------------------------------------------
-;; When I configure `evil' I add 8 cursor colors depending on the evil state.
+;; When I configure `evil' I add 7 cursor colors depending on the evil state.
 ;; Unspecified faces are handled by the dark part of the vanilla theme.
 ;; ----------------------------------------------------------------------------
 ;; Fonts
@@ -38,12 +38,6 @@
 (set-face-attribute
  'success
  nil :foreground "#af5")
-(set-face-attribute
- 'shadow
- nil :foreground "#432")
-(set-face-attribute
- 'match
- nil :background "#432")
 ;; ----------------------------------------------------------------------------
 ;; font-lock faces
 ;; ----------------------------------------------------------------------------
@@ -71,6 +65,15 @@
 ;; ----------------------------------------------------------------------------
 ;; Decorations
 ;; ----------------------------------------------------------------------------
+(set-face-attribute
+ 'region
+ nil :background "#432")
+(set-face-attribute
+ 'shadow
+ nil :foreground "#432")
+(set-face-attribute
+ 'match
+ nil :background "#432")
 (set-face-attribute
  'highlight
  nil :background "#432")
@@ -110,28 +113,28 @@
    nil :foreground "#fa5" :weight 'bold :height 1.25)
   (set-face-attribute
    'org-level-1
-   nil :foreground "#fa5" :weight 'bold :height 1.0)
+   nil :foreground "#fa5" :weight 'bold :height 1.25)
   (set-face-attribute
    'org-level-2
-   nil :foreground "#fa5" :weight 'bold :height 1.0)
+   nil :foreground "#fa5" :weight 'bold :height 1.25)
   (set-face-attribute
    'org-level-3
-   nil :foreground "#fa5" :weight 'bold :height 1.0)
+   nil :foreground "#fa5" :weight 'bold :height 1.25)
   (set-face-attribute
    'org-level-4
-   nil :foreground "#fa5" :weight 'bold :height 1.0)
+   nil :foreground "#fa5" :weight 'bold :height 1.25)
   (set-face-attribute
    'org-level-5
-   nil :foreground "#fa5" :weight 'bold :height 1.0)
+   nil :foreground "#fa5" :weight 'bold :height 1.25)
   (set-face-attribute
    'org-level-6
-   nil :foreground "#fa5" :weight 'bold :height 1.0)
+   nil :foreground "#fa5" :weight 'bold :height 1.25)
   (set-face-attribute
    'org-level-7
-   nil :foreground "#fa5" :weight 'bold :height 1.0)
+   nil :foreground "#fa5" :weight 'bold :height 1.25)
   (set-face-attribute
    'org-level-8
-   nil :foreground "#fa5" :weight 'bold :height 1.0)
+   nil :foreground "#fa5" :weight 'bold :height 1.25)
   (set-face-attribute
    'org-todo
    nil :foreground "#f5a" :height 0.8)
@@ -188,10 +191,7 @@
    nil :foreground "#5af" :underline nil :height 0.8)
   (set-face-attribute
    'org-link
-   nil :foreground "#5af")
-  (set-face-attribute
-   'org-meta-line
-   nil :height 1.25))
+   nil :foreground "#5af"))
 ;; ----------------------------------------------------------------------------
 ;; Bullets
 ;; ----------------------------------------------------------------------------
@@ -211,7 +211,7 @@
    nil :foreground "#fa5" :background "#221" :weight 'bold :height 1.25)
   (set-face-attribute
    'org-agenda-structure
-   nil :foreground "#fa5" :background "#221" :box nil :weight 'bold :height 1.0)
+   nil :foreground "#fa5" :background "#221" :box nil :weight 'bold :height 1.25)
   (set-face-attribute
    'org-column
    nil :background "#221")
@@ -294,7 +294,7 @@
 ;; ============================================================================
 (set-face-attribute
  'show-paren-match
- nil :foreground "#bba" :background "#000" :weight 'bold)
+ nil :foreground "#bba" :background "#221" :weight 'bold)
 (with-eval-after-load 'rainbow-delimiters
   (set-face-attribute
    'rainbow-delimiters-base-error-face

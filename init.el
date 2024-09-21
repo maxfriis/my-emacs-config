@@ -13,7 +13,7 @@
        (locate-user-emacs-file "my-faces.el")
        (locate-user-emacs-file "my-faces.elc"))
   (byte-compile-file (locate-user-emacs-file "my-faces.el")))
-(if (eq (user-uid) 0) ; Different colors as super user
+(if (eq (user-uid) 0) ; Different default colors as root
     (load (locate-user-emacs-file "my-ansi-faces.elc") nil t)
   ;; else
   (load (locate-user-emacs-file "my-faces.elc") nil t))
@@ -91,7 +91,7 @@
          (if global-display-line-numbers-mode
              '(-7 "%3c %p")
            ;; else
-           "%4l,%2c")
+           "%4l,%c")
        ;; else
        '(-3 "%p"))))))
 
@@ -353,7 +353,7 @@
 ;; Cursors are special. I combine f and 0 to color all types.
 ;; I tax the eyes a bit to follow the cursor/point and the evil states.
 ;; |------+----------+------+---------|
-;; | #000 | region   | #fff | visual  |
+;; | #000 | not used | #fff | visual  |
 ;; |------+----------+------+---------|
 ;; | #f00 | operator | #0ff | emacs   |
 ;; | #0f0 | normal   | #f0f | replace |
@@ -364,11 +364,8 @@
 ;; Replace state has a magenta color and use a horizontal hbar cursor.
 ;; Emacs and motion states have the remaining cyan and blue extreme rgb colors.
 ;; "Input" states have the colors with 2 f's and bars in common.
-;; The visual state has a white hollow cursor and regions are black.
+;; The visual state has a white hollow cursor.
 ;; ----------------------------------------------------------------------------
-(set-face-attribute
- 'region
- nil :background "#000")
 (setq
  evil-operator-state-cursor '(box        "#f00")
  evil-normal-state-cursor   '(box        "#0f0")
@@ -427,6 +424,19 @@
      evil-org-mode))
   (require 'evil-org-agenda)
   (evil-org-agenda-set-keys))
+;; ----------------------------------------------------------------------------
+;; Disable hl-line when marking region
+;; ----------------------------------------------------------------------------
+(add-hook
+ 'evil-visual-state-entry-hook
+ (lambda ()
+   (global-hl-line-mode 0)
+   (hl-line-mode 0)))
+(add-hook
+ 'evil-visual-state-exit-hook
+ (lambda ()
+   (global-hl-line-mode 1)
+   (hl-line-mode 1)))
 
 ;; ============================================================================
 ;;; Org.el
@@ -606,13 +616,13 @@
      (agenda ""
              ((org-agenda-span 'week)))
      (todo "TODO"
-           ;; TODOs with [/] cookies (subtasks).
+           ;; TODOs with [/] cookies and potential subtasks.
            ((org-agenda-overriding-header "No timestamp TODO or HOLD:")
             (org-agenda-skip-function
              '(org-agenda-skip-entry-if
                'notregexp "\\[[0-9]+/[0-9]+\\]"
                ;; or
-               'scheduled)))) ; will be shown with a deadline.
+               'scheduled)))) ; show projects with a deadline or normal timestamp.
      (todo "TODO"
            ;; Not every TODO has or should have a timestamp.
            ((org-agenda-overriding-header "") ; share heading with the item above
@@ -1062,8 +1072,8 @@
   "xx"  '(transpose-chars                        :which-key "Swap chars")
   "y"   '(:ignore t                              :which-key "y")
   "z"   '(:ignore t                              :which-key "Zoom")
+  "zg"  '(global-text-scale-adjust               :which-key "Global")
   "zl"  '(text-scale-adjust                      :which-key "Local")
-  "zz"  '(global-text-scale-adjust               :which-key "Global")
   ;; Danish
   "æ"   '(:ignore t                              :which-key "æ")
   "ø"   '(:ignore t                              :which-key "ø")

@@ -37,12 +37,6 @@
 (set-face-attribute
  'success
  nil :foreground "#0f0")
-(set-face-attribute
- 'shadow
- nil :foreground "#f00")
-(set-face-attribute
- 'match
- nil :background "#f00")
 ;; ----------------------------------------------------------------------------
 ;; font-lock faces
 ;; ----------------------------------------------------------------------------
@@ -70,6 +64,15 @@
 ;; ----------------------------------------------------------------------------
 ;; Decorations
 ;; ----------------------------------------------------------------------------
+(set-face-attribute
+ 'region
+ nil :background "#f00")
+(set-face-attribute
+ 'shadow
+ nil :foreground "#f00")
+(set-face-attribute
+ 'match
+ nil :background "#f00")
 (set-face-attribute
  'highlight
  nil :background "#f00")
@@ -137,28 +140,28 @@
    nil :foreground "#ff0" :weight 'bold :height 1.25)
   (set-face-attribute
    'org-level-1
-   nil :foreground "#ff0" :weight 'bold :height 1.0)
+   nil :foreground "#ff0" :weight 'bold :height 1.25)
   (set-face-attribute
    'org-level-2
-   nil :foreground "#ff0" :weight 'bold :height 1.0)
+   nil :foreground "#ff0" :weight 'bold :height 1.25)
   (set-face-attribute
    'org-level-3
-   nil :foreground "#ff0" :weight 'bold :height 1.0)
+   nil :foreground "#ff0" :weight 'bold :height 1.25)
   (set-face-attribute
    'org-level-4
-   nil :foreground "#ff0" :weight 'bold :height 1.0)
+   nil :foreground "#ff0" :weight 'bold :height 1.25)
   (set-face-attribute
    'org-level-5
-   nil :foreground "#ff0" :weight 'bold :height 1.0)
+   nil :foreground "#ff0" :weight 'bold :height 1.25)
   (set-face-attribute
    'org-level-6
-   nil :foreground "#ff0" :weight 'bold :height 1.0)
+   nil :foreground "#ff0" :weight 'bold :height 1.25)
   (set-face-attribute
    'org-level-7
-   nil :foreground "#ff0" :weight 'bold :height 1.0)
+   nil :foreground "#ff0" :weight 'bold :height 1.25)
   (set-face-attribute
    'org-level-8
-   nil :foreground "#ff0" :weight 'bold :height 1.0)
+   nil :foreground "#ff0" :weight 'bold :height 1.25)
   (set-face-attribute
    'org-todo
    nil :foreground "#f0f" :height 0.8)
@@ -215,10 +218,7 @@
    nil :foreground "#00f" :underline nil :height 0.8)
   (set-face-attribute
    'org-link
-   nil :foreground "#00f")
-  (set-face-attribute
-   'org-meta-line
-   nil :height 1.25))
+   nil :foreground "#00f"))
 ;; ----------------------------------------------------------------------------
 ;; Bullets
 ;; ----------------------------------------------------------------------------
@@ -238,7 +238,7 @@
    nil :foreground "#ff0" :background "#000" :weight 'bold :height 1.25)
   (set-face-attribute
    'org-agenda-structure
-   nil :foreground "#ff0" :background "#000" :box nil :weight 'bold :height 1.0)
+   nil :foreground "#ff0" :background "#000" :box nil :weight 'bold :height 1.25)
   (set-face-attribute
    'org-column
    nil :background "#000")
