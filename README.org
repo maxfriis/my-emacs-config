@@ -26,11 +26,27 @@ Examples of their use are:
 |-------+-----------------+---+-------+--------------+---+-------+----------------|
 Unspecified faces are handled by the vanilla theme.
 
-When I configure evil I add 8 ansi colors reserved for the cursor.
+** Root
+
+As root I use 8 ansi colors for the theme.
+| Color | Use            |   | Color | Use             |
+|-------+----------------+---+-------+-----------------|
+| #000  | background     |   | #fff  | default text    |
+|-------+----------------+---+-------+-----------------|
+| #f00  | shadow/hl-line |   | #0ff  | comment/tags    |
+| #0f0  | success/done   |   | #f0f  | error/todo      |
+| #00f  | link/timestamp |   | #ff0  | warning/heading |
+|-------+----------------+---+-------+-----------------|
+Operator state is automatically converted to cyan when shown on the red hl-line background.
+The idea is to have something clearly indicating that I have root privileges and have a fallback theme I can use with an ansi color terminal.
+
+** Cursor and evil state
+
+When I configure evil I add 7 ansi colors reserved for the cursor.
 I tax the eyes a bit with extreme colors to help keeping track of the evil state and cursor placement.
 | Color | State    |   | Color | State   |
 |-------+----------+---+-------+---------|
-| #000  | region   |   | #fff  | visual  |
+| #000  | not used |   | #fff  | visual  |
 |-------+----------+---+-------+---------|
 | #f00  | operator |   | #0ff  | emacs   |
 | #0f0  | normal   |   | #f0f  | replace |
@@ -42,20 +58,7 @@ Insert state is the last trafic light color (yellow) and use a bar.
 Replace state has the opposite color of insert state and use an hbar.
 Emacs and motion states have the remaining rgb colors.
 "Input" states have colors with 2 f's and bars in common.
-The visual state is hollow and might be filled with the region color.
-
-As root I use these 8 ansi colors for the theme too.
-| Color | Use            |   | Color | Use             |
-|-------+----------------+---+-------+-----------------|
-| #000  | background     |   | #fff  | default text    |
-|-------+----------------+---+-------+-----------------|
-| #f00  | shadow/hl-line |   | #0ff  | comment/tags    |
-| #0f0  | success/done   |   | #f0f  | error/todo      |
-| #00f  | link/timestamp |   | #ff0  | warning/heading |
-|-------+----------------+---+-------+-----------------|
-The conflicts are primarily that the region color only shows on the hl-line.
-Operator state is automatically converted to cyan when shown on the hl-line.
-The idea is to have something clearly indicating that I have root privileges and have a fallback theme I can use with an ansi color terminal.
+The visual state is hollow and can be filled with the region color.
 
 * Modeline
 
@@ -88,7 +91,7 @@ I use package.el and (require 'xyz) to install and load packages.
 I used to use use-package but that seem to increase the number of garbage collections significantly (about 5 fold for me).
 It is not clear to me that gains from controlling when to load packages (:defer) is worth this cost.
 
-I think deferring also makes little sense combined with Emacs server/client.
+I think deferring also makes little sense combined with Emacs server/client and current computers.
 If I was bothered by a slow startup time I would make a daemon on boot and use emacsclient.
 With that setup use-package's defers might hurt performance if everything is not loaded in the daemon.
 
@@ -153,7 +156,7 @@ As you get used to the less complex bindings you will develop foresight to use l
 ** Casual use
 
 As a more casual or inexperienced user, one paste command is preferable.
-My configuration can work as a great introduction to evil keybindings.
+My configuration can work as an introduction to evil keybindings.
 
 The cursor model in normal state will be more consistent both with it's insert state but also with other programs.
 If you dislike layers and try to minimize their use, you gain a lot from not needing capitalized bindings.
@@ -170,9 +173,11 @@ I extend it with a few external packages, the native prettify.el and a few hooks
 ** Org-agenda
 
 I restrict myself to the 4 todo-states NEXT, TODO, HOLD and DONE.
+
+NEXT is an unblocked task that can be done in less than 5 mins.
 HOLD is an inactive state that can be translated to "pending third party action".
 The other states are self explanatory.
-Some might want a canceled state, but I cancel items by archiving them in an active state.
+I don't have a canceled state because I just archive canceled items in an active state.
 
 Besides the states I use refile and an unrestricted number of categories for todo items.
 When I have a project I introduce a new category with a capture.
@@ -181,17 +186,15 @@ I configure my custom agenda to have 4 sections:
 
 1. I have a potentially empty section without a headline where I display my NEXT items.
    When I capture ideas they will go in my inbox as a NEXT item.
-   NEXT items are unblocked tasks that take less than 5 minutes meant to be handled asap.
+   NEXT items are unblocked tasks that take less than 5 minutes.
    Organizing an item into my agenda is such a task.
 2. After this I display this week's agenda with active todo-state items that have an active timestamp.
    Items from the first section can potentially be repeated here if they are timestamped.
 3. Not all TODO items have or even should have a timestamp.
-   In this section I pile up items that have not been dealt a time slot yet.
-   Some will never have a time slot like e.g. a project with multiple tasks associated.
-   I can follow the progress of subtasks here with a cookie.
-   Last I also display items on HOLD in this section.
+   I display items with a cookie at the top and these will typically be projects containing subtasks.
+   At the bottom I display items on HOLD which I also like to keep an eye on.
 4. The final section like the first is usually empty.
-   This is where I can append a search or whatever the agenda menu offers.
+   This is where I can append what the agenda menu offers including a few custom options.
 The main two capture templates is a simple idea capture and an item with a category that I can refile to.
 That is all I need for my agenda.
 

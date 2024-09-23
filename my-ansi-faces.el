@@ -38,30 +38,6 @@
  'success
  nil :foreground "#0f0")
 ;; ----------------------------------------------------------------------------
-;; font-lock faces
-;; ----------------------------------------------------------------------------
-(set-face-attribute
- 'font-lock-builtin-face
- nil :foreground "#0f0")
-(set-face-attribute
- 'font-lock-comment-face
- nil :foreground "#0ff")
-(set-face-attribute
- 'font-lock-constant-face
- nil :foreground "#ff0")
-(set-face-attribute
- 'font-lock-function-name-face
- nil :foreground "#0f0")
-(set-face-attribute
- 'font-lock-keyword-face
- nil :foreground "#00f")
-(set-face-attribute
- 'font-lock-string-face
- nil :foreground "#0ff")
-(set-face-attribute
- 'font-lock-warning-face
- nil :underline nil)
-;; ----------------------------------------------------------------------------
 ;; Decorations
 ;; ----------------------------------------------------------------------------
 (set-face-attribute
@@ -122,6 +98,30 @@
   (set-face-attribute
    'tab-line-highlight ;; mouseover
    nil :foreground "#fff" :background "#000" :box nil))
+;; ----------------------------------------------------------------------------
+;; font-lock faces
+;; ----------------------------------------------------------------------------
+(set-face-attribute
+ 'font-lock-builtin-face
+ nil :foreground "#0f0")
+(set-face-attribute
+ 'font-lock-comment-face
+ nil :foreground "#0ff")
+(set-face-attribute
+ 'font-lock-constant-face
+ nil :foreground "#ff0")
+(set-face-attribute
+ 'font-lock-function-name-face
+ nil :foreground "#0f0")
+(set-face-attribute
+ 'font-lock-keyword-face
+ nil :foreground "#00f")
+(set-face-attribute
+ 'font-lock-string-face
+ nil :foreground "#0ff")
+(set-face-attribute
+ 'font-lock-warning-face
+ nil :underline nil)
 ;; ----------------------------------------------------------------------------
 ;; Define more keywords
 ;; ----------------------------------------------------------------------------
@@ -227,8 +227,11 @@
    'org-superstar-leading
    nil :foreground "#f00" :height 0.8) ; the dots marking the deapt
   (set-face-attribute
+   'org-superstar-header-bullet
+   nil :foreground "#ff0" :height 0.8) ; the header bullet face
+  (set-face-attribute
    'org-superstar-item
-   nil :foreground "#ff0" :height 0.8)) ; the bullet face
+   nil :foreground "#ff0" :height 0.8)) ; the item bullet face
 ;; ----------------------------------------------------------------------------
 ;; Agenda
 ;; ----------------------------------------------------------------------------
@@ -262,7 +265,7 @@
    nil :foreground "#0ff" :background "#f00")
   (set-face-attribute
    'org-agenda-date
-   nil :foreground "#00f" :background "#000" :box nil :weight 'normal)
+   nil :foreground "#00f" :background "#000" :box nil :weight 'normal :height 0.8)
   (set-face-attribute
    'org-agenda-date-weekend
    nil :foreground "#00f" :background "#000" :box nil :weight 'normal :underline nil)

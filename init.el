@@ -17,6 +17,7 @@
     (load (locate-user-emacs-file "my-ansi-faces.elc") nil t)
   ;; else
   (load (locate-user-emacs-file "my-faces.elc") nil t))
+;; I could use variables, but I like to see the color codes when I set faces.
 
 ;; ============================================================================
 ;;; Modeline
@@ -25,18 +26,18 @@
  mode-line-buffer-identification-keymap nil)
 (setq-default ; mode-line-format is buffer local so setq-default
  mode-line-format
- '(mode-line-front-space
-   (:eval
-    (if (eq (user-uid) 0)
-        (list "#")
-      ;; else
-      (list " ")))
-   mode-line-modified
-   " "
-   mode-line-buffer-identification
-   " "
-   (:eval
+ '((:eval ; I just eval and list everything
     (list
+     "%e"
+     mode-line-front-space
+     (if (eq (user-uid) 0)
+         "#"
+       ;; else
+       " ")
+     mode-line-modified
+     " "
+     mode-line-buffer-identification
+     " "
      ;; short major mode name
      (propertize
       (concat
@@ -44,7 +45,7 @@
        (string-replace
         "-" " "
         (replace-regexp-in-string
-         "\\`emacs-" ""
+         "\\`emacs-" "e"
          (replace-regexp-in-string
           "\\`org-" ""
           (replace-regexp-in-string
@@ -57,43 +58,33 @@
       'local-map (make-mode-line-mouse-map
                   'mouse-1 #'transpose-frame)
       'mouse-face 'mode-line-highlight)
-     (when (mode-line-window-selected-p)
-       (list
-        (unless (eq vc-mode nil) ; version control
-          (replace-regexp-in-string
-           "\\` Git" " "
-           vc-mode))
-        (when (buffer-narrowed-p)
-          (list
-           " "
-           (propertize
-            "[n]"
-            'help-echo "Narrowed, mouse-1: widen"
-            'local-map (make-mode-line-mouse-map
-                        'mouse-1 #'mode-line-widen)
-            'mouse-face 'mode-line-highlight)))
-        mode-line-misc-info))
-     " "))
-   (:eval
-    (list
-     ;; gap for alignment
-     (if (mode-line-window-selected-p)
-         (propertize
-          " "
-          'display '((space :align-to (- (+ right right-fringe right-margin) 7)))
-          'face    'mode-line-inactive)
-       ;; else
+     (when (buffer-narrowed-p)
        (propertize
-        " "
-        'display '((space :align-to (- (+ right right-fringe right-margin) 3)))))
+        "(n)"
+        'help-echo "Narrowed, mouse-1: widen"
+        'local-map (make-mode-line-mouse-map
+                    'mouse-1 #'mode-line-widen)
+        'mouse-face 'mode-line-highlight))
+     ;; version control in active window
+     (when (and vc-mode (mode-line-window-selected-p))
+       (replace-regexp-in-string
+        "\\` Git" " "
+        vc-mode))
+     " "
+     mode-line-misc-info
+     ;; gap for alignment
+     (propertize
+      " "
+      'display '((space :align-to (- (+ right right-fringe right-margin) 8)))
+      'face    'mode-line-inactive)
      ;; position information
      (if (mode-line-window-selected-p)
          (if global-display-line-numbers-mode
-             '(-7 "%3c %p")
+             '(-8 "%4c %p")
            ;; else
            "%4l,%c")
        ;; else
-       '(-3 "%p"))))))
+       '(-8 "     %p"))))))
 
 ;; ============================================================================
 ;;; Other vanilla stuff
@@ -101,8 +92,8 @@
 ;; Variables
 ;; ----------------------------------------------------------------------------
 (setq-default ; buffer-local variables
- indent-tabs-mode nil
- display-line-numbers-width 3)
+ display-line-numbers-width 3 ; min width
+ indent-tabs-mode nil)
 (setq
  tab-width 4
  frame-title-format
@@ -182,10 +173,10 @@
 ;; ----------------------------------------------------------------------------
 ;; Hooks
 ;; ----------------------------------------------------------------------------
+(add-hook 'before-save-hook #'whitespace-cleanup)
 (add-hook 'dired-mode-hook  #'dired-hide-details-mode) ; toggle with "("
 (add-hook 'dired-mode-hook  #'dired-omit-mode)         ; toggle with "a"
-(add-hook 'text-mode-hook   #'visual-line-mode)
-(add-hook 'before-save-hook #'whitespace-cleanup)
+(add-hook 'text-mode-hook   #'visual-line-mode)        ; linebreaks
 (add-hook
  'emacs-startup-hook
  (lambda ()
@@ -308,13 +299,13 @@
    ("melpa" . "https://melpa.org/packages/"))
  package-selected-packages
  '(evil evil-collection evil-nerd-commenter evil-surround evil-numbers evil-org
-        vertico marginalia orderless consult embark embark-consult lsp-mode
-        avy org-superstar org-appear org-present cape corfu nerd-icons-corfu
+        org-superstar org-appear org-present magit cape corfu nerd-icons-corfu
         nerd-icons nerd-icons-dired nerd-icons-ibuffer nerd-icons-completion
+        avy vertico marginalia orderless consult embark embark-consult lsp-mode
         rainbow-delimiters rainbow-mode golden-ratio ace-window transpose-frame
         recursive-narrow centered-cursor-mode visual-fill-column mixed-pitch
         undo-tree keycast indent-guide counsel helpful flycheck writegood-mode
-        magit which-key general super-save backup-each-save auto-package-update))
+        which-key general super-save backup-each-save auto-package-update))
 (unless (package-installed-p 'package)
   (require 'package))
 (package-initialize)
@@ -374,13 +365,13 @@
  evil-replace-state-cursor  '((hbar . 4) "#f0f")
  evil-insert-state-cursor   '((bar  . 4) "#ff0")
  evil-visual-state-cursor   '(hollow     "#fff")
- evil-ex-substitute-highlight-all nil
  evil-ex-search-persistent-highlight nil
+ evil-ex-substitute-highlight-all nil
  evil-shift-round t
  evil-undo-system 'undo-tree
+ evil-want-C-u-scroll t   ; in the motion states
  evil-want-integration t
  evil-want-keybinding nil ; evil-collection need this
- evil-want-C-u-scroll t   ; in the motion states
  vim-style-remap-Y-to-y$ t)
 ;; ----------------------------------------------------------------------------
 ;; Evil package
@@ -400,7 +391,7 @@
 ;; This model is easier to internalize especially if you are not a power user.
 ;; It's more similar to other editing experiences.
 ;; More info: [[https://www.dr-qubit.org/Evil_cursor_model.html]]
-;; Normal `evil' behavior will work if the next few lines are omitted.
+;; Default `evil' behavior will work if the next few lines are omitted.
 (when (file-newer-than-file-p
        (locate-user-emacs-file "evil-cursor-model.el")
        (locate-user-emacs-file "evil-cursor-model.elc"))
@@ -425,18 +416,17 @@
   (require 'evil-org-agenda)
   (evil-org-agenda-set-keys))
 ;; ----------------------------------------------------------------------------
-;; Disable hl-line when marking region
+;; Disable hl-line when marking a region
 ;; ----------------------------------------------------------------------------
 (add-hook
  'evil-visual-state-entry-hook
  (lambda ()
-   (global-hl-line-mode 0)
-   (hl-line-mode 0)))
+   (global-hl-line-mode 0)))
 (add-hook
  'evil-visual-state-exit-hook
  (lambda ()
-   (global-hl-line-mode 1)
-   (hl-line-mode 1)))
+   (global-hl-line-mode 1)))
+
 
 ;; ============================================================================
 ;;; Org.el
@@ -452,9 +442,15 @@
   (make-directory org-directory))
 (unless (file-exists-p org-agenda-directory)
   (make-directory org-agenda-directory))
-;; Need at least one agenda file. Can't just be a directory
+;; Create empty capture files
+(unless (file-exists-p (concat org-directory "archive.org"))
+  (make-empty-file     (concat org-directory "archive.org")))
 (unless (file-exists-p (concat org-directory "inbox.org"))
   (make-empty-file     (concat org-directory "inbox.org")))
+(unless (file-exists-p (concat org-agenda-directory "note.org"))
+  (make-empty-file     (concat org-agenda-directory "note.org")))
+(unless (file-exists-p (concat org-agenda-directory "plan.org"))
+  (make-empty-file     (concat org-agenda-directory "plan.org")))
 ;; Create agenda.org with two refile targets
 (unless (file-exists-p (concat org-agenda-directory "agenda.org"))
   (find-file           (concat org-agenda-directory "agenda.org"))
@@ -472,13 +468,6 @@
     ":END:\n"))
   (save-buffer)
   (switch-to-buffer "*scratch*"))
-;; Create additional empty capture files
-(unless (file-exists-p (concat org-agenda-directory "plan.org"))
-  (make-empty-file     (concat org-agenda-directory "plan.org")))
-(unless (file-exists-p (concat org-agenda-directory "note.org"))
-  (make-empty-file     (concat org-agenda-directory "note.org")))
-(unless (file-exists-p (concat org-directory "archive.org"))
-  (make-empty-file     (concat org-directory "archive.org")))
 ;; ----------------------------------------------------------------------------
 ;; Variables setting up the environment
 ;; ----------------------------------------------------------------------------
@@ -645,11 +634,11 @@
              '(org-agenda-skip-entry-if
                'notregexp org-priority-regexp))))))
    ("d" "DONE entries"
-    ;; Useful for archiving done tasks
+    ;; For archiving done tasks
     ((todo "DONE"
            ((org-agenda-overriding-header "Done TODOs")))))
    ("u" "Untagged TODOs"
-    ;; Useful for adding tags
+    ;; For adding tags
     ((tags-todo "-{.*}"
                 ((org-agenda-overriding-header "Untagged TODOs"))))))
  org-agenda-time-grid nil
@@ -664,10 +653,10 @@
  org-agenda-deadline-leaders
  '("☒" "☒%3dd" "☒%3dx")
  org-agenda-timerange-leaders
- '(":1" "%2d/%d") ; :# is a marker to discover when this is used
- org-agenda-entry-text-leaders ":2"
- org-agenda-bulk-mark-char ":3"
- org-agenda-breadcrumbs-separator ":4"
+ '("Range" "%2d/%d") ; :# is a marker to discover when this is used
+ org-agenda-entry-text-leaders ":"
+ org-agenda-bulk-mark-char ":"
+ org-agenda-breadcrumbs-separator ":"
  ;; org-agenda-start-with-log-mode t
  org-agenda-skip-scheduled-if-done t
  org-agenda-skip-deadline-if-done t
@@ -1211,3 +1200,4 @@
 ;;; Startup page
 ;; ============================================================================
 (my/org-agenda-custom)
+;; End of init.el
