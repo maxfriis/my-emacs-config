@@ -29,7 +29,7 @@ Unspecified faces are handled by the vanilla theme.
 Note that I don't use #83f due to bad color contrast.
 
 I have made a screenshot:
-[[https://github.com/maxfriis/my-emacs-config/emacs_screenshot.png]]
+[[https://github.com/maxfriis/my-emacs-config/blob/3ae045b6d7ab7c7ea1fa06a4e60fc5f21fd4acaf/emacs_screenshot.png]]
 
 ** Root
 
