@@ -28,7 +28,8 @@ Examples of their use are:
 Unspecified faces are handled by the vanilla theme.
 Note that I don't use #83f due to bad color contrast.
 
-[[file:screenshot of emacs.png]]
+I have made a screenshot:
+[[https://github.com/maxfriis/my-emacs-config/emacs_screenshot.png]]
 
 ** Root
 
