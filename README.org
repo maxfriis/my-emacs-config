@@ -4,7 +4,7 @@
 * Early init
 
 Here I set some variables that influence the startup process.
-This both about performance but also about seeing defaults I don't end up using.
+This is both about performance but also about seeing defaults I don't end up using.
 E.g. I don't want a white background to blink on startup because I prefer a dark theme.
 
 * My font faces
@@ -17,14 +17,18 @@ I don't like or use custom.el.
 
 I restrict myself to use 8 dark theme colors.
 Examples of their use are:
-| Color | Use             |   | Color | Use          |   | Color | Use            |
-|-------+-----------------+---+-------+--------------+---+-------+----------------|
-| #221  | background      |   | #bba  | default text |   | #432  | shadow/hl-line |
-|-------+-----------------+---+-------+--------------+---+-------+----------------|
-| #f5a  | error/todo      |   | #af5  | success/done |   | #5af  | link/timestamp |
-| #fa5  | warning/heading |   | #5fa  | comment/tags |   | #a5f  | not used       |
-|-------+-----------------+---+-------+--------------+---+-------+----------------|
+| Color | Use            |   | Color | Use             |
+|-------+----------------+---+-------+-----------------|
+| #220  | background     |   | #bba  | default text    |
+|-------+----------------+---+-------+-----------------|
+| #f38  | error/todo     |   | #f83  | warning/heading |
+| #8f3  | success/done   |   | #3f8  | comment/tags    |
+| #38f  | link/timestamp |   | #432  | shadow/hl-line  |
+|-------+----------------+---+-------+-----------------|
 Unspecified faces are handled by the vanilla theme.
+Note that I don't use #83f due to bad color contrast.
+
+[[file:screenshot of emacs.png]]
 
 ** Root
 
@@ -33,28 +37,28 @@ As root I use 8 ansi colors for the theme.
 |-------+----------------+---+-------+-----------------|
 | #000  | background     |   | #fff  | default text    |
 |-------+----------------+---+-------+-----------------|
-| #f00  | shadow/hl-line |   | #0ff  | comment/tags    |
-| #0f0  | success/done   |   | #f0f  | error/todo      |
-| #00f  | link/timestamp |   | #ff0  | warning/heading |
+| #f00  | error/todo     |   | #ff0  | warning/heading |
+| #0f0  | success/done   |   | #0ff  | comment/tags    |
+| #00f  | link/timestamp |   | #f0f  | shadow/hl-line  |
 |-------+----------------+---+-------+-----------------|
-Operator state is automatically converted to cyan when shown on the red hl-line background.
+Replace state is automatically converted to cyan when shown on the magenta hl-line background.
 The idea is to have something clearly indicating that I have root privileges and have a fallback theme I can use with an ansi color terminal.
 
 ** Cursor and evil state
 
 When I configure evil I add 7 ansi colors reserved for the cursor.
 I tax the eyes a bit with extreme colors to help keeping track of the evil state and cursor placement.
-| Color | State    |   | Color | State   |
-|-------+----------+---+-------+---------|
-| #000  | not used |   | #fff  | visual  |
-|-------+----------+---+-------+---------|
-| #f00  | operator |   | #0ff  | emacs   |
-| #0f0  | normal   |   | #f0f  | replace |
-| #00f  | motion   |   | #ff0  | insert  |
-|-------+----------+---+-------+---------|
+| Color | State      |   | Color | State   |
+|-------+------------+---+-------+---------|
+| #000  | delimiters |   | #fff  | visual  |
+|-------+------------+---+-------+---------|
+| #f00  | operator   |   | #ff0  | insert  |
+| #0f0  | normal     |   | #0ff  | emacs   |
+| #00f  | motion     |   | #f0f  | replace |
+|-------+------------+---+-------+---------|
 Operator state is red to alert.
 Normal state has the opposite green color.
-Insert state is the last trafic light color (yellow) and use a bar.
+Insert state is the last traffic light color (yellow) and use a bar.
 Replace state has the opposite color of insert state and use an hbar.
 Emacs and motion states have the remaining rgb colors.
 "Input" states have colors with 2 f's and bars in common.
@@ -93,27 +97,25 @@ It is not clear to me that gains from controlling when to load packages (:defer)
 
 I think deferring also makes little sense combined with Emacs server/client and current computers.
 If I was bothered by a slow startup time I would make a daemon on boot and use emacsclient.
-With that setup use-package's defers might hurt performance if everything is not loaded in the daemon.
 
 Deferring can also make debugging harder.
 You might have to ask yourself is or isn't this or that loaded, when did it happen and is that what is causing the problem right now?
 It's easier and cleaner to just have everything loaded.
 Note that packages sometimes defer stuff so I don't avoid this potential problem.
-
 Use-package/straight also have some other advantages like updating packages directly from a git repo, but I don't use that.
-I preserve some of the structure that is also a feature of use-package.
 
+I preserve some of the structure that is also a feature of use-package.
 That means that I will set variables associated with a package just before I require it.
 This would typically be part of an :init or :custom section in use-package.
 Hooks (:hook or :config) and mode activations (:init?! or :config) I do right after require.
 I do keybindings (:bind or :command) at the end of the configuration in a dedicated section.
-Faces (:custom-face) are handled in a separate loaded file.
+Faces (:custom-face) are handled in a loaded file.
 
 All this should make it fairly easy to convert my config to use use-package or straight.
 
 ** Honorable mentions
 
-I will only comment on the 3 packages evil, org and general.
+I will only comment on the 3 packages: evil, org and general.
 Honorable mentions are vertico, corfu, ace-window, recursive-narrow and magit but I use many more.
 
 * Evil.el
@@ -176,8 +178,8 @@ I restrict myself to the 4 todo-states NEXT, TODO, HOLD and DONE.
 
 NEXT is an unblocked task that can be done in less than 5 mins.
 HOLD is an inactive state that can be translated to "pending third party action".
-The other states are self explanatory.
-I don't have a canceled state because I just archive canceled items in an active state.
+The default states are self explanatory.
+I don't have a canceled state because I just archive those items in an active state.
 
 Besides the states I use refile and an unrestricted number of categories for todo items.
 When I have a project I introduce a new category with a capture.
