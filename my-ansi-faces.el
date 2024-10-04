@@ -9,9 +9,9 @@
 ;; |------+-----------------+------+-----------------|
 ;; | #000 | background      | #fff | default text    |
 ;; |------+-----------------+------+-----------------|
-;; | #f00 | shadow/hl-line  | #0ff | comment/tag     |
-;; | #0f0 | success/done    | #f0f | error/todo      |
-;; | #00f | link/timestamp  | #ff0 | warning/heading |
+;; | #f00 | shadow/hl-line  | #ff0 | warning/heading |
+;; | #0f0 | success/done    | #0ff | comment/tag     |
+;; | #00f | link/timestamp  | #f0f | error/todo      |
 ;; |------+-----------------+------+-----------------|
 ;; These colors will display nicely in an 8 or 16 color ansi terminal.
 ;; Unspecified faces are handled by the dark part of the vanilla theme.
@@ -27,6 +27,8 @@
 (set-face-attribute
  'variable-pitch
  nil :font "Verdana")
+;; ----------------------------------------------------------------------------
+;; Special faces
 ;; ----------------------------------------------------------------------------
 (set-face-attribute
  'error
@@ -70,22 +72,23 @@
 (set-face-attribute
  'mode-line-inactive
  nil :foreground "#f00" :background "#000" :box nil :overline t)
-(set-face-attribute
- 'tab-bar
- nil :foreground "#f00" :background "#000" :weight 'bold :box nil :inherit 'default :height 0.8)
-(set-face-attribute
- 'tab-bar-tab
- nil :foreground "#000" :background "#f00" :box t)
-(set-face-attribute
- 'tab-bar-tab-inactive
- nil :foreground "#f00" :background "#000" :box nil)
+(with-eval-after-load 'tab-bar
+  (set-face-attribute
+   'tab-bar
+   nil :foreground "#f00" :background "#000" :weight 'bold :box nil :height 0.8 :inherit 'default)
+  (set-face-attribute
+   'tab-bar-tab
+   nil :foreground "#000" :background "#f00" :box t)
+  (set-face-attribute
+   'tab-bar-tab-inactive
+   nil :foreground "#f00" :background "#000" :box nil))
 (with-eval-after-load 'tab-line
   (set-face-attribute
    'tab-line
    nil :foreground "#f00" :background "#000" :overline t :box nil)
   (set-face-attribute
    'tab-line-tab ;; active tab in another frame
-   nil :inherit 'tab-line :box nil)
+   nil :box nil :inherit 'tab-line)
   (set-face-attribute
    'tab-line-tab-current
    nil :foreground "#000" :background "#f00" :box nil)
@@ -322,26 +325,9 @@
 ;; ============================================================================
 ;;; Misc. other package faces
 ;; ============================================================================
-(with-eval-after-load 'dired
-  (set-face-attribute
-   'dired-ignored
-   nil :foreground "#0ff"))
 (set-face-attribute ; matching parenthesis get cursor colors
  'show-paren-match
  nil :foreground "#fff" :background "#000" :weight 'bold)
-(with-eval-after-load 'rainbow-delimiters
-  (set-face-attribute
-   'rainbow-delimiters-base-error-face
-   nil :foreground "#fff" :background "#f0f" :weight 'bold :underline t)
-  (set-face-attribute
-   'rainbow-delimiters-depth-1-face
-   nil :foreground "#00f")
-  (set-face-attribute
-   'rainbow-delimiters-depth-2-face
-   nil :foreground "#0f0")
-  (set-face-attribute
-   'rainbow-delimiters-depth-3-face
-   nil :foreground "#f0f"))
 (with-eval-after-load 'keycast
   (set-face-attribute
    'keycast-key
@@ -365,3 +351,21 @@
   (set-face-attribute
    'indent-guide-face
    nil :foreground "#f00"))
+(with-eval-after-load 'dired
+  (set-face-attribute
+   'dired-ignored
+   nil :foreground "#0ff"))
+(with-eval-after-load 'rainbow-delimiters
+  (set-face-attribute
+   'rainbow-delimiters-base-error-face
+   nil :foreground "#fff" :background "#f0f" :weight 'bold :underline t)
+  (set-face-attribute
+   'rainbow-delimiters-depth-1-face
+   nil :foreground "#00f")
+  (set-face-attribute
+   'rainbow-delimiters-depth-2-face
+   nil :foreground "#0f0")
+  (set-face-attribute
+   'rainbow-delimiters-depth-3-face
+   nil :foreground "#f0f"))
+;; End of my-ansi-faces.el

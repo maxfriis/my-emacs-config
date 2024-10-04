@@ -6,6 +6,7 @@
 ;; ============================================================================
 ;; Modern computers are able to handle more than the defaults
 ;; Garbage collection start at 50MB rather than 800k etc.
+;; I also clean up some defaults I don't want to see during startup.
 ;; ----------------------------------------------------------------------------
 (setq
  gc-cons-threshold (* 50 1024 1024)
@@ -16,15 +17,10 @@
  inhibit-compacting-font-caches t
  frame-inhibit-implied-resize t
  frame-title-format "GNU Emacs"
- mode-line-format nil)
-
-;; ============================================================================
-;;; Maximize and dark background
-;; ============================================================================
-(setq
+ mode-line-format nil
  default-frame-alist
  '((fullscreen       . maximized)
-   (background-color . "#221")
+   (background-color . "#000")
    (cursor-color     . "#0f0")))
 
 ;; ============================================================================
@@ -37,3 +33,4 @@
 (tool-bar-mode     -1)
 (tooltip-mode      -1)
 (blink-cursor-mode -1)
+;; End of early-init.el

@@ -5,6 +5,7 @@
 ;;; Font faces (my themes)
 ;; ============================================================================
 ;; I like everything compiled
+;; ----------------------------------------------------------------------------
 (when (file-newer-than-file-p
        (locate-user-emacs-file "my-ansi-faces.el")
        (locate-user-emacs-file "my-ansi-faces.elc"))
@@ -13,27 +14,25 @@
        (locate-user-emacs-file "my-faces.el")
        (locate-user-emacs-file "my-faces.elc"))
   (byte-compile-file (locate-user-emacs-file "my-faces.el")))
-(if (eq (user-uid) 0) ; Different default colors as root
+;; ----------------------------------------------------------------------------
+;; I could use variables, but to see the color codes. I use two files.
+;; ----------------------------------------------------------------------------
+(if (eq (user-uid) 0) ; Different colors as root
     (load (locate-user-emacs-file "my-ansi-faces.elc") nil t)
   ;; else
   (load (locate-user-emacs-file "my-faces.elc") nil t))
-;; I could use variables, but I like to see the color codes when I set faces.
 
 ;; ============================================================================
 ;;; Modeline
 ;; ============================================================================
-(setq
- mode-line-buffer-identification-keymap nil)
 (setq-default ; mode-line-format is buffer local so setq-default
  mode-line-format
- '((:eval ; I just eval and list everything
+ '((:eval ; eval and list everything
     (list
      "%e"
      mode-line-front-space
-     (if (eq (user-uid) 0)
-         "#"
-       ;; else
-       " ")
+     (when (eq (user-uid) 0)
+       "#")
      mode-line-modified
      " "
      mode-line-buffer-identification
@@ -157,7 +156,7 @@
  ;; ----------------------------------------------------------------------------
  display-time-format "[%Y-%m-%d %a %H:%M]"
  display-line-numbers-type 'relative
- ;; Popups not associated with a file pop below the current window.
+ ;; Popups not associated with a file pop below the current window
  display-buffer-alist
  '(("\\`\s?\\*.*\\*\s?\\'"
     (display-buffer-reuse-mode-window
@@ -266,7 +265,7 @@
 ;; Save and quit
 ;; ----------------------------------------------------------------------------
 (defun my/save-all-kill-emacs-no-prompt ()
-  "Save all and quit without prompting" ; Not risky with backup-each-save.
+  "Save all and quit without prompting" ; Not risky with backup-each-save
   (interactive)
   (save-some-buffers t)
   (when (file-newer-than-file-p
@@ -346,14 +345,14 @@
 ;; |------+----------+------+---------|
 ;; | #000 | not used | #fff | visual  |
 ;; |------+----------+------+---------|
-;; | #f00 | operator | #0ff | emacs   |
-;; | #0f0 | normal   | #f0f | replace |
-;; | #00f | motion   | #ff0 | insert  |
+;; | #f00 | operator | #ff0 | insert  |
+;; | #0f0 | normal   | #0ff | emacs   |
+;; | #00f | motion   | #f0f | replace |
 ;; |------+----------+------+---------|
 ;; Operator state is red to alert. Normal state has the opposite green color.
 ;; Insert state has the remaining yellow trafic light color and use a bar.
 ;; Replace state has a magenta color and use a horizontal hbar cursor.
-;; Emacs and motion states have the remaining cyan and blue extreme rgb colors.
+;; Emacs and motion states have the remaining cyan and blue ansi rgb colors.
 ;; "Input" states have the colors with 2 f's and bars in common.
 ;; The visual state has a white hollow cursor.
 ;; ----------------------------------------------------------------------------
@@ -361,9 +360,9 @@
  evil-operator-state-cursor '(box        "#f00")
  evil-normal-state-cursor   '(box        "#0f0")
  evil-motion-state-cursor   '(box        "#00f")
+ evil-insert-state-cursor   '((bar  . 4) "#ff0")
  evil-emacs-state-cursor    '((bar  . 4) "#0ff")
  evil-replace-state-cursor  '((hbar . 4) "#f0f")
- evil-insert-state-cursor   '((bar  . 4) "#ff0")
  evil-visual-state-cursor   '(hollow     "#fff")
  evil-ex-search-persistent-highlight nil
  evil-ex-substitute-highlight-all nil
@@ -426,7 +425,6 @@
  'evil-visual-state-exit-hook
  (lambda ()
    (global-hl-line-mode 1)))
-
 
 ;; ============================================================================
 ;;; Org.el
@@ -505,7 +503,7 @@
    ("CRYPT"    . ?C)
    ("ORDERED"  . ?O)
    ("NOEXPORT" . ?X))
- org-startup-folded 'show2levels
+ ;; org-startup-folded 'show2levels
  org-cycle-hide-block-startup t
  org-confirm-babel-evaluate nil
  ;; ----------------------------------------------------------------------------
@@ -595,7 +593,7 @@
  org-agenda-files (list (concat org-directory "inbox.org")
                         org-agenda-directory) ; all org files in the agenda dir
  org-agenda-format-date " [%F %a] "
- org-agenda-block-separator ?﹋ ; ﹌̅‾﹉⎺ also separate appended agenda ("a")
+ org-agenda-block-separator ?﹋ ; ﹌̅‾﹉⎺
  org-agenda-span 'month
  org-agenda-custom-commands
  '(("c" "Custom agenda setup"
@@ -605,13 +603,13 @@
      (agenda ""
              ((org-agenda-span 'week)))
      (todo "TODO"
-           ;; TODOs with [/] cookies and potential subtasks.
+           ;; TODOs with [/] cookies and potential subtasks go on top.
            ((org-agenda-overriding-header "No timestamp TODO or HOLD:")
             (org-agenda-skip-function
              '(org-agenda-skip-entry-if
                'notregexp "\\[[0-9]+/[0-9]+\\]"
                ;; or
-               'scheduled)))) ; show projects with a deadline or normal timestamp.
+               'timestamp))))
      (todo "TODO"
            ;; Not every TODO has or should have a timestamp.
            ((org-agenda-overriding-header "") ; share heading with the item above
@@ -624,11 +622,11 @@
      ;; Inactive states
      (todo "HOLD"
            ;; HOLD for third party action pending.
-           ((org-agenda-overriding-header "")
+           ((org-agenda-overriding-header "") ; same block
             (org-agenda-block-separator nil)))
      (todo "DONE"
            ;; Prioritized DONE.
-           ((org-agenda-overriding-header "")
+           ((org-agenda-overriding-header "") ; same block
             (org-agenda-block-separator nil)
             (org-agenda-skip-function
              '(org-agenda-skip-entry-if
@@ -653,7 +651,7 @@
  org-agenda-deadline-leaders
  '("☒" "☒%3dd" "☒%3dx")
  org-agenda-timerange-leaders
- '("Range" "%2d/%d") ; :# is a marker to discover when this is used
+ '("Range" "%2d/%d")
  org-agenda-entry-text-leaders ":"
  org-agenda-bulk-mark-char ":"
  org-agenda-breadcrumbs-separator ":"
@@ -848,6 +846,8 @@
  rainbow-delimiters-max-face-count 3)
 (require 'rainbow-delimiters)
 (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
+;; (setq
+;;  indent-guide-char ":")
 (require 'indent-guide)
 (require 'rainbow-mode)
 (add-hook 'prog-mode-hook #'rainbow-mode)

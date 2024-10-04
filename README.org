@@ -19,7 +19,7 @@ I restrict myself to use 8 dark theme colors.
 Examples of their use are:
 | Color | Use            |   | Color | Use             |
 |-------+----------------+---+-------+-----------------|
-| #220  | background     |   | #ddb  | default text    |
+| #220  | background     |   | #dda  | default text    |
 |-------+----------------+---+-------+-----------------|
 | #f38  | error/todo     |   | #f83  | warning/heading |
 | #8f3  | success/done   |   | #3f8  | comment/tags    |
@@ -39,11 +39,11 @@ As root I use 8 ansi colors for the theme.
 |-------+----------------+---+-------+-----------------|
 | #000  | background     |   | #fff  | default text    |
 |-------+----------------+---+-------+-----------------|
-| #f00  | error/todo     |   | #ff0  | warning/heading |
+| #f00  | shadow/hl-line |   | #ff0  | warning/heading |
 | #0f0  | success/done   |   | #0ff  | comment/tags    |
-| #00f  | link/timestamp |   | #f0f  | shadow/hl-line  |
+| #00f  | link/timestamp |   | #f0f  | error/todo      |
 |-------+----------------+---+-------+-----------------|
-Replace state is automatically converted to cyan when shown on the magenta hl-line background.
+Operator state is automatically converted to cyan when shown on the red hl-line background.
 The idea is to have something clearly indicating that I have root privileges and have a fallback theme I can use with an ansi color terminal.
 
 ** Cursor and evil state
