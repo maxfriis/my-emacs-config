@@ -31,13 +31,9 @@ Note that I don't use #83f (bad color contrast).
 
 ** Screenshot
 
-[[https://github.com/maxfriis/my-emacs-config/blob/3ae045b6d7ab7c7ea1fa06a4e60fc5f21fd4acaf/emacs_screenshot.png]]
+[[https://github.com/maxfriis/my-emacs-config/blob/38e43cdf451fdf72d8ec684b803a325e4e6eae73/emacs_screenshot.png]]
 
-** NEXT Root
-:LOGBOOK:
-- State "NEXT" from "TODO"    [2024-11-18 Mon 14:00]
-- State "TODO" from           [2024-11-18 Mon 14:00]
-:END:
+** Root
 
 As root I use 8 ansi colors for the theme.
 | Color | Use            |   | Color | Use             |
