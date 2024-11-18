@@ -15,7 +15,7 @@
        (locate-user-emacs-file "my-faces.elc"))
   (byte-compile-file (locate-user-emacs-file "my-faces.el")))
 ;; ----------------------------------------------------------------------------
-;; I could use variables, but to see the color codes. I use two files.
+;; I could use variables, but to see the color codes I use two files.
 ;; ----------------------------------------------------------------------------
 (if (eq (user-uid) 0) ; Different colors as root
     (load (locate-user-emacs-file "my-ansi-faces.elc") nil t)
@@ -36,7 +36,14 @@
      mode-line-modified
      " "
      mode-line-buffer-identification
-     " "
+     (if (buffer-narrowed-p)
+         (propertize
+          "ⓝ"
+          'help-echo "Narrowed, mouse-1: widen"
+          'local-map (make-mode-line-mouse-map
+                      'mouse-1 #'mode-line-widen)
+          'mouse-face 'mode-line-highlight)
+       " ")
      ;; short major mode name
      (propertize
       (concat
@@ -57,13 +64,6 @@
       'local-map (make-mode-line-mouse-map
                   'mouse-1 #'transpose-frame)
       'mouse-face 'mode-line-highlight)
-     (when (buffer-narrowed-p)
-       (propertize
-        "(n)"
-        'help-echo "Narrowed, mouse-1: widen"
-        'local-map (make-mode-line-mouse-map
-                    'mouse-1 #'mode-line-widen)
-        'mouse-face 'mode-line-highlight))
      ;; version control in active window
      (when (and vc-mode (mode-line-window-selected-p))
        (replace-regexp-in-string
@@ -76,7 +76,7 @@
       " "
       'display '((space :align-to (- (+ right right-fringe right-margin) 8)))
       'face    'mode-line-inactive)
-     ;; position information
+     ;; position info
      (if (mode-line-window-selected-p)
          (if global-display-line-numbers-mode
              '(-8 "%4c %p")
@@ -232,6 +232,16 @@
   (org-capture nil "i")
   (org-save-all-org-buffers))
 ;; ----------------------------------------------------------------------------
+;; My faces (theme)
+;; ----------------------------------------------------------------------------
+(defun my/toggle-faces ()
+  "My default faces"
+  (interactive)
+  (if (equal (face-background 'default) "#000")
+      (load (locate-user-emacs-file "my-faces.elc") nil t)
+    ;; else
+    (load (locate-user-emacs-file "my-ansi-faces.elc") nil t)))
+;; ----------------------------------------------------------------------------
 ;; Ace window swap
 ;; ----------------------------------------------------------------------------
 (defun my/ace-swap-window ()
@@ -259,8 +269,8 @@
 (defun my/magit-stage-all-and-commit (message)
   (interactive "sCommit Message: ")
   (save-some-buffers t)
-  (shell-command
-   (format "git commit -a -m \"%s\" &" message)))
+  (call-process-shell-command
+   (format "git commit -a -m \"%s\" &" message) nil nil))
 ;; ----------------------------------------------------------------------------
 ;; Save and quit
 ;; ----------------------------------------------------------------------------
@@ -277,16 +287,6 @@
          (locate-user-emacs-file "init.elc"))
     (byte-compile-file (locate-user-emacs-file "init.el")))
   (kill-emacs))
-;; ----------------------------------------------------------------------------
-;; My faces (theme)
-;; ----------------------------------------------------------------------------
-(defun my/toggle-faces ()
-  "My default faces"
-  (interactive)
-  (if (equal (face-background 'default) "#000")
-      (load (locate-user-emacs-file "my-faces.elc") nil t)
-    ;; else
-    (load (locate-user-emacs-file "my-ansi-faces.elc") nil t)))
 
 ;; ============================================================================
 ;;; Package.el
@@ -455,7 +455,7 @@
   (insert
    (concat
     "#+title: Main agenda file\n"
-    "#+startup: content\n"
+    "#+startup: content hideblocks\n"
     "* Event [/]\n"
     ":PROPERTIES:\n"
     ":CATEGORY: Event\n"
@@ -693,7 +693,7 @@
  org-latex-title-command nil
  org-export-with-smart-quotes t
  org-export-backends
- '(ascii beamer html latex md odt org)
+ '(ascii latex beamer texinfo html odt md org)
  org-file-apps
  '(("\\.docx\\'"    . default)
    ("\\.mm\\'"      . default)
@@ -748,7 +748,7 @@
 ;; ----------------------------------------------------------------------------
 (setq
  org-superstar-headline-bullets-list
- '(?① ?② ?③ ?④ ?ⓧ)
+ '(?⓪ ?① ?② ?③ ?ⓧ)
  org-superstar-cycle-headline-bullets nil)
 (require 'org-superstar)
 (add-hook 'org-mode-hook #'org-superstar-mode)
@@ -1071,7 +1071,7 @@
 ;; ============================================================================
 ;;; Keybindings
 ;; ============================================================================
-(bind-key* "¤" 'evil-normal-state) ; I'm experimenting with a phone keyboard
+(bind-key* "¤" 'evil-normal-state) ; Experimenting with a phone keyboard
 (bind-keys
  ;; ----------------------------------------------------------------------------
  ;; Global keys!!! (minor mode maps will override)
@@ -1164,6 +1164,8 @@
  ("M-."           . embark-dwim)
  ("<next>"        . marginalia-cycle))
 ;; ----------------------------------------------------------------------------
+;; Keys in maps depending on evil state
+;; ----------------------------------------------------------------------------
 (evil-define-key 'normal org-mode-map
   "t"         #'org-todo
   "T"         #'org-todo-yesterday)
@@ -1175,7 +1177,7 @@
   "A"         #'org-agenda-archive-default-with-confirmation
   "R"         #'org-agenda-refile
   "T"         #'org-agenda-todo-yesterday
-  "gf"        #'org-agenda-follow-mode
+  ;; "gf"        #'org-agenda-follow-mode
   "gy"        #'org-agenda-year-view
   "sd"        #'org-agenda-deadline
   "ss"        #'org-agenda-schedule

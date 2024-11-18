@@ -6,13 +6,12 @@
 ;; ============================================================================
 ;; Modern computers are able to handle more than the defaults
 ;; Garbage collection start at 50MB rather than 800k etc.
-;; I also clean up some defaults I don't want to see during startup.
+;; I also clean up some defaults I don't want to see blink during startup.
 ;; ----------------------------------------------------------------------------
 (setq
  gc-cons-threshold (* 50 1024 1024)
  gc-cons-percentage 0.5
  read-process-output-max (* 16 1024 1024)
- package-enable-at-startup nil
  inhibit-startup-message t
  inhibit-compacting-font-caches t
  frame-inhibit-implied-resize t

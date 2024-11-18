@@ -7,7 +7,7 @@
 ;; 3 `sizes': small (4/5=0.8), normal (1.0) and large (5/4=1.25).
 ;; 8 `colors': #??? combining f(15), 8 and 3 (n^2-1) and some grayishs colors.
 ;; |------+-----------------+------+-----------------|
-;; | #220 | background      | #ddb | default text    |
+;; | #210 | background      | #dcb | default text    |
 ;; |------+-----------------+------+-----------------|
 ;; | #f38 | error/todo      | #f83 | warning/heading |
 ;; | #8f3 | success/done    | #3f8 | comment/tag     |
@@ -15,7 +15,7 @@
 ;; |------+-----------------+------+-----------------|
 ;; Dark, warm, simple, systematic and aesthetically pleasing.
 ;; ----------------------------------------------------------------------------
-;; I don't use #83f due to bad color contrast.
+;; I don't use #83f due to color contrast.
 ;; When I configure `evil' I add 7 cursor colors indicating the evil state.
 ;; Unspecified faces are handled by the dark part of the vanilla theme.
 ;; ----------------------------------------------------------------------------
@@ -23,7 +23,7 @@
 ;; ----------------------------------------------------------------------------
 (set-face-attribute
  'default
- nil :font "Ubuntu Mono" :foreground "#ddb" :background "#220" :height 180)
+ nil :font "Ubuntu Mono" :foreground "#dcb" :background "#210" :height 180)
 (set-face-attribute
  'fixed-pitch
  nil :font "Ubuntu Mono")
@@ -62,19 +62,19 @@
  nil :foreground "#432")
 (set-face-attribute
  'fringe
- nil :foreground "#432" :background "#220")
+ nil :foreground "#432" :background "#210")
 (set-face-attribute
  'line-number
- nil :foreground "#432" :background "#220" :height 0.8)
+ nil :foreground "#432" :background "#210" :height 0.8)
 (set-face-attribute
  'line-number-current-line
- nil :foreground "#220" :background "#432" :weight 'bold)
+ nil :foreground "#210" :background "#432" :weight 'bold)
 (set-face-attribute
  'mode-line
- nil :foreground "#220" :background "#432" :box nil :height 0.8)
+ nil :foreground "#210" :background "#432" :box nil :height 0.8)
 (set-face-attribute
  'mode-line-inactive
- nil :foreground "#432" :background "#220" :box nil :overline t)
+ nil :foreground "#432" :background "#210" :box nil :overline t)
 ;; ----------------------------------------------------------------------------
 ;; font-lock faces
 ;; ----------------------------------------------------------------------------
@@ -159,7 +159,7 @@
    nil :foreground "#3f8" :weight 'normal :height 0.8)
   (set-face-attribute
    'org-checkbox
-   nil :foreground "#3f8" :background "#220" :box nil :height 0.8)
+   nil :foreground "#3f8" :background "#210" :box nil :height 0.8)
   (set-face-attribute
    'org-tag
    nil :foreground "#3f8" :weight 'normal)
@@ -177,7 +177,7 @@
    nil :foreground "#3f8" :height 0.8)
   (set-face-attribute
    'org-block
-   nil :foreground "#ddb")
+   nil :foreground "#dcb")
   (set-face-attribute
    'org-block-begin-line
    nil :foreground "#38f" :height 0.8)
@@ -215,13 +215,13 @@
 (with-eval-after-load 'org-agenda
   (set-face-attribute
    'header-line
-   nil :foreground "#f83" :background "#220" :weight 'bold :height 1.25)
+   nil :foreground "#f83" :background "#210" :weight 'bold :height 1.25)
   (set-face-attribute
    'org-agenda-structure
-   nil :foreground "#f83" :background "#220" :box nil :weight 'bold :height 1.25)
+   nil :foreground "#f83" :background "#210" :box nil :weight 'bold :height 1.25)
   (set-face-attribute
    'org-column
-   nil :background "#220")
+   nil :background "#210")
   (set-face-attribute
    'org-warning
    nil :foreground "#f38")
@@ -236,19 +236,19 @@
    nil :foreground "#3f8")
   (set-face-attribute
    'org-agenda-calendar-event
-   nil :foreground "#ddb")
+   nil :foreground "#dcb")
   (set-face-attribute
    'org-agenda-clocking
    nil :foreground "#3f8" :background "#432")
   (set-face-attribute
    'org-agenda-date
-   nil :foreground "#38f" :background "#220" :box nil :weight 'normal :height 0.8)
+   nil :foreground "#38f" :background "#210" :box nil :weight 'normal :height 0.8)
   (set-face-attribute
    'org-agenda-date-weekend
-   nil :foreground "#38f" :background "#220" :box nil :weight 'normal :underline nil)
+   nil :foreground "#38f" :background "#210" :box nil :weight 'normal :underline nil)
   (set-face-attribute
    'org-agenda-date-today
-   nil :foreground "#f83" :background "#220" :box nil :weight 'normal :slant 'normal :inverse-video nil)
+   nil :foreground "#f83" :background "#210" :box nil :weight 'normal :slant 'normal :inverse-video nil)
   (set-face-attribute
    'org-upcoming-distant-deadline
    nil :foreground "#8f3")
@@ -301,43 +301,43 @@
 ;; ============================================================================
 (set-face-attribute
  'show-paren-match
- nil :foreground "#ddb" :background "#220" :weight 'bold)
+ nil :foreground "#dcb" :background "#210" :weight 'bold)
 (with-eval-after-load 'tab-bar
   (set-face-attribute
    'tab-bar
-   nil :foreground "#432" :background "#220" :weight 'bold :box nil :height 0.8 :inherit 'default)
+   nil :foreground "#432" :background "#210" :weight 'bold :box nil :height 0.8 :inherit 'default)
   (set-face-attribute
    'tab-bar-tab
-   nil :foreground "#220" :background "#432" :box t)
+   nil :foreground "#210" :background "#432" :box t)
   (set-face-attribute
    'tab-bar-tab-inactive
-   nil :foreground "#432" :background "#220" :box nil))
+   nil :foreground "#432" :background "#210" :box nil))
 (with-eval-after-load 'tab-line
   (set-face-attribute
    'tab-line
-   nil :foreground "#432" :background "#220" :overline t :box nil)
+   nil :foreground "#432" :background "#210" :overline t :box nil)
   (set-face-attribute
    'tab-line-tab ;; active tab in another frame
    nil :box nil :inherit 'tab-line)
   (set-face-attribute
    'tab-line-tab-current
-   nil :foreground "#220" :background "#432" :box nil)
+   nil :foreground "#210" :background "#432" :box nil)
   (set-face-attribute
    'tab-line-tab-modified
-   nil :foreground "#220" :background "#432" :box nil)
+   nil :foreground "#210" :background "#432" :box nil)
   (set-face-attribute
    'tab-line-tab-inactive
-   nil :foreground "#432" :background "#220" :box nil)
+   nil :foreground "#432" :background "#210" :box nil)
   (set-face-attribute
    'tab-line-highlight ;; mouseover
-   nil :foreground "#ddb" :background "#220" :box nil))
+   nil :foreground "#dcb" :background "#210" :box nil))
 (with-eval-after-load 'corfu
   (set-face-attribute
    'corfu-default
-   nil :foreground "#432" :background "#220")
+   nil :foreground "#432" :background "#210")
   (set-face-attribute
    'corfu-current
-   nil :foreground "#220" :background "#432"))
+   nil :foreground "#210" :background "#432"))
 (with-eval-after-load 'dired
   (set-face-attribute
    'dired-ignored
@@ -345,7 +345,7 @@
 (with-eval-after-load 'keycast
   (set-face-attribute
    'keycast-key
-   nil :foreground "#220" :background "#432" :box t :height 0.8))
+   nil :foreground "#210" :background "#432" :box t :height 0.8))
 (with-eval-after-load 'ace-window
   (set-face-attribute
    'aw-leading-char-face
@@ -365,7 +365,7 @@
 (with-eval-after-load 'rainbow-delimiters
   (set-face-attribute
    'rainbow-delimiters-base-error-face
-   nil :foreground "#ddb" :background "#f38" :weight 'bold :underline t)
+   nil :foreground "#dcb" :background "#f38" :weight 'bold :underline t)
   (set-face-attribute
    'rainbow-delimiters-depth-1-face
    nil :foreground "#38f")
