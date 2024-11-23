@@ -6,7 +6,7 @@
 
 Here I set some variables that influence the startup process.
 This is both about performance but also about seeing defaults I don't end up using.
-E.g. I don't want a white background to blink on startup because I prefer a dark theme.
+E.g. I don't want a white background to blink on startup when I prefer a dark theme.
 
 * My font faces
 
@@ -46,6 +46,10 @@ As root I use 8 ansi colors for the theme.
 |-------+----------------+---+-------+-----------------|
 Operator state is automatically converted to cyan when shown on the red hl-line background.
 The idea is to have something clearly indicating that I have root privileges and have a fallback theme I can use with an ansi color terminal.
+
+** Ansi screenshot
+
+[[https://github.com/maxfriis/my-emacs-config/blob/38e43cdf451fdf72d8ec684b803a325e4e6eae73/emacs_screenshot.png]]
 
 ** Cursor and evil state
 
@@ -221,7 +225,7 @@ A few evil bindings specific to the change in cursor model are rebound inside ev
 
 * Youtube videos
 
-I have made a few Youtube videos on this configuration:
+I have made a few Youtube videos roughly on this configuration:
 
 #+begin_center
 [[https://www.youtube.com/watch?v=Ey0sRfGyERg][I Install my Emacs configuration]]
@@ -234,6 +238,13 @@ I have made a few Youtube videos on this configuration:
 #+begin_center
 [[https://www.youtube.com/watch?v=5ziOMpT4EwE][My Emacs org-agenda and capture setup]]
 #+end_center
+
+#+begin_center
+[[https://www.youtube.com/watch?v=M3dbr2NrnQ0][The 8 colors I use in Emacs]]
+#+end_center
+
+Note that I have modified my init files after I made the videos.
+My configuration is constantly evolving.
 
 * Clone
 
