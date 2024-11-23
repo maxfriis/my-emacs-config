@@ -49,7 +49,7 @@ The idea is to have something clearly indicating that I have root privileges and
 
 ** Ansi screenshot
 
-[[https://github.com/maxfriis/my-emacs-config/blob/38e43cdf451fdf72d8ec684b803a325e4e6eae73/emacs_screenshot.png]]
+[[https://github.com/maxfriis/my-emacs-config/blob/e0b85c82812217243b7dccf3089687084de1603f/emacs_ansi_screenshot.png]]
 
 ** Cursor and evil state
 
