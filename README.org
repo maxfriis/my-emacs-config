@@ -29,7 +29,7 @@ Examples of their use are:
 Unspecified faces are handled by the vanilla theme.
 Note that I don't use #83f (bad color contrast).
 
-** Screenshot
+*** Screenshot
 
 [[https://github.com/maxfriis/my-emacs-config/blob/38e43cdf451fdf72d8ec684b803a325e4e6eae73/emacs_screenshot.png]]
 
@@ -47,9 +47,9 @@ As root I use 8 ansi colors for the theme.
 Operator state is automatically converted to cyan when shown on the red hl-line background.
 The idea is to have something clearly indicating that I have root privileges and have a fallback theme I can use with an ansi color terminal.
 
-** Ansi screenshot
+*** Ansi screenshot
 
-[[https://github.com/maxfriis/my-emacs-config/blob/e0b85c82812217243b7dccf3089687084de1603f/emacs_ansi_screenshot.png]]
+[[https://github.com/maxfriis/my-emacs-config/blob/e54ebe124c60b8b1413f3c456c2887c9cf2befde/emacs_ansi_screenshot.png]]
 
 ** Cursor and evil state
 
@@ -215,7 +215,7 @@ Prot has a nice Youtube video about it: [[https://www.youtube.com/watch?v=gojOZ3
 For now I use general.el to handle my leader keybindings.
 Inspired by Spacemacs I use =<SPC>= as my leader key and part of the structure in my leader keybindings are also inspired by this project.
 
-* Keybindings
+** Other keybindings
 
 I like to have my keybindings in a section rather than distributed out among my packages.
 I find it more useful to spot collisions by gathering these bindings in one place.
@@ -226,23 +226,10 @@ A few evil bindings specific to the change in cursor model are rebound inside ev
 * Youtube videos
 
 I have made a few Youtube videos roughly on this configuration:
-
-#+begin_center
-[[https://www.youtube.com/watch?v=Ey0sRfGyERg][I Install my Emacs configuration]]
-#+end_center
-
-#+begin_center
-[[https://www.youtube.com/watch?v=L9aGgAt6Hd8][A tour of my Emacs init files]]
-#+end_center
-
-#+begin_center
-[[https://www.youtube.com/watch?v=5ziOMpT4EwE][My Emacs org-agenda and capture setup]]
-#+end_center
-
-#+begin_center
-[[https://www.youtube.com/watch?v=M3dbr2NrnQ0][The 8 colors I use in Emacs]]
-#+end_center
-
++ [[https://www.youtube.com/watch?v=Ey0sRfGyERg][I Install my Emacs configuration]]
++ [[https://www.youtube.com/watch?v=L9aGgAt6Hd8][A tour of my Emacs init files]]
++ [[https://www.youtube.com/watch?v=5ziOMpT4EwE][My Emacs org-agenda and capture setup]]
++ [[https://www.youtube.com/watch?v=M3dbr2NrnQ0][The 8 colors I use in Emacs]]
 Note that I have modified my init files after I made the videos.
 My configuration is constantly evolving.
 
