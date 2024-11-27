@@ -20,7 +20,7 @@ I restrict myself to use 8 dark theme colors.
 Examples of their use are:
 | Color | Use            |   | Color | Use             |
 |-------+----------------+---+-------+-----------------|
-| #210  | background     |   | #dcb  | default text    |
+| #210  | background     |   | #edc  | default text    |
 |-------+----------------+---+-------+-----------------|
 | #f38  | error/todo     |   | #f83  | warning/heading |
 | #8f3  | success/done   |   | #3f8  | comment/tags    |
@@ -50,6 +50,8 @@ The idea is to have something clearly indicating that I have root privileges and
 *** Ansi screenshot
 
 [[https://github.com/maxfriis/my-emacs-config/blob/e54ebe124c60b8b1413f3c456c2887c9cf2befde/emacs_ansi_screenshot.png]]
+
+I have included my "space-menu".
 
 ** Cursor and evil state
 
@@ -120,22 +122,22 @@ Faces (:custom-face) are handled in a loaded file.
 
 All this should make it fairly easy to convert my config to use use-package or straight.
 
-** Honorable mentions
+*** Honorable mentions
 
 I will only comment on the 3 packages: evil, org and general.
 Honorable mentions are vertico, corfu, ace-window, recursive-narrow and magit but I use many more.
 
-* Evil.el
+** Evil.el
 
 Evil has become the foundation of my use of Emacs.
 
-** Layered versus modal bindings
+*** Layered versus modal bindings
 
 Emacs comes with a complex but very powerful set of /layered/ keybindings (using =<ctrl>=, =<meta>=, =<shift>= or combinations of these).
 An alternative is the evil package with Vim's /modal/ keybindings combined with some layering.
 I prefer modal bindings and try to minimize the use of layers.
 
-** Cursor model (my sacrilege)
+*** Cursor model (my sacrilege)
 
 Besides the modal approach Vim has a unique cursor model.
 When in insert state it works with the standard cursor between characters approach that all other editors use.
@@ -148,7 +150,7 @@ This has the advantage of fewer keys being used (e.g. no need for =a=) at little
 You might want to rebind some keys but with few exceptions I just leave the evil bindings be.
 I do swap the two paste bindings =p= and =P= to avoid using the capitalized one.
 
-** Two ways of pasting
+*** Two ways of pasting
 
 I will try to illustrate the efficiency with a case study on pasting.
 Vim's cursor on character model requires two ways of pasting.
@@ -162,7 +164,7 @@ On the other hand you end up with the more complex two commands where only one i
 The complex keybindings will only be an advantage to a power user.
 As you get used to the less complex bindings you will develop foresight to use less "correction-motions".
 
-** Casual use
+*** Casual use
 
 As a more casual or inexperienced user, one paste command is preferable.
 My configuration can work as an introduction to evil keybindings.
@@ -174,12 +176,12 @@ I very much dislike holding down two keys at once just as if I were using vanill
 In my configuration the between characters behavior is isolated in evil-cursor-model.el, which I have slightly modified compared to [[https://www.dr-qubit.org/Evil_cursor_model.html][the author's original version]].
 Standard evil behavior is easy to achieve by simply not loading that file.
 
-* Org.el
+** Org.el
 
 I customize this native package with a large set of variables.
 I extend it with a few external packages, the native prettify.el and a few hooks.
 
-** Org-agenda
+*** Org-agenda
 
 I restrict myself to the 4 todo-states NEXT, TODO, HOLD and DONE.
 
@@ -207,7 +209,7 @@ I configure my custom agenda to have 4 sections:
 The main two capture templates is a simple idea capture and an item with a category that I can refile to.
 That is all I need for my agenda.
 
-* General.el
+** General.el
 
 As with my theme and modeline I could and perhaps should do my leader key keybindings with "-maps", but I'm not there yet.
 Prot has a nice Youtube video about it: [[https://www.youtube.com/watch?v=gojOZ3k1mmk][Emacs: define prefix/leader key]].
@@ -215,7 +217,7 @@ Prot has a nice Youtube video about it: [[https://www.youtube.com/watch?v=gojOZ3
 For now I use general.el to handle my leader keybindings.
 Inspired by Spacemacs I use =<SPC>= as my leader key and part of the structure in my leader keybindings are also inspired by this project.
 
-** Other keybindings
+*** Other keybindings
 
 I like to have my keybindings in a section rather than distributed out among my packages.
 I find it more useful to spot collisions by gathering these bindings in one place.
