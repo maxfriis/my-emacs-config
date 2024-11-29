@@ -2,6 +2,13 @@
 #+startup: showall hideblocks
 #+options: toc:nil
 
+This configuration is not complex.
+It's a great start if you want to make your own configuration.
+The few custom functions I use are simple and short.
+
+The bad thing for a fresh start is that the configuration is customized for my Danish keyboard.
+That should be easy to adjust to your own keyboard.
+
 * Early init
 
 Here I set some variables that influence the startup process.
@@ -49,9 +56,9 @@ The idea is to have something clearly indicating that I have root privileges and
 
 *** Ansi screenshot
 
-[[https://github.com/maxfriis/my-emacs-config/blob/e54ebe124c60b8b1413f3c456c2887c9cf2befde/emacs_ansi_screenshot.png]]
+With my "space-menu".
 
-I have included my "space-menu".
+[[https://github.com/maxfriis/my-emacs-config/blob/e54ebe124c60b8b1413f3c456c2887c9cf2befde/emacs_ansi_screenshot.png]]
 
 ** Cursor and evil state
 
@@ -159,7 +166,7 @@ You can mimic this behavior by using a "correction-motion" before paste in the c
 This means that from a strict efficiency perspective it is not clear what is gained from two paste commands.
 
 This does not mean that Vim's way of doing things is inferior.
-You should minimize "correction-motions", so you can go directly for Vim's "verb" -> "noun" approach as often as you can.
+You should minimize "correction-motions", so you can go directly for Vim's "verb" → "noun" approach as often as you can.
 On the other hand you end up with the more complex two commands where only one is really necessary.
 The complex keybindings will only be an advantage to a power user.
 As you get used to the less complex bindings you will develop foresight to use less "correction-motions".
@@ -203,6 +210,7 @@ I configure my custom agenda to have 4 sections:
    Items from the first section can potentially be repeated here if they are timestamped.
 3. Not all TODO items have or even should have a timestamp.
    I display items with a cookie at the top and these will typically be projects containing subtasks.
+   Then I display unscheduled items.
    At the bottom I display items on HOLD which I also like to keep an eye on.
 4. The final section like the first is usually empty.
    This is where I can append what the agenda menu offers including a few custom options.
