@@ -331,7 +331,7 @@
 (with-eval-after-load 'keycast
   (set-face-attribute
    'keycast-key
-   nil :foreground "#000" :background "#f00" :box t :height 0.8))
+   nil :foreground "#000" :background "#f00" :box t))
 (with-eval-after-load 'corfu
   (set-face-attribute
    'corfu-default

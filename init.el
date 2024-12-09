@@ -175,7 +175,7 @@
 (add-hook 'before-save-hook #'whitespace-cleanup)
 (add-hook 'dired-mode-hook  #'dired-hide-details-mode) ; toggle with "("
 (add-hook 'dired-mode-hook  #'dired-omit-mode)         ; toggle with "a"
-(add-hook 'text-mode-hook   #'visual-line-mode)        ; linebreaks
+(add-hook 'text-mode-hook   #'visual-line-mode)        ; soft linebreaks
 (add-hook
  'emacs-startup-hook
  (lambda ()
@@ -315,9 +315,9 @@
 ;; Update, undo, save and backup
 ;; ----------------------------------------------------------------------------
 (setq
- auto-package-update-interval 7
- auto-package-update-hide-results t
- auto-package-update-prompt-before-update t)
+ auto-package-update-interval 10
+ ;; auto-package-update-prompt-before-update t
+ auto-package-update-hide-results t)
 (require 'auto-package-update)
 (auto-package-update-maybe)
 (setq
@@ -435,7 +435,7 @@
  org-directory "~/org/")
 (defvar
   org-agenda-directory (concat org-directory "agenda/")
-  "Default org-agenda directory")
+  "Default org-agenda directory.\n\nAll org files in this directory will be searched when the agenda is constructed.")
 (unless (file-exists-p org-directory)
   (make-directory org-directory))
 (unless (file-exists-p org-agenda-directory)
@@ -447,15 +447,22 @@
   (make-empty-file     (concat org-directory "inbox.org")))
 (unless (file-exists-p (concat org-agenda-directory "note.org"))
   (make-empty-file     (concat org-agenda-directory "note.org")))
+;; Create plan.org with a header
 (unless (file-exists-p (concat org-agenda-directory "plan.org"))
-  (make-empty-file     (concat org-agenda-directory "plan.org")))
+  (find-file           (concat org-agenda-directory "plan.org"))
+  (insert
+   (concat
+    "#+title: Projects\n"
+    "#+startup: content hideblocks\n\n"))
+  (save-buffer)
+  (switch-to-buffer "*scratch*"))
 ;; Create agenda.org with two refile targets
 (unless (file-exists-p (concat org-agenda-directory "agenda.org"))
   (find-file           (concat org-agenda-directory "agenda.org"))
   (insert
    (concat
     "#+title: Main agenda file\n"
-    "#+startup: content hideblocks\n"
+    "#+startup: content hideblocks\n\n"
     "* Event [/]\n"
     ":PROPERTIES:\n"
     ":CATEGORY: Event\n"
@@ -603,20 +610,20 @@
      (agenda ""
              ((org-agenda-span 'week)))
      (todo "TODO"
-           ;; TODOs with [/] cookies and potential subtasks go on top.
+           ;; Not every TODO has or should have a timestamp.
            ((org-agenda-overriding-header "No timestamp TODO or HOLD:")
             (org-agenda-skip-function
              '(org-agenda-skip-entry-if
-               'notregexp "\\[[0-9]+/[0-9]+\\]"
+               'regexp "\\[[0-9]+/[0-9]+\\]"
                ;; or
                'timestamp))))
      (todo "TODO"
-           ;; Not every TODO has or should have a timestamp.
+           ;; TODOs with [/] cookies and potential subtasks.
            ((org-agenda-overriding-header "") ; share heading with the item above
             (org-agenda-block-separator nil)  ; don't separate
             (org-agenda-skip-function
              '(org-agenda-skip-entry-if
-               'regexp "\\[[0-9]+/[0-9]+\\]"
+               'notregexp "\\[[0-9]+/[0-9]+\\]"
                ;; or
                'timestamp))))
      ;; Inactive states
@@ -631,14 +638,14 @@
             (org-agenda-skip-function
              '(org-agenda-skip-entry-if
                'notregexp org-priority-regexp))))))
-   ("d" "DONE entries"
+   ("d" "DONE ToDos"
     ;; For archiving done tasks
     ((todo "DONE"
-           ((org-agenda-overriding-header "Done TODOs")))))
-   ("u" "Untagged TODOs"
+           ((org-agenda-overriding-header "DONE ToDos")))))
+   ("u" "Untagged ToDos"
     ;; For adding tags
     ((tags-todo "-{.*}"
-                ((org-agenda-overriding-header "Untagged TODOs"))))))
+                ((org-agenda-overriding-header "Untagged ToDos"))))))
  org-agenda-time-grid nil
  org-agenda-prefix-format
  '((agenda   . "  %-6c%-12t%?-6s")
@@ -711,15 +718,15 @@
  (lambda ()
    (setq
     prettify-symbols-alist ; utf8's that work with most fonts even in the terminal
-    '(("[-]"            . ?⊟) ; Not a "ballot" icon
-      ("[ ]"            . ?☐)
-      ("[X]"            . ?☒)
+    '(("[-]"            . ?⊟) ; ⧈⧇⊡⧆⊞⊟⧄⧅⊠⟏⟎
+      ("[ ]"            . ?⊡)
+      ("[X]"            . ?⊠)
       ("CLOSED:"        . ?☑) ; The checkmark displays different in some fonts
-      ("SCHEDULED:"     . ?☐) ; That's OK because the inactive timestamp "CLOSED:"
-      ("DEADLINE:"      . ?☒) ; is different from the active timestamps
+      ("SCHEDULED:"     . ?☐)
+      ("DEADLINE:"      . ?☒)
       (":PROPERTIES:"   . ?⚙) ; Settings
       (":LOGBOOK:"      . ?☰) ; Meta data
-      ("CLOCK:"         . ?–) ; Items in logbook have a dash bullet
+      ("CLOCK:"         . ?–) ; Items in the logbook have a dash bullet
       (":END:"          . ?✐)
       ("#+begin_export" . ?✎)
       ("#+end_export"   . ?✐)
@@ -944,7 +951,7 @@
   "bo"  '(counsel-switch-buffer-other-window     :which-key "Other win")
   "bm"  '(view-echo-area-messages                :which-key "Messages")
   "bs"  '(scratch-buffer                         :which-key "Scratch")
-  "c"   '(:ignore t                              :which-key "c")
+  "c"   '(my/org-capture-idea                    :which-key "Capt. idea")
   "d"   '(:ignore t                              :which-key "d")
   "e"   '(:ignore t                              :which-key "Eval")
   "ee"  '(eval-expression                        :which-key "Expression")
@@ -1064,9 +1071,9 @@
   "zg"  '(global-text-scale-adjust               :which-key "Global")
   "zl"  '(text-scale-adjust                      :which-key "Local")
   ;; Danish
+  "å"   '(:ignore t                              :which-key "å")
   "æ"   '(:ignore t                              :which-key "æ")
-  "ø"   '(:ignore t                              :which-key "ø")
-  "å"   '(:ignore t                              :which-key "å"))
+  "ø"   '(evil-goto-line                         :which-key "End buf"))
 
 ;; ============================================================================
 ;;; Keybindings

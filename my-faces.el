@@ -5,9 +5,9 @@
 ;;; Vanilla faces
 ;; ============================================================================
 ;; 3 `sizes': small (4/5=0.8), normal (1.0) and large (5/4=1.25).
-;; 8 `colors': #??? combining f(15), 8 and 3 (n^2-1) and some grayishs colors.
+;; 8 `colors': #??? combining f(15), 8 and 3 (n^2-1) and some dusty colors.
 ;; |------+-----------------+------+-----------------|
-;; | #210 | background      | #dcb | default text    |
+;; | #210 | background      | #edc | default text    |
 ;; |------+-----------------+------+-----------------|
 ;; | #f38 | error/todo      | #f83 | warning/heading |
 ;; | #8f3 | success/done    | #3f8 | comment/tag     |
@@ -23,7 +23,7 @@
 ;; ----------------------------------------------------------------------------
 (set-face-attribute
  'default
- nil :font "Ubuntu Mono" :foreground "#dcb" :background "#210" :height 180)
+ nil :font "Ubuntu Mono" :foreground "#edc" :background "#210" :height 180)
 (set-face-attribute
  'fixed-pitch
  nil :font "Ubuntu Mono")
@@ -177,7 +177,7 @@
    nil :foreground "#3f8" :height 0.8)
   (set-face-attribute
    'org-block
-   nil :foreground "#dcb")
+   nil :foreground "#edc")
   (set-face-attribute
    'org-block-begin-line
    nil :foreground "#38f" :height 0.8)
@@ -236,7 +236,7 @@
    nil :foreground "#3f8")
   (set-face-attribute
    'org-agenda-calendar-event
-   nil :foreground "#dcb")
+   nil :foreground "#edc")
   (set-face-attribute
    'org-agenda-clocking
    nil :foreground "#3f8" :background "#432")
@@ -301,7 +301,7 @@
 ;; ============================================================================
 (set-face-attribute
  'show-paren-match
- nil :foreground "#dcb" :background "#210" :weight 'bold)
+ nil :foreground "#edc" :background "#210" :weight 'bold)
 (with-eval-after-load 'tab-bar
   (set-face-attribute
    'tab-bar
@@ -330,7 +330,7 @@
    nil :foreground "#432" :background "#210" :box nil)
   (set-face-attribute
    'tab-line-highlight ;; mouseover
-   nil :foreground "#dcb" :background "#210" :box nil))
+   nil :foreground "#edc" :background "#210" :box nil))
 (with-eval-after-load 'corfu
   (set-face-attribute
    'corfu-default
@@ -345,7 +345,7 @@
 (with-eval-after-load 'keycast
   (set-face-attribute
    'keycast-key
-   nil :foreground "#210" :background "#432" :box t :height 0.8))
+   nil :foreground "#210" :background "#432" :box t))
 (with-eval-after-load 'ace-window
   (set-face-attribute
    'aw-leading-char-face
@@ -365,7 +365,7 @@
 (with-eval-after-load 'rainbow-delimiters
   (set-face-attribute
    'rainbow-delimiters-base-error-face
-   nil :foreground "#dcb" :background "#f38" :weight 'bold :underline t)
+   nil :foreground "#edc" :background "#f38" :weight 'bold :underline t)
   (set-face-attribute
    'rainbow-delimiters-depth-1-face
    nil :foreground "#38f")

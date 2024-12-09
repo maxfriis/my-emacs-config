@@ -9,7 +9,7 @@ The few custom functions I use are simple and short.
 The bad thing for a fresh start is that the configuration is customized for my Danish keyboard.
 That should be easy to adjust to your own keyboard.
 
-* Early init
+** Early init
 
 Here I set some variables that influence the startup process.
 This is both about performance but also about seeing defaults I don't end up using.
@@ -96,7 +96,7 @@ Prot has a Youtube video on how to make your own modeline: [[https://www.youtube
 Here I set variables that are used by vanilla Emacs or a native package.
 I also activate a few global minor modes and add some hooks.
 
-* Custom functions
+** Custom functions
 
 I keep these functions very simple.
 Emacs usually provide what I need without me having to write a function.
@@ -190,9 +190,9 @@ I extend it with a few external packages, the native prettify.el and a few hooks
 
 *** Org-agenda
 
-I restrict myself to the 4 todo-states NEXT, TODO, HOLD and DONE.
+I restrict myself to the 4 todo-states *NEXT*, *TODO*, *HOLD* and *DONE*.
 
-NEXT is an unblocked task that can be done in less than 5 mins.
+NEXT is an unblocked task that can be done in less than 5 minutes.
 HOLD is an inactive state that can be translated to "pending third party action".
 The default states are self explanatory.
 I don't have a canceled state because I just archive those items in an active state.
@@ -214,7 +214,7 @@ I configure my custom agenda to have 4 sections:
    At the bottom I display items on HOLD which I also like to keep an eye on.
 4. The final section like the first is usually empty.
    This is where I can append what the agenda menu offers including a few custom options.
-The main two capture templates is a simple idea capture and an item with a category that I can refile to.
+The main two capture templates is a simple idea capture and a category capture that I can refile to.
 That is all I need for my agenda.
 
 ** General.el
