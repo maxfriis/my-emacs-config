@@ -322,9 +322,11 @@
   (when (file-newer-than-file-p
          (locate-user-emacs-file "init.el")
          (locate-user-emacs-file "init.elc"))
-    (copy-file ; backup to debug a broken config with a working Emacs.
-     (locate-user-emacs-file "init.elc")
-     (locate-user-emacs-file "init.elc~") t)
+    (when (file-exists-p
+           (locate-user-emacs-file "init.elc"))
+      (copy-file ; backup to debug a broken config with a working Emacs.
+       (locate-user-emacs-file "init.elc")
+       (locate-user-emacs-file "init.elc~") t))
     (byte-compile-file (locate-user-emacs-file "init.el")))
   (kill-emacs))
 
