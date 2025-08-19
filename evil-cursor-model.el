@@ -20,13 +20,18 @@
  evil-highlight-closing-paren-at-point-states nil)
 ;; (setq evil-cross-lines t) ; "f" and "t" will work cross lines
 ;; ----------------------------------------------------------------------------
-;; paste and motion command rebindings
+;; my paste and input command rebindings
 ;; ----------------------------------------------------------------------------
 (evil-define-key 'normal 'global
   "p"  #'evil-paste-before ; swapped because only "p" is used to paste.
   "P"  #'evil-paste-after  ; "jp" or "lp" does the same thing.
   "o"  #'evil-open-above   ; swapped to be consistent with paste.
-  "O"  #'evil-open-below)  ; "jo" does the same thing.
+  "O"  #'evil-open-below   ; "jo" does the same thing.
+  "a"  #'evil-append-line  ; swapped because I only use it to edit from eol.
+  "A"  #'evil-append)      ; "li" does the same thing.
+;; ----------------------------------------------------------------------------
+;; motion command rebindings
+;; ----------------------------------------------------------------------------
 ;; "w" and "b" works out of the evil box. Rebinding other motions.
 (evil-define-key 'motion 'global
   "t"  #'evil-find-char

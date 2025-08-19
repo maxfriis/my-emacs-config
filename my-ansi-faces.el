@@ -16,20 +16,11 @@
 ;; These colors will display nicely in an 8 or 16 color ansi terminal.
 ;; Unspecified faces are handled by the dark part of the vanilla theme.
 ;; ----------------------------------------------------------------------------
-;; Fonts
+;; Special faces
 ;; ----------------------------------------------------------------------------
 (set-face-attribute
  'default
- nil :font "Ubuntu Mono" :foreground "#fff" :background "#000" :height 180)
-(set-face-attribute
- 'fixed-pitch
- nil :font "Ubuntu Mono")
-(set-face-attribute
- 'variable-pitch
- nil :font "Verdana")
-;; ----------------------------------------------------------------------------
-;; Special faces
-;; ----------------------------------------------------------------------------
+ nil :foreground "#fff" :background "#000")
 (set-face-attribute
  'error
  nil :foreground "#f0f" :underline t)
@@ -72,35 +63,6 @@
 (set-face-attribute
  'mode-line-inactive
  nil :foreground "#f00" :background "#000" :box nil :overline t)
-(with-eval-after-load 'tab-bar
-  (set-face-attribute
-   'tab-bar
-   nil :foreground "#f00" :background "#000" :weight 'bold :box nil :height 0.8 :inherit 'default)
-  (set-face-attribute
-   'tab-bar-tab
-   nil :foreground "#000" :background "#f00" :box t)
-  (set-face-attribute
-   'tab-bar-tab-inactive
-   nil :foreground "#f00" :background "#000" :box nil))
-(with-eval-after-load 'tab-line
-  (set-face-attribute
-   'tab-line
-   nil :foreground "#f00" :background "#000" :overline t :box nil)
-  (set-face-attribute
-   'tab-line-tab ;; active tab in another frame
-   nil :box nil :inherit 'tab-line)
-  (set-face-attribute
-   'tab-line-tab-current
-   nil :foreground "#000" :background "#f00" :box nil)
-  (set-face-attribute
-   'tab-line-tab-modified
-   nil :foreground "#000" :background "#f00" :box nil)
-  (set-face-attribute
-   'tab-line-tab-inactive
-   nil :foreground "#f00" :background "#000" :box nil)
-  (set-face-attribute
-   'tab-line-highlight ;; mouseover
-   nil :foreground "#fff" :background "#000" :box nil))
 ;; ----------------------------------------------------------------------------
 ;; font-lock faces
 ;; ----------------------------------------------------------------------------
@@ -327,11 +289,11 @@
 ;; ============================================================================
 (set-face-attribute ; matching parenthesis get cursor colors
  'show-paren-match
- nil :foreground "#fff" :background "#000" :weight 'bold)
+ nil :foreground "#fff" :background "#f00" :weight 'bold)
 (with-eval-after-load 'keycast
   (set-face-attribute
    'keycast-key
-   nil :foreground "#000" :background "#f00" :box t))
+   nil :foreground "#000" :background "#f00" :box t :height 0.8))
 (with-eval-after-load 'corfu
   (set-face-attribute
    'corfu-default
@@ -368,4 +330,33 @@
   (set-face-attribute
    'rainbow-delimiters-depth-3-face
    nil :foreground "#f0f"))
+(with-eval-after-load 'tab-bar
+  (set-face-attribute
+   'tab-bar
+   nil :foreground "#f00" :background "#000" :weight 'bold :box nil :height 0.8 :inherit 'default)
+  (set-face-attribute
+   'tab-bar-tab
+   nil :foreground "#000" :background "#f00" :box t)
+  (set-face-attribute
+   'tab-bar-tab-inactive
+   nil :foreground "#f00" :background "#000" :box nil))
+(with-eval-after-load 'tab-line
+  (set-face-attribute
+   'tab-line
+   nil :foreground "#f00" :background "#000" :overline t :box nil)
+  (set-face-attribute
+   'tab-line-tab ;; active tab in another frame
+   nil :box nil :inherit 'tab-line)
+  (set-face-attribute
+   'tab-line-tab-current
+   nil :foreground "#000" :background "#f00" :box nil)
+  (set-face-attribute
+   'tab-line-tab-modified
+   nil :foreground "#000" :background "#f00" :box nil)
+  (set-face-attribute
+   'tab-line-tab-inactive
+   nil :foreground "#f00" :background "#000" :box nil)
+  (set-face-attribute
+   'tab-line-highlight ;; mouseover
+   nil :foreground "#fff" :background "#000" :box nil))
 ;; End of my-ansi-faces.el
