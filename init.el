@@ -1200,7 +1200,7 @@
  ;; Operator state keys!!!
  ;; ----------------------------------------------------------------------------
  :map evil-operator-state-map
- ;; Bad things happen if I hit "å" in operator state.
+ ;; Bad things happen if I hit "å" in operator state without this.
  ;; Danish keyboard
  ("å"             . keyboard-escape-quit)
  ;; ----------------------------------------------------------------------------
@@ -1231,8 +1231,8 @@
  ;; Visual state keys!!!
  ;; ----------------------------------------------------------------------------
  :map evil-visual-state-map
- ;; "S" is dedicated to `evil-surround'. Use "C-s" for `isearch'.
- ("s"             . isearch-forward-thing-at-point) ; Works with region input.
+ ;; "S" is dedicated to `evil-surround'. Use "C-s" for `isearch-forward'.
+ ("s"             . isearch-forward-thing-at-point) ; With region as input.
  ;; I change Vim's visual state behavior and exit like insert state with <esc>.
  ("v"             . exchange-point-and-mark)
  ;; ----------------------------------------------------------------------------
