@@ -330,7 +330,8 @@
 ;; Save and quit
 ;; ----------------------------------------------------------------------------
 (defun my/save-all-kill-emacs-no-prompt ()
-  "Save all and quit without prompt." ; I use backup-each-save and super-save.
+  ;; I use `super-save' and `backup-each-save'.
+  "Save all and quit without prompt."
   (interactive)
   (save-some-buffers t)
   (when (file-newer-than-file-p
@@ -572,6 +573,11 @@
 (evil-collection-init)
 (require 'evil-surround)
 (global-evil-surround-mode 1)
+(add-hook
+ 'emacs-lisp-mode-hook
+ (lambda ()
+   (push
+    '(?` . ("`" . "'")) evil-surround-pairs-alist)))
 (require 'evil-nerd-commenter)
 (require 'evil-numbers)
 (with-eval-after-load 'org
@@ -1171,11 +1177,7 @@
   "y"   '(:ignore t                              :which-key "y")
   "z"   '(:ignore t                              :which-key "Zoom")
   "zg"  '(global-text-scale-adjust               :which-key "Global")
-  "zl"  '(text-scale-adjust                      :which-key "Local")
-  ;; Danish
-  "å"   '(:ignore t                              :which-key "å")
-  "æ"   '(:ignore t                              :which-key "æ")
-  "ø"   '(:ignore t                              :which-key "ø"))
+  "zl"  '(text-scale-adjust                      :which-key "Local"))
 
 ;; ============================================================================
 ;;; Keybindings
@@ -1193,7 +1195,7 @@
  ("C-<tab>"       . tab-next)
  ("C-S-<tab>"     . tab-previous)
  ("C-a"           . org-cycle-agenda-files)
- ("M-p"           . consult-yank-pop) ; Paste with kill-ring dialog.
+ ("M-p"           . consult-yank-pop) ; Paste with `kill-ring' dialog.
  ;; ----------------------------------------------------------------------------
  ;; Operator state keys!!!
  ;; ----------------------------------------------------------------------------
@@ -1229,8 +1231,8 @@
  ;; Visual state keys!!!
  ;; ----------------------------------------------------------------------------
  :map evil-visual-state-map
- ("s"             . evil-surround-region)
- ("S"             . evil-Surround-region)
+ ;; "S" is dedicated to `evil-surround'. Use "C-s" for `isearch'.
+ ("s"             . isearch-forward-thing-at-point) ; Works with region input.
  ;; I change Vim's visual state behavior and exit like insert state with <esc>.
  ("v"             . exchange-point-and-mark)
  ;; ----------------------------------------------------------------------------
@@ -1292,7 +1294,7 @@
 (evil-define-key 'normal 'global
   ;; I never use Vim's substitute "s". If I need it "cl" does the same thing.
   "s"         #'isearch-forward                 ; I like emacs' "C-s" search.
-  "S"         #'isearch-forward-thing-at-point) ; Works a bit like Vim's "*".
+  "S"         #'isearch-forward-thing-at-point) ; A bit like Vim's "*".
 (evil-define-key 'normal org-mode-map
   "t"         #'org-todo
   "T"         #'org-todo-yesterday)
