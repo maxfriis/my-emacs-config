@@ -27,14 +27,14 @@ I restrict myself to use 8 dark theme colors.
 Examples of their use are:
 | Color | Use            |   | Color | Use             |
 |-------+----------------+---+-------+-----------------|
-| #210  | background     |   | #edc  | default text    |
+| #210  | background     |   | #dcb  | default text    |
 |-------+----------------+---+-------+-----------------|
-| #f38  | error/todo     |   | #f83  | warning/heading |
-| #8f3  | success/done   |   | #3f8  | comment/tags    |
-| #38f  | link/timestamp |   | #432  | shadow/hl-line  |
+| #f37  | error/todo     |   | #f73  | warning/heading |
+| #7f3  | success/done   |   | #3f7  | comment/tags    |
+| #37f  | link/timestamp |   | #432  | shadow/hl-line  |
 |-------+----------------+---+-------+-----------------|
 Unspecified faces are handled by the vanilla theme.
-Note that I don't use #83f (bad color contrast).
+Note that I don't use #73f (bad color contrast).
 
 *** Screenshot
 

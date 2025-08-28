@@ -10,7 +10,9 @@
 ;; Use Emacs' cursor-between-characters model of cursor positioning in
 ;; `evil-mode' instead of Vim's normal-mode cursor-on-characters model.
 ;; ============================================================================
-;; (require 'evil)
+(unless (package-installed-p
+         'evil)
+  (require 'evil))
 ;; ----------------------------------------------------------------------------
 ;; cursor-related `evil-mode' settings
 ;; ----------------------------------------------------------------------------
