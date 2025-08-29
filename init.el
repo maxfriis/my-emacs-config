@@ -100,7 +100,7 @@
         "\\` Git" " "
         vc-mode))
      " "
-     ;; Show the variable global-mode-string which is usually nil.
+     ;; Show the variable `global-mode-string' which is usually nil.
      mode-line-misc-info
      ;; Horizontal gap for alignment.
      (propertize
@@ -164,7 +164,7 @@
    "\\`~/\\.emacs\\.d/.*\\.el\\'"
    "\\`~/\\.emacs\\.d/bookmarks\\'"
    "\\`~/\\.emacs\\.d/diary\\'")
- shell-default-shell 'eshell ; I use a terminal outside emacs when I need it.
+ shell-default-shell 'eshell ; I use a terminal outside Emacs when I need it.
  eshell-ls-initial-args
  '("-agho")
  ;; ----------------------------------------------------------------------------
@@ -285,14 +285,6 @@
     (org-agenda-redo t) ; Might turn of hl-line for some reason?
     (beginning-of-buffer)))
 ;; ----------------------------------------------------------------------------
-;; Ace window swap
-;; ----------------------------------------------------------------------------
-(defun my/ace-swap-window ()
-  "Swap two windows (prompt if 3+). Keep focusing the current window."
-  (interactive)
-  (ace-swap-window)
-  (aw-flip-window))
-;; ----------------------------------------------------------------------------
 ;; 3-window setup
 ;; ----------------------------------------------------------------------------
 (defun my/3-windows ()
@@ -307,7 +299,15 @@
   (switch-to-buffer "*scratch*")
   (other-window -2)) ; Back to initial window.
 ;; ----------------------------------------------------------------------------
-;; Toggle ny faces (theme)
+;; Ace window swap
+;; ----------------------------------------------------------------------------
+(defun my/ace-swap-window ()
+  "Swap two windows (prompt if 3+). Keep focusing the current window."
+  (interactive)
+  (ace-swap-window)
+  (aw-flip-window))
+;; ----------------------------------------------------------------------------
+;; Toggle my faces (theme)
 ;; ----------------------------------------------------------------------------
 (defun my/toggle-faces ()
   "Toggle my 2 default faces."
@@ -419,22 +419,6 @@
 (with-eval-after-load 'evil
   (add-hook 'git-commit-mode-hook #'evil-insert-state)
   (evil-set-initial-state 'magit-log-edit-mode 'insert))
-;; ----------------------------------------------------------------------------
-;; Font pitch
-;; ----------------------------------------------------------------------------
-(setq
- mixed-pitch-set-height t)
-(require 'mixed-pitch)
-(dolist
-    (face
-     '(org-special-keyword org-date org-tag org-priority org-todo org-table))
-  (add-to-list 'mixed-pitch-fixed-pitch-faces face))
-;; ----------------------------------------------------------------------------
-;; Narrow with dwim
-;; ----------------------------------------------------------------------------
-(with-eval-after-load 'org
-  (require 'recursive-narrow))
-(put 'narrow-to-region 'disabled nil) ; Disable a recursive-narrow warning.
 ;; ============================================================================
 ;;;; Windows
 ;; ============================================================================
@@ -445,6 +429,12 @@
 (ace-window-display-mode 1)
 (require 'centered-cursor-mode)
 (global-centered-cursor-mode 1) ; I like this controversial mode.
+;; ----------------------------------------------------------------------------
+;; Narrow with dwim
+;; ----------------------------------------------------------------------------
+(with-eval-after-load 'org
+  (require 'recursive-narrow))
+(put 'narrow-to-region 'disabled nil) ; Disable a recursive-narrow warning.
 ;; ============================================================================
 ;;;; Completion
 ;; ============================================================================
@@ -525,6 +515,16 @@
 (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
 (require 'rainbow-mode)
 (add-hook 'prog-mode-hook #'rainbow-mode)
+;; ----------------------------------------------------------------------------
+;; Font pitch
+;; ----------------------------------------------------------------------------
+(setq
+ mixed-pitch-set-height t)
+(require 'mixed-pitch)
+(dolist
+    (face
+     '(org-special-keyword org-date org-tag org-priority org-todo org-table))
+  (add-to-list 'mixed-pitch-fixed-pitch-faces face))
 
 ;; ============================================================================
 ;;; Evil.el
@@ -561,10 +561,11 @@
  evil-want-keybinding nil ; evil-collection need this.
  evil-want-integration t
  vim-style-remap-Y-to-y$ t)
-;; ----------------------------------------------------------------------------
-;; Evil packages
-;; ----------------------------------------------------------------------------
+;; ============================================================================
+;;;; Evil packages
+;; ============================================================================
 ;; I dislike using my <ctrl> key and prefer modal to layered keybindings.
+;; ----------------------------------------------------------------------------
 (unless (package-installed-p
          'evil)
   (require 'evil))
@@ -589,9 +590,9 @@
      evil-org-mode))
   (require 'evil-org-agenda)
   (evil-org-agenda-set-keys))
-;; ----------------------------------------------------------------------------
-;;;; Hooks to disable hl-line while marking a region or `inputing'
-;; ----------------------------------------------------------------------------
+;; ============================================================================
+;;;; Hooks to disable `hl-line' while marking a region or inputing
+;; ============================================================================
 (dolist
     (hook
      '(evil-visual-state-entry-hook
@@ -616,7 +617,7 @@
 ;;;; Evil_cursor_model (my controversial sacrilege)
 ;; ============================================================================
 ;; I use Emacs' cursor-between-characters model of cursor positioning in
-;; `evil-mode' instead of Vim's normal-mode cursor-on-characters model.
+;; `evil-mode' instead of Vim's normal state cursor-on-characters model.
 ;; ----------------------------------------------------------------------------
 ;; I use Vim's modal bindings but I rarely use capitalized bindings as `verbs'.
 ;; `<shift>' just like `<ctrl>' is a layer and I minimize the use of layers.
@@ -625,9 +626,9 @@
 ;; ----------------------------------------------------------------------------
 ;; This cursor model is easier to internalize if you are not a power user.
 ;; I find it more consistent to use the same model in insert and normal state.
-;; It is modal but closer to other editing experiences.
+;; It is still modal but closer to other editing experiences.
 ;; More info: [[https://www.dr-qubit.org/Evil_cursor_model.html]]
-;; Default evil/Vim behavior will work if the "(load..." line is omitted.
+;; Default evil/Vim behavior will work if the "(load..." line below is omitted.
 ;; ----------------------------------------------------------------------------
 (when (file-newer-than-file-p
        (locate-user-emacs-file "evil-cursor-model.el")
@@ -705,9 +706,9 @@
    (type "|" "HOLD(h@/!)" "DONE(d!/!)"))  ; Inactive states
  org-priority-default ?C
  org-priority-faces ; This affects rendering in the agenda.
- '((?A . (:slant nil :height 0.8))
-   (?B . (:slant nil :height 0.8))
-   (?C . (:slant nil :height 0.8)))
+ '((?A . (:slant nil :height 0.8)) ; For some reason the default is slanted.
+   (?B . (:slant nil :height 0.8)) ; I don't know how to fix it with faces.
+   (?C . (:slant nil :height 0.8))) ; I have not investigated since this works.
  org-list-allow-alphabetical t
  org-list-demote-modify-bullet
  '(("+" . "*")
@@ -867,7 +868,7 @@
                'regexp "\\[[0-9]+/[0-9]+\\]"
                ;; or
                'timestamp))))
-     ;; Inactive states.
+     ;; Inactive states. Will not show in the agenda even if scheduled.
      (todo "HOLD"
            ;; HOLD for third party action pending.
            ((org-agenda-overriding-header "") ; same block
@@ -879,6 +880,7 @@
             (org-agenda-skip-function
              '(org-agenda-skip-entry-if
                'notregexp org-priority-regexp))))))
+   ;; Custom options for maintainance.
    ("d" "DONE TODOs"
     ;; For archiving done tasks.
     ((todo "DONE"
@@ -895,15 +897,11 @@
    (tags     . "  %-6c%-12e")
    (search   . "  %-6c%-12e"))
  org-agenda-scheduled-leaders
- '("☐" "☐%3dx")
+ '("⧄" "⧄%3dx")
  org-agenda-deadline-leaders
- '("☒" "☒%3dd" "☒%3dx")
+ '("⧅" "⧅%3dd" "⧅%3dx")
  org-agenda-timerange-leaders
  '("Range" "%2d/%d")
- ;; org-agenda-entry-text-leaders ":"
- ;; org-agenda-bulk-mark-char ":"
- ;; org-agenda-breadcrumbs-separator ":"
- ;; org-agenda-start-with-log-mode t
  org-agenda-skip-scheduled-if-done t
  org-agenda-skip-deadline-if-done t
  org-agenda-skip-deadline-prewarning-if-scheduled t
@@ -934,9 +932,9 @@
    (holiday-fixed 12 24    "Juleaften"))
  org-agenda-include-diary t
  diary-mark-entries t)
-;; ----------------------------------------------------------------------------
+;; ============================================================================
 ;;;; Load org
-;; ----------------------------------------------------------------------------
+;; ============================================================================
 (unless (package-installed-p
          'org)
   (require 'org))
@@ -948,20 +946,20 @@
  (lambda ()
    (setq
     prettify-symbols-alist ; utf8's that work in the terminal.
-    '(("[-]"            . ?⊟) ; Options: ⧈⧇⊡⧆⊞⊟⧄⧅⊠⟏⟎
-      ("[ ]"            . ?⊡) ; ▸▴▾◂
+    '(("[-]"            . ?⊟) ; utf8 options: ⧈⧇⊡⧆⊞⊟⧄⧅⊠⟏⟎ ▸▴▾◂ ✏✎✐ ☑☐☒
+      ("[ ]"            . ?⊡)
       ("[X]"            . ?⊠)
-      ("CLOSED:"        . ?☑) ; Display different in some fonts.
-      ("SCHEDULED:"     . ?☐)
-      ("DEADLINE:"      . ?☒)
+      ("CLOSED:"        . ?⧇)
+      ("SCHEDULED:"     . ?⧄)
+      ("DEADLINE:"      . ?⧅)
       (":PROPERTIES:"   . ?⚙) ; Settings.
       (":LOGBOOK:"      . ?☰) ; Meta data.
       ("CLOCK:"         . ?–) ; Other items in the logbook have a dash bullet.
-      (":END:"          . ?✐)
-      ("#+begin_export" . ?✎)
-      ("#+end_export"   . ?✐)
-      ("#+begin_src"    . ?✎)
-      ("#+end_src"      . ?✐))
+      (":END:"          . ?▴)
+      ("#+begin_export" . ?▾)
+      ("#+end_export"   . ?▴)
+      ("#+begin_src"    . ?▾)
+      ("#+end_src"      . ?▴))
     prettify-symbols-unprettify-at-point t)
    (prettify-symbols-mode 1)))
 ;; ----------------------------------------------------------------------------
@@ -1061,11 +1059,11 @@
   "e"   '(:ignore t                              :which-key "Evaluate")
   "f"   '(:ignore t                              :which-key "Files")
   "fS"  '(save-some-buffers                      :which-key "Save all")
-  "fR"  '(consult-recent-file                    :which-key "Mini recent")
   "fa"  '(my/open-agenda-file                    :which-key "Agenda")
   "fd"  '(dired-jump                             :which-key "Dired")
   "ff"  '(counsel-find-file                      :which-key "Find")
   "fi"  '(my/open-init-file                      :which-key "Init")
+  "fm"  '(consult-recent-file                    :which-key "Mini recent")
   "fn"  '(my/open-note-file                      :which-key "Notes")
   "fp"  '(find-file-at-point                     :which-key "At point")
   "fr"  '(recentf-open-files                     :which-key "Recent")
@@ -1144,7 +1142,7 @@
   "tc"  '(global-centered-cursor-mode            :which-key "Vert.center")
   "tf"  '(mixed-pitch-mode                       :which-key "Font pitch")
   "tg"  '(golden-ratio-mode                      :which-key "Gold ratio")
-  "th"  '(hl-line-mode                           :which-key "Hl line")
+  "th"  '(global-hl-line-mode                    :which-key "Hl line")
   "tk"  '(keycast-tab-bar-mode                   :which-key "Keycast")
   "tl"  '(global-display-line-numbers-mode       :which-key "Line number")
   "to"  '(outline-minor-mode                     :which-key "Outline")
@@ -1209,7 +1207,7 @@
  :map evil-motion-state-map
  ("<down>"        . evil-next-visual-line)     ; up/down navigate wrapped lines.
  ("<up>"          . evil-previous-visual-line) ; j/k respect line atoms in vim.
- ("´"             . other-window) ; I think always clockwise.
+ ("´"             . other-window)
  ("¨"             . next-buffer) ; opposite direction of the "<spc> <tab>" swap.
  ("½"             . tab-new)
  ("gc"            . evilnc-comment-operator)
@@ -1233,7 +1231,7 @@
  :map evil-visual-state-map
  ;; "S" is dedicated to `evil-surround'. Use "C-s" for `isearch-forward'.
  ("s"             . isearch-forward-thing-at-point) ; With region as input.
- ;; I change Vim's visual state behavior and exit like insert state with <esc>.
+ ;; I change Vim's visual state behavior and exit with <esc> like insert state.
  ("v"             . exchange-point-and-mark)
  ;; ----------------------------------------------------------------------------
  ;; Insert state keys!!!
@@ -1250,7 +1248,7 @@
  ("C-u"           . universal-argument)
  ("C-w"           . evil-forward-word-begin)
  ("C-W"           . evil-forward-WORD-begin)
- ("C-v"           . set-mark-command) ; "C-SPC" is used by general.el.
+ ("C-v"           . set-mark-command) ; "C-<spc>" is used by general.el.
  ("C-0"           . evil-beginning-of-line)
  ;; Danish keyboard
  ("C-æ"           . evil-forward-paragraph)
@@ -1276,13 +1274,10 @@
  :map ccm-map
  ("<prior>"       . nil)
  ("<next>"        . nil)
- ;; ("<wheel-up>"    . previous-line)
- ;; ("<wheel-down>"  . next-line)
  :map minibuffer-local-map
  ("C-."           . embark-act)
  ("M-."           . embark-dwim)
- ("<next>"        . marginalia-cycle))
-(bind-keys
+ ("<next>"        . marginalia-cycle)
  :map org-present-mode-keymap
  ("<left>"        . org-present-prev)
  ("<right>"       . org-present-next)
@@ -1293,13 +1288,13 @@
 ;; ============================================================================
 (evil-define-key 'normal 'global
   ;; I never use Vim's substitute "s". If I need it "cl" does the same thing.
-  "s"         #'isearch-forward                 ; I like emacs' "C-s" search.
+  "s"         #'isearch-forward                 ; I like Emacs' "C-s" search.
   "S"         #'isearch-forward-thing-at-point) ; A bit like Vim's "*".
 (evil-define-key 'normal org-mode-map
   "t"         #'org-todo
   "T"         #'org-todo-yesterday)
 (evil-define-key 'motion org-agenda-mode-map
-  (kbd "SPC") nil ; Make general.el take over "SPC".
+  (kbd "SPC") nil ; Make general.el take over "<spc>".
   (kbd "S-<left>")  #'org-agenda-earlier
   (kbd "S-<right>") #'org-agenda-later
   "a"         #'org-agenda-append-agenda
@@ -1322,13 +1317,13 @@
   "å"         #'my/org-agenda-custom
   "Å"         #'my/org-capture-idea)
 (evil-define-key 'normal dired-mode-map
-  (kbd "SPC") nil ; Make general.el take over "SPC".
+  (kbd "SPC") nil ; Make general.el take over "<spc>".
   "a"         #'dired-hide-details-mode
   "h"         #'dired-up-directory
   "l"         #'dired-find-file
   "s"         #'dired-omit-mode)
 (evil-define-key 'normal help-mode-map
-  (kbd "SPC") nil) ; Make general.el take over "SPC".
+  (kbd "SPC") nil) ; Make general.el take over "<spc>".
 
 ;; ============================================================================
 ;;; Startup page
