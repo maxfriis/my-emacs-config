@@ -7,22 +7,23 @@
 ;; ============================================================================
 
 ;; ============================================================================
-;; Use Emacs' cursor-between-characters model of cursor positioning in
-;; `evil-mode' instead of Vim's normal-mode cursor-on-characters model.
+;;; Use Emacs' cursor-between-characters model of cursor positioning in
+;;; `evil-mode' instead of Vim's normal state cursor-on-characters model.
 ;; ============================================================================
 (unless (package-installed-p
          'evil)
   (require 'evil))
-;; ----------------------------------------------------------------------------
-;; cursor-related `evil-mode' settings
-;; ----------------------------------------------------------------------------
+
+;; ============================================================================
+;;; Cursor related `evil-mode' settings
+;; ============================================================================
 (setq
  evil-move-cursor-back nil
  evil-move-beyond-eol t
  evil-highlight-closing-paren-at-point-states nil)
 ;; (setq evil-cross-lines t) ; "f" and "t" will work cross lines
 ;; ----------------------------------------------------------------------------
-;; my paste and input command rebindings
+;;;; My paste and insert command rebindings
 ;; ----------------------------------------------------------------------------
 (evil-define-key 'normal 'global
   "p"  #'evil-paste-before ; swapped because only "p" is used to paste.
@@ -32,7 +33,7 @@
   "a"  #'evil-append-line  ; swapped because I only use it to edit from eol.
   "A"  #'evil-append)      ; "li" does the same thing.
 ;; ----------------------------------------------------------------------------
-;; motion command rebindings
+;;;; Motion command rebindings
 ;; ----------------------------------------------------------------------------
 ;; "w" and "b" works out of the evil box. Rebinding other motions.
 (evil-define-key 'motion 'global
@@ -47,7 +48,7 @@
   "%"  #'evil-jump-item-before)
 
 ;; ============================================================================
-;; evil commands implementing Emacs' cursor model
+;;; Evil commands implementing Emacs' cursor model
 ;; ============================================================================
 (evil-define-motion evil-find-char-after (count char)
   "Move point immediately after the next COUNT'th occurrence of CHAR.
@@ -120,7 +121,7 @@ If BIGWORD is non-nil, move by WORDS."
   (evil-backward-after-word-end count t))
 
 ;; ----------------------------------------------------------------------------
-;; redefine `inclusive' motion type to not include character after point
+;;;; Redefine inclusive motion type to not include character after point
 ;; ----------------------------------------------------------------------------
 (evil-define-type inclusive
   "Return the positions unchanged, with some exceptions.
@@ -153,7 +154,7 @@ If the end position is at the beginning of a line, then:
                       (if (= width 1) "" "s")))))
 
 ;; ----------------------------------------------------------------------------
-;; make "e" search offset put point after last character
+;;;; Make "e" search offset put point after last character
 ;; ----------------------------------------------------------------------------
 (defun ad-evil-ex-search-adjust-offset (offset)
   (unless (zerop (length offset))
@@ -170,7 +171,7 @@ If the end position is at the beginning of a line, then:
  :after #'ad-evil-ex-search-adjust-offset)
 
 ;; ----------------------------------------------------------------------------
-;; `evil-jump-item' move point after matching delimeter if it jumps forward
+;;;; `evil-jump-item' move point after matching delimeter if it jumps forward
 ;; ----------------------------------------------------------------------------
 (evil-define-motion evil-jump-item-before (count)
   "Find the next item in this line immediately before

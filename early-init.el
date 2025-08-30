@@ -17,7 +17,7 @@
  ;; Trigger fewer garbage collections. Use more memory.
  inhibit-compacting-font-caches t)
  ;; ;; Disable some compilation warnings.
- ;; native-comp-async-report-warnings-errors nil)
+ ;; (setq native-comp-async-report-warnings-errors nil)
 
 ;; ============================================================================
 ;;; Vanilla defaults

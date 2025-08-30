@@ -15,14 +15,14 @@
   (set-face-attribute
    'default
    nil :font "DejaVu Sans Mono"))) ; Fallback mono space font.
-;; Though the Ubuntu font is nice it does not look good with Ubuntu Mono.
+;; Though the Ubuntu font is OK it does not look good with Ubuntu Mono.
 (when (find-font
        (font-spec :name "Verdana"))
   (set-face-attribute
    'variable-pitch
    nil :font "Verdana-20")) ; Best variable width font with Ubuntu Mono imo.
 ;; ----------------------------------------------------------------------------
-;; I like the lisp files I load to be compiled.
+;; I compile the lisp files I load.
 ;; ----------------------------------------------------------------------------
 (when (file-newer-than-file-p
        (locate-user-emacs-file "my-ansi-faces.el")
@@ -48,23 +48,24 @@
  mode-line-format
  '((:eval ; Eval and list everything.
     (list
-     "%e"
+     ;; "%e" ; show a memory error I have never seen.
      " "
      ;; Indicators for writable and modified.
      mode-line-modified
-     ;; Other custom indicator.
+     ;; Custom indicator.
      (cond
-      ((eq (user-uid) 0)
+      ((and
+        (eq (user-uid) 0)
+        (mode-line-window-selected-p))
        (propertize
         "#"
         'help-echo "Root access"
-        'face 'warning
+        'face 'warning ; Emphasize this indicator.
         'mouse-face 'mode-line-highlight))
       ((buffer-narrowed-p)
        (propertize
         "n"
         'help-echo "Narrowed, mouse-1: Widen"
-        'face 'warning
         'mouse-face 'mode-line-highlight
         'local-map (make-mode-line-mouse-map
                     'mouse-1 #'mode-line-widen)))
@@ -89,13 +90,16 @@
             "-mode\\'" ""
             (downcase (symbol-name major-mode)))))))
        "]")
-      'help-echo (concat (symbol-name major-mode) ", mouse-1: Cycle outline")
+      'help-echo (concat
+                  (symbol-name major-mode)
+                  ", mouse-1: Cycle outline")
       'mouse-face 'mode-line-highlight
       'local-map (make-mode-line-mouse-map
-                  'mouse-1 #'outline-cycle-buffer)) ; I use outline-minor-mode.
+                  'mouse-1 #'outline-cycle-buffer)) ; I use `outline-minor-mode'.
      ;; Version control in active window.
      (when (and
-            vc-mode (mode-line-window-selected-p))
+            vc-mode
+            (mode-line-window-selected-p))
        (replace-regexp-in-string
         "\\` Git" " "
         vc-mode))
@@ -114,7 +118,7 @@
              (list
               (propertize
                "%4c "
-               'help-echo "Position, mouse-1: Toggle line numbers"
+               'help-echo "Column number, mouse-1: Toggle line numbers"
                'mouse-face 'mode-line-highlight
                'local-map (make-mode-line-mouse-map
                            'mouse-1 #'global-display-line-numbers-mode))
@@ -123,7 +127,7 @@
            (list
             (propertize
              "%4l,"
-             'help-echo "Position, mouse-1: Toggle line numbers"
+             'help-echo "Line number, mouse-1: Toggle line numbers"
              'mouse-face 'mode-line-highlight
              'local-map (make-mode-line-mouse-map
                          'mouse-1 #'global-display-line-numbers-mode))
@@ -179,7 +183,7 @@
  auto-revert-verbose nil
  global-auto-revert-non-file-buffers t ; Update dired buffer.
  ;; ----------------------------------------------------------------------------
- ;; Incremental search (I use Emacs rather than vim tools for search)
+ ;; Incremental search (I use Emacs rather than Vim tools for search)
  ;; ----------------------------------------------------------------------------
  search-whitespace-regexp ".*?"
  isearch-lazy-count t
@@ -221,9 +225,10 @@
 ;; Hooks
 ;; ----------------------------------------------------------------------------
 (add-hook 'before-save-hook #'whitespace-cleanup)
-(add-hook 'dired-mode-hook  #'dired-omit-mode)         ; Toggle with "s".
-(add-hook 'dired-mode-hook  #'dired-hide-details-mode) ; Toggle with "a".
-(add-hook 'prog-mode-hook   #'outline-minor-mode)      ; Cycle with "S-tab".
+(add-hook 'after-save-hook  #'vc-refresh-state)
+(add-hook 'dired-mode-hook  #'dired-omit-mode)         ; Toggle with "a".
+(add-hook 'dired-mode-hook  #'dired-hide-details-mode) ; Toggle with "s".
+(add-hook 'prog-mode-hook   #'outline-minor-mode)      ; Cycle with "S-<tab>".
 (add-hook 'text-mode-hook   #'visual-line-mode)        ; Soft line breaks.
 (add-hook
  'emacs-startup-hook
@@ -294,7 +299,7 @@
   (split-window-right)
   (other-window 1)
   (mode-line-other-buffer) ; Switch to the most recent buffer.
-  (split-window-below) ; (scratch-buffer) will situationally work differently.
+  (split-window-below) ; `scratch-buffer' will situationally work differently.
   (other-window 1)
   (switch-to-buffer "*scratch*")
   (other-window -2)) ; Back to initial window.
@@ -302,7 +307,7 @@
 ;; Ace window swap
 ;; ----------------------------------------------------------------------------
 (defun my/ace-swap-window ()
-  "Swap two windows (prompt if 3+). Keep focusing the current window."
+  "Swap window contents (prompt if 3+). Keep focusing the current window."
   (interactive)
   (ace-swap-window)
   (aw-flip-window))
@@ -310,7 +315,8 @@
 ;; Toggle my faces (theme)
 ;; ----------------------------------------------------------------------------
 (defun my/toggle-faces ()
-  "Toggle my 2 default faces."
+  "Toggle my two default faces.
+\nThey are loaded from my-faces.elc and my-ansi-faces.elc respectively."
   (interactive)
   (if (equal ; (eq...) will not work here. (equal...) is more relaxed.
        (face-background 'default) "#000")
@@ -321,18 +327,19 @@
 ;; Magit stage and commit
 ;; ----------------------------------------------------------------------------
 (defun my/magit-stage-all-and-commit (message)
-  "Easy commit everything."
+  "Easy stage and commit everything."
   (interactive "sCommit Message: ")
   (save-some-buffers t)
   (call-process-shell-command
-   (format "git commit -a -m \"%s\" &" message) nil nil))
+   (format "git commit -a -m \"%s\"" message) nil nil) ; Don't use &.
+  (vc-refresh-state))
 ;; ----------------------------------------------------------------------------
 ;; Save and quit
 ;; ----------------------------------------------------------------------------
 (defun my/save-all-kill-emacs-no-prompt ()
-  ;; I use `super-save' and `backup-each-save'.
-  "Save all and quit without prompt."
+  "Save all and quit without a prompt."
   (interactive)
+  ;; I use `super-save' and `backup-each-save' which makes this less risky.
   (save-some-buffers t)
   (when (file-newer-than-file-p
          (locate-user-emacs-file "early-init.el")
@@ -343,7 +350,7 @@
          (locate-user-emacs-file "init.elc"))
     (when (file-exists-p ; A fresh install has no compiled elc file to copy.
            (locate-user-emacs-file "init.elc"))
-      (copy-file ; Backup to debug a broken config with a working Emacs.
+      (copy-file ; Backup to easily debug a broken config with a working Emacs.
        (locate-user-emacs-file "init.elc")
        (locate-user-emacs-file "init.elc~") t)) ; Overwrite.
     (byte-compile-file (locate-user-emacs-file "init.el")))
@@ -355,10 +362,9 @@
 ;; I use the old package.el system rather than a newer alternative.
 ;; The alternatives generally increase garbage collections to a point where
 ;; you need to know what you are doing to gain anything from using them.
-;; I trust packages to defer stuff when it's warranted and useful and
-;; I don't want to micromanage.
+;; I trust packages to defer relevant stuff and I don't want to micromanage.
 ;; ----------------------------------------------------------------------------
-(setq
+((setq
  load-prefer-newer t ; Use .el if newer than .elc.
  package-archives
  '(("elpa"         . "https://elpa.gnu.org/packages/")
@@ -367,7 +373,7 @@
    ("nongnu"       . "https://elpa.nongnu.org/nongnu/")
    ("org"          . "https://orgmode.org/elpa/"))
  package-archive-priorities
- '(("elpa"  . 2)  ; Minimize bleeding edge with old versions from elpa.
+ '(("elpa"  . 2)  ; Minimize bleeding edge with older versions from elpa.
    ("melpa" . 1)) ; Other archives have priority 0.
  package-selected-packages
  '(evil evil-collection evil-nerd-commenter evil-surround evil-numbers evil-org
@@ -380,7 +386,7 @@
         super-save backup-each-save general))
 (unless (package-installed-p
          'package)
-  (require 'package)) ; I keep this even though it is no longer needed.
+  (require 'package)) ; I keep this even though it is not needed.
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents))
@@ -392,7 +398,6 @@
 ;; ----------------------------------------------------------------------------
 (setq
  auto-package-update-interval 30
- ;; auto-package-update-prompt-before-update t
  auto-package-update-hide-results t)
 (require 'auto-package-update)
 (auto-package-update-maybe)
@@ -402,10 +407,10 @@
  undo-tree-auto-save-history t)
 (require 'undo-tree)
 (global-undo-tree-mode 1)
-(require 'saveplace)
-(save-place-mode 1)
 (require 'savehist)
 (savehist-mode 1)
+(require 'saveplace)
+(save-place-mode 1)
 (require 'super-save)
 (super-save-mode 1)
 (setq
@@ -419,26 +424,26 @@
 (with-eval-after-load 'evil
   (add-hook 'git-commit-mode-hook #'evil-insert-state)
   (evil-set-initial-state 'magit-log-edit-mode 'insert))
+(add-hook 'magit-run-post-commit-hook  #'vc-refresh-state)
 ;; ============================================================================
-;;;; Windows
+;;;; Help and completion
 ;; ============================================================================
-(require 'golden-ratio)
-(golden-ratio-mode 1)
-(require 'transpose-frame)
-(require 'ace-window)
-(ace-window-display-mode 1)
-(require 'centered-cursor-mode)
-(global-centered-cursor-mode 1) ; I like this controversial mode.
+(require 'counsel)
+(require 'helpful)
+(bind-key [remap describe-function] #'counsel-describe-function)
+(bind-key [remap describe-variable] #'counsel-describe-variable)
+(bind-key [remap describe-command]  #'helpful-command)
+(bind-key [remap describe-key]      #'helpful-key)
+(require 'keycast)
+(keycast-tab-bar-mode 1)
 ;; ----------------------------------------------------------------------------
-;; Narrow with dwim
+;; Writing tips
 ;; ----------------------------------------------------------------------------
-(with-eval-after-load 'org
-  (require 'recursive-narrow))
-(put 'narrow-to-region 'disabled nil) ; Disable a recursive-narrow warning.
-;; ============================================================================
-;;;; Completion
-;; ============================================================================
-;; Mini buffer
+(require 'flycheck)
+(add-hook 'org-mode-hook #'flyspell-mode)
+(require 'writegood-mode)
+;; ----------------------------------------------------------------------------
+;; Mini buffer completion
 ;; ----------------------------------------------------------------------------
 (setq
  vertico-resize nil)
@@ -456,7 +461,7 @@
 (require 'consult)   ; Combine functionality (e.g. buffers + recentf).
 (require 'embark)    ; I don't use it yet.
 ;; ----------------------------------------------------------------------------
-;; Buffer
+;; Buffer completion
 ;; ----------------------------------------------------------------------------
 (setq
  corfu-auto t
@@ -468,41 +473,25 @@
 (global-corfu-mode 1)
 (corfu-echo-mode 1)
 (corfu-history-mode 1)
+;; ============================================================================
+;;;; Buffers
+;; ============================================================================
 (setq
  avy-timeout-seconds 1) ; I'm slow and don't use this much.
 (require 'avy)
-;; ============================================================================
-;;;; Help
-;; ============================================================================
-(require 'counsel)
-(require 'helpful)
-(bind-key [remap describe-function] 'counsel-describe-function)
-(bind-key [remap describe-variable] 'counsel-describe-variable)
-(bind-key [remap describe-command]  'helpful-command)
-(bind-key [remap describe-key]      'helpful-key)
-(require 'keycast)
-(keycast-tab-bar-mode 1)
+(with-eval-after-load 'org
+  (require 'recursive-narrow))
+(put 'narrow-to-region 'disabled nil) ; Disable a recursive-narrow warning.
 ;; ----------------------------------------------------------------------------
-;; Writing tips
+;; Font pitch
 ;; ----------------------------------------------------------------------------
-(require 'flycheck)
-(add-hook 'org-mode-hook #'flyspell-mode)
-(require 'writegood-mode)
-;; ============================================================================
-;;;; Thumbnails and colors
-;; ============================================================================
-(when (display-graphic-p)
-  (require 'nerd-icons) ; I prefer nerd-icons to all-the-icons.
-  (require 'nerd-icons-dired)
-  (add-hook 'dired-mode-hook #'nerd-icons-dired-mode)
-  (require 'nerd-icons-ibuffer)
-  (add-hook 'ibuffer-mode-hook #'nerd-icons-ibuffer-mode)
-  (require 'nerd-icons-corfu)
-  (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter)
-  (with-eval-after-load 'marginalia
-    (require 'nerd-icons-completion)
-    (nerd-icons-completion-mode 1)
-    (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup)))
+(setq
+ mixed-pitch-set-height t)
+(require 'mixed-pitch)
+(dolist
+    (face
+     '(org-special-keyword org-date org-tag org-priority org-todo org-table))
+  (add-to-list 'mixed-pitch-fixed-pitch-faces face))
 ;; ----------------------------------------------------------------------------
 ;; Color guiding
 ;; ----------------------------------------------------------------------------
@@ -516,15 +505,32 @@
 (require 'rainbow-mode)
 (add-hook 'prog-mode-hook #'rainbow-mode)
 ;; ----------------------------------------------------------------------------
-;; Font pitch
+;; Thumbnails
 ;; ----------------------------------------------------------------------------
-(setq
- mixed-pitch-set-height t)
-(require 'mixed-pitch)
-(dolist
-    (face
-     '(org-special-keyword org-date org-tag org-priority org-todo org-table))
-  (add-to-list 'mixed-pitch-fixed-pitch-faces face))
+(when (display-graphic-p)
+  (require 'nerd-icons) ; I prefer nerd-icons to all-the-icons.
+  (require 'nerd-icons-dired)
+  (add-hook 'dired-mode-hook #'nerd-icons-dired-mode)
+  (require 'nerd-icons-ibuffer)
+  (add-hook 'ibuffer-mode-hook #'nerd-icons-ibuffer-mode)
+  (require 'nerd-icons-corfu)
+  (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter)
+  (with-eval-after-load 'marginalia
+    (require 'nerd-icons-completion)
+    (nerd-icons-completion-mode 1)
+    (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup)))
+;; ============================================================================
+;;;; Windows
+;; ============================================================================
+(require 'transpose-frame)
+(require 'ace-window)
+(ace-window-display-mode 1)
+(require 'golden-ratio)
+(golden-ratio-mode 1)
+(require 'centered-cursor-mode)
+;; Enable mouse wheel scroll in the focused window.
+(add-to-list 'ccm-ignored-commands 'mwheel-scroll)
+(global-centered-cursor-mode 1) ; I like this controversial mode.
 
 ;; ============================================================================
 ;;; Evil.el
@@ -540,9 +546,9 @@
 ;; |------+----------+------+----------|
 ;; The `normal' state is green and the `operator' state is red to alert.
 ;; The `insert' state has the remaining yellow traffic light color and a `bar'.
-;; The `replace' state is magenta and use a horizontal `hbar' cursor.
-;; The `emacs' and `motion' states have the remaining cyan and blue rgb colors.
-;; "Input" states have the colors with 2 f's and bars in common.
+;; The rare `replace' state is magenta and use a horizontal `hbar' cursor.
+;; The `emacs' and `motion' state have the remaining cyan and blue ansi colors.
+;; "Input" states have the colors with two f's and bars in common.
 ;; The `visual' state has a white hollow cursor.
 ;; ----------------------------------------------------------------------------
 (setq
@@ -591,7 +597,7 @@
   (require 'evil-org-agenda)
   (evil-org-agenda-set-keys))
 ;; ============================================================================
-;;;; Hooks to disable `hl-line' while marking a region or inputing
+;;;; Hooks to disable `hl-line' while marking a visual region or inputing
 ;; ============================================================================
 (dolist
     (hook
@@ -625,9 +631,9 @@
 ;; I use "p" to paste and "a", "c", "i" or "o" to enter insert state.
 ;; ----------------------------------------------------------------------------
 ;; This cursor model is easier to internalize if you are not a power user.
-;; I find it more consistent to use the same model in insert and normal state.
-;; It is still modal but closer to other editing experiences.
-;; More info: [[https://www.dr-qubit.org/Evil_cursor_model.html]]
+;; It's more consistent to use the same model in both insert and normal state.
+;; Editing is still modal but closer to other editing experiences than Vim.
+;; More info: [[https://www.dr-qubit.org/evil_cursor_model.html]]
 ;; Default evil/Vim behavior will work if the "(load..." line below is omitted.
 ;; ----------------------------------------------------------------------------
 (when (file-newer-than-file-p
@@ -772,7 +778,7 @@
 ;; ============================================================================
 (setq
  org-capture-templates
- `(("c" "Category" entry ; Back tick to "concat" for code readability.
+ `(("c" "Category" entry ; Back tick to ",(concat..." for code readability.
     (file ,(concat org-agenda-directory "plan.org"))
     ,(concat
       "* TODO [/] %^{Heading}\n"
@@ -945,13 +951,13 @@
  'org-mode-hook
  (lambda ()
    (setq
-    prettify-symbols-alist ; utf8's that work in the terminal.
-    '(("[-]"            . ?⊟) ; utf8 options: ⧈⧇⊡⧆⊞⊟⧄⧅⊠⟏⟎ ▸▴▾◂ ✏✎✐ ☑☐☒
-      ("[ ]"            . ?⊡)
+    prettify-symbols-alist
+    '(("[ ]"            . ?⊡) ; utf8 options: ⧈⧇⊡⧆⊞⊟⧄⧅⊠⟏⟎ ▸▾▴◂ ✏✎✐ ☑☐☒
+      ("[-]"            . ?⊟)
       ("[X]"            . ?⊠)
-      ("CLOSED:"        . ?⧇)
       ("SCHEDULED:"     . ?⧄)
       ("DEADLINE:"      . ?⧅)
+      ("CLOSED:"        . ?⊠)
       (":PROPERTIES:"   . ?⚙) ; Settings.
       (":LOGBOOK:"      . ?☰) ; Meta data.
       ("CLOCK:"         . ?–) ; Other items in the logbook have a dash bullet.
@@ -967,13 +973,13 @@
 ;; ----------------------------------------------------------------------------
 (add-hook
  'org-after-todo-state-change-hook
- (lambda () ; Overkill to update all "[/]" cookies with every state change.
+ (lambda () ; Update "[/]" cookies in all buffers with every TODO state change.
    (mapcar
     (lambda (buffer)
       (with-current-buffer buffer (org-update-statistics-cookies t)))
     (org-buffer-list))))
 ;; ----------------------------------------------------------------------------
-;; Insert state in org-capture and on org-add-note/org-refile
+;; Insert state in `org-capture' and on `org-add-note'/`org-refile'
 ;; ----------------------------------------------------------------------------
 (with-eval-after-load 'evil
   (add-hook 'org-capture-mode-hook     #'evil-insert-state)
@@ -1028,7 +1034,7 @@
   "SPC" '(counsel-M-x                            :which-key "M-x")
   ;; Toggle 2 top buffers:
   "TAB" '(mode-line-other-buffer                 :which-key "Toggle buf")
-  ;; "<spc>-#" is inspired by emacs "C-x #" bindings where # is a number.
+  ;; "<spc> #" is inspired by Emacs' "C-x #" bindings where # is a number.
   "0"   '(delete-window                          :which-key "Del win")
   "1"   '(delete-other-windows                   :which-key "Max win")
   "2"   '(split-window-below                     :which-key "Win below")
@@ -1206,16 +1212,16 @@
  ;; ----------------------------------------------------------------------------
  :map evil-motion-state-map
  ("<down>"        . evil-next-visual-line)     ; up/down navigate wrapped lines.
- ("<up>"          . evil-previous-visual-line) ; j/k respect line atoms in vim.
+ ("<up>"          . evil-previous-visual-line) ; j/k respect line atoms in Vim.
  ("´"             . other-window)
- ("¨"             . next-buffer) ; opposite direction of the "<spc> <tab>" swap.
+ ("¨"             . next-buffer) ; Opposite direction of the "<spc> <tab>" swap.
  ("½"             . tab-new)
  ("gc"            . evilnc-comment-operator)
  ;; Danish keyboard
- ("æ"             . evil-forward-paragraph)
- ("Æ"             . evil-backward-paragraph)
- ("ø"             . evil-end-of-line)
- ("Ø"             . evil-first-non-blank)
+ ("æ"             . forward-paragraph)
+ ("Æ"             . backward-paragraph)
+ ("ø"             . move-end-of-line)
+ ("Ø"             . move-beginning-of-line)
  ("å"             . my/org-agenda-custom)
  ("Å"             . my/org-capture-idea)
  ("C-å"           . org-cycle-agenda-files)
@@ -1230,7 +1236,7 @@
  ;; ----------------------------------------------------------------------------
  :map evil-visual-state-map
  ;; "S" is dedicated to `evil-surround'. Use "C-s" for `isearch-forward'.
- ("s"             . isearch-forward-thing-at-point) ; With region as input.
+ ("s"             . isearch-forward-thing-at-point) ; The region as input.
  ;; I change Vim's visual state behavior and exit with <esc> like insert state.
  ("v"             . exchange-point-and-mark)
  ;; ----------------------------------------------------------------------------
@@ -1249,12 +1255,12 @@
  ("C-w"           . evil-forward-word-begin)
  ("C-W"           . evil-forward-WORD-begin)
  ("C-v"           . set-mark-command) ; "C-<spc>" is used by general.el.
- ("C-0"           . evil-beginning-of-line)
+ ("C-0"           . beginning-of-line)
  ;; Danish keyboard
- ("C-æ"           . evil-forward-paragraph)
- ("C-Æ"           . evil-backward-paragraph)
+ ("C-æ"           . forward-paragraph)
+ ("C-Æ"           . backward-paragraph)
  ("C-ø"           . move-end-of-line)
- ("C-Ø"           . evil-first-non-blank)
+ ("C-Ø"           . move-beginning-of-line)
  ;; ----------------------------------------------------------------------------
  ;; Other maps
  ;; ----------------------------------------------------------------------------
@@ -1284,17 +1290,17 @@
  ("<up>"          . org-present-beginning)
  ("<down>"        . org-present-end))
 ;; ============================================================================
-;;;; Keys in maps depending on evil state
+;;;; Keybindings in maps depending on evil state with `evil-define-key'
 ;; ============================================================================
 (evil-define-key 'normal 'global
   ;; I never use Vim's substitute "s". If I need it "cl" does the same thing.
-  "s"         #'isearch-forward                 ; I like Emacs' "C-s" search.
+  "s"         #'isearch-forward                 ; I like Emacs' "C-s" isearch.
   "S"         #'isearch-forward-thing-at-point) ; A bit like Vim's "*".
 (evil-define-key 'normal org-mode-map
   "t"         #'org-todo
   "T"         #'org-todo-yesterday)
 (evil-define-key 'motion org-agenda-mode-map
-  (kbd "SPC") nil ; Make general.el take over "<spc>".
+  (kbd "SPC") nil ; Make general.el take over <spc>.
   (kbd "S-<left>")  #'org-agenda-earlier
   (kbd "S-<right>") #'org-agenda-later
   "a"         #'org-agenda-append-agenda
@@ -1317,13 +1323,13 @@
   "å"         #'my/org-agenda-custom
   "Å"         #'my/org-capture-idea)
 (evil-define-key 'normal dired-mode-map
-  (kbd "SPC") nil ; Make general.el take over "<spc>".
-  "a"         #'dired-hide-details-mode
+  (kbd "SPC") nil ; Make general.el take over <spc>.
+  "a"         #'dired-omit-mode ; Inspired by "ls -a".
   "h"         #'dired-up-directory
   "l"         #'dired-find-file
-  "s"         #'dired-omit-mode)
+  "s"         #'dired-hide-details-mode) ; Like "ls -l".
 (evil-define-key 'normal help-mode-map
-  (kbd "SPC") nil) ; Make general.el take over "<spc>".
+  (kbd "SPC") nil) ; Make general.el take over <spc>.
 
 ;; ============================================================================
 ;;; Startup page
