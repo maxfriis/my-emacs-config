@@ -22,18 +22,11 @@
  evil-move-beyond-eol t
  evil-highlight-closing-paren-at-point-states nil)
 ;; (setq evil-cross-lines t) ; "f" and "t" will work cross lines
-;; ----------------------------------------------------------------------------
-;;;; My paste and insert command rebindings
-;; ----------------------------------------------------------------------------
-(evil-define-key 'normal 'global
-  "p"  #'evil-paste-before ; swapped because only "p" is used to paste.
-  "P"  #'evil-paste-after  ; "jp" or "lp" does the same thing.
-  "o"  #'evil-open-above   ; swapped to be consistent with paste.
-  "O"  #'evil-open-below   ; "jo" does the same thing.
-  "a"  #'evil-append-line  ; swapped because I only use it to edit from eol.
-  "A"  #'evil-append)      ; "li" does the same thing.
-;; ----------------------------------------------------------------------------
-;;;; Motion command rebindings
+
+;; ============================================================================
+;;; Command rebindings
+;; ============================================================================
+;;;; Motion commands
 ;; ----------------------------------------------------------------------------
 ;; "w" and "b" works out of the evil box. Rebinding other motions.
 (evil-define-key 'motion 'global
@@ -46,6 +39,30 @@
   "ge" #'evil-backward-after-word-end
   "gE" #'evil-backward-after-WORD-end
   "%"  #'evil-jump-item-before)
+;; ----------------------------------------------------------------------------
+;;;; Paste and insert commands
+;; ----------------------------------------------------------------------------
+;; With the cursor-between-charactors model some Vim bindings makes less sense.
+;; Vim's "a" is almost useless whereas "A" still has it's use. To reduce the
+;; use of the <shift> layer I swap "a" and "A". Likewise Vim's paste binding
+;; "p" is not as useful as "P". Therefore I swap "p" and "P". Last Vim's "o"
+;; should default to be consistent with the new "p" when pasting lines. I also
+;; swap "o" and "O". With these changes you can get used to almost never use
+;; capitalized bindings for Vim's `nouns' and the efficiency is the same.
+;; ----------------------------------------------------------------------------
+;; Note that <shift> can be replaced by a motion and with some training and
+;; musle memory you might already be in the right place for your command.
+;; Furthermore you avoid a choice between two commands when only one is needed.
+;; These alternative bindings are controversial since one of the advantages of
+;; Vim's bindings is that you can work with an unconfigured Vi install.
+;; ----------------------------------------------------------------------------
+(evil-define-key 'normal 'global
+  "a"  #'evil-append-line  ; swapped because I only use it to edit from eol.
+  "A"  #'evil-append       ; "li" does the same thing.
+  "o"  #'evil-open-above   ; swapped to be consistent with paste and "cc".
+  "O"  #'evil-open-below   ; "jo" does the same thing.
+  "p"  #'evil-paste-before ; swapped because only "p" is used to paste.
+  "P"  #'evil-paste-after) ; "jp" or "lp" does the same thing.
 
 ;; ============================================================================
 ;;; Evil commands implementing Emacs' cursor model
@@ -64,7 +81,6 @@ Movement is restricted to the current line unless `evil-cross-lines' is non-nil.
     (evil-find-char count char)
     (forward-char))
   (setq evil-last-find (list #'evil-find-char-after char (> count 0))))
-
 
 (defun evil-forward-after-end (thing &optional count)
   "Move forward to end of THING.
@@ -188,5 +204,5 @@ or somewhere after the cursor and jump to the corresponding one."
       (evil-jump-item count)
       (when (> (point) pos) (forward-char)))))
 
-;; (provide 'evil-cursor-model)
+;; (provide 'evil-emacs-cursor-model)
 ;; End of evil-cursor-model.el

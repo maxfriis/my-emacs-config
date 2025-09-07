@@ -16,7 +16,7 @@
 ;; Dark, warm, simple, systematic and aesthetically pleasing.
 ;; ----------------------------------------------------------------------------
 ;; I don't use #73f due to color contrast.
-;; When I configure `evil' I add 7 cursor colors indicating the evil state.
+;; I add 7 cursor colors indicating the evil state when I configure `evil'.
 ;; Unspecified faces are handled by the dark part of the vanilla theme.
 ;; ----------------------------------------------------------------------------
 ;; Special faces

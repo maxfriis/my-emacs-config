@@ -4,7 +4,7 @@
 ;; ============================================================================
 ;;; Early variables
 ;; ============================================================================
-;; Modern computers are able to handle more than the defaults
+;; Modern computers are able to handle more than the defaults.
 ;; Garbage collection start at 50MB rather than 800k etc.
 ;; ----------------------------------------------------------------------------
 (setq
@@ -12,12 +12,10 @@
  gc-cons-percentage 0.5
  ;; The recommended max read chunk for my system:
  read-process-output-max (* 1024 1024)
- ;; Recalculating frame size is expencive if fonts/modeline change or something.
+ ;; Recalculating frame size is expencive if fonts/modeline change.
  frame-inhibit-implied-resize t
- ;; Trigger fewer garbage collections. Use more memory.
+ ;; Trigger fewer garbage collections but use more memory.
  inhibit-compacting-font-caches t)
- ;; ;; Disable some compilation warnings.
- ;; (setq native-comp-async-report-warnings-errors nil)
 
 ;; ============================================================================
 ;;; Vanilla defaults
@@ -29,7 +27,7 @@
  inhibit-startup-message t
  mode-line-format nil
  frame-title-format "GNU Emacs"
- default-frame-alist
+ initial-frame-alist ; Can be `default-frame-alist', but Emacs write to that.
  '((fullscreen       . maximized)
    (foreground-color . "#fff")
    (background-color . "#000")

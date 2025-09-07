@@ -5,15 +5,14 @@
 ;;; Vanilla faces
 ;; ============================================================================
 ;; 3 `sizes': small (4/5=0.8), normal (1.0) and large (5/4=1.25).
-;; 8 `colors': #??? combining f(15), 7 and 3 and some dusty colors.
 ;; |------+-----------------+------+-----------------|
 ;; | #000 | background      | #fff | default text    |
 ;; |------+-----------------+------+-----------------|
 ;; | #555 | error/todo      | #999 | warning/heading |
 ;; | #ddd | success/done    | #bbb | comment/tag     |
-;; | #777 | link/timestamp  | #222 | shadow/hl-line  |
+;; | #777 | link/timestamp  | #333 | shadow/hl-line  |
 ;; |------+-----------------+------+-----------------|
-;; Dark, warm, simple, systematic and aesthetically pleasing.
+;; Dark, simple, and systematic.
 ;; ----------------------------------------------------------------------------
 ;; When I configure `evil' I add 7 cursor colors indicating the evil state.
 ;; Unspecified faces are handled by the dark part of the vanilla theme.
@@ -37,34 +36,34 @@
 ;; ----------------------------------------------------------------------------
 (set-face-attribute
  'region
- nil :background "#222")
+ nil :background "#333")
 (set-face-attribute
  'shadow
- nil :foreground "#222")
+ nil :foreground "#333")
 (set-face-attribute
  'match
- nil :background "#222")
+ nil :background "#333")
 (set-face-attribute
  'highlight
- nil :background "#222")
+ nil :background "#333")
 (set-face-attribute
  'vertical-border
- nil :foreground "#222")
+ nil :foreground "#333")
 (set-face-attribute
  'fringe
- nil :foreground "#222" :background "#000")
+ nil :foreground "#333" :background "#000")
 (set-face-attribute
  'line-number
- nil :foreground "#222" :background "#000" :height 0.8)
+ nil :foreground "#333" :background "#000" :height 0.8)
 (set-face-attribute
  'line-number-current-line
- nil :foreground "#000" :background "#222" :weight 'bold)
+ nil :foreground "#000" :background "#333" :weight 'bold)
 (set-face-attribute
  'mode-line
- nil :foreground "#000" :background "#222" :box nil :height 0.8)
+ nil :foreground "#000" :background "#333" :box nil :height 0.8)
 (set-face-attribute
  'mode-line-inactive
- nil :foreground "#222" :background "#000" :box nil :overline t)
+ nil :foreground "#333" :background "#000" :box nil :overline t)
 ;; ----------------------------------------------------------------------------
 ;; font-lock faces
 ;; ----------------------------------------------------------------------------
@@ -192,7 +191,7 @@
 (with-eval-after-load 'org-superstar
   (set-face-attribute
    'org-superstar-leading
-   nil :foreground "#222" :height 0.8) ; the dots marking the deapt
+   nil :foreground "#333" :height 0.8) ; the dots marking the deapt
   (set-face-attribute
    'org-superstar-header-bullet
    nil :foreground "#999" :height 0.8) ; the header bullet face
@@ -229,7 +228,7 @@
    nil :foreground "#fff")
   (set-face-attribute
    'org-agenda-clocking
-   nil :foreground "#bbb" :background "#222")
+   nil :foreground "#bbb" :background "#333")
   (set-face-attribute
    'org-agenda-date
    nil :foreground "#777" :background "#000" :box nil :weight 'normal :height 0.8)
@@ -272,7 +271,7 @@
    nil :foreground "#999" :background "#555" :weight 'bold :height 0.8)
   (set-face-attribute
    'org-habit-overdue-future-face
-   nil :background "#222" :height 0.8)
+   nil :background "#333" :height 0.8)
   (set-face-attribute
    'org-habit-ready-face
    nil :foreground "#999" :background "#ddd" :weight 'bold :height 0.8)
@@ -281,28 +280,28 @@
    nil :background "#ddd" :height 0.8)
   (set-face-attribute
    'org-habit-clear-face
-   nil :foreground "#999" :background "#222" :weight 'bold :height 0.8)
+   nil :foreground "#999" :background "#333" :weight 'bold :height 0.8)
   (set-face-attribute
    'org-habit-clear-future-face
-   nil :background "#222" :height 0.8))
+   nil :background "#333" :height 0.8))
 
 ;; ============================================================================
 ;;; Misc. other package faces
 ;; ============================================================================
 (set-face-attribute
  'show-paren-match
- nil :foreground "#fff" :background "#222" :weight 'bold)
+ nil :foreground "#fff" :background "#333" :weight 'bold)
 (with-eval-after-load 'keycast
   (set-face-attribute
    'keycast-key
-   nil :foreground "#000" :background "#222" :box t :height 0.8))
+   nil :foreground "#000" :background "#333" :box t :height 0.8))
 (with-eval-after-load 'corfu
   (set-face-attribute
    'corfu-default
-   nil :foreground "#222" :background "#000")
+   nil :foreground "#333" :background "#000")
   (set-face-attribute
    'corfu-current
-   nil :foreground "#000" :background "#222"))
+   nil :foreground "#000" :background "#333"))
 (with-eval-after-load 'dired
   (set-face-attribute
    'dired-ignored
@@ -314,11 +313,11 @@
 (with-eval-after-load 'counsel
   (set-face-attribute
    'ivy-current-match ; counsel use this ivy face
-   nil :foreground "#ddd" :background "#222"))
+   nil :foreground "#ddd" :background "#333"))
 (with-eval-after-load 'indent-guide
   (set-face-attribute
    'indent-guide-face
-   nil :foreground "#222"))
+   nil :foreground "#333"))
 (with-eval-after-load 'dired
   (set-face-attribute
    'dired-ignored
@@ -339,29 +338,29 @@
 (with-eval-after-load 'tab-bar
   (set-face-attribute
    'tab-bar
-   nil :foreground "#222" :background "#000" :weight 'bold :box nil :height 0.8 :inherit 'default)
+   nil :foreground "#333" :background "#000" :weight 'bold :box nil :height 0.8 :inherit 'default)
   (set-face-attribute
    'tab-bar-tab
-   nil :foreground "#000" :background "#222" :box t)
+   nil :foreground "#000" :background "#333" :box t)
   (set-face-attribute
    'tab-bar-tab-inactive
-   nil :foreground "#222" :background "#000" :box nil))
+   nil :foreground "#333" :background "#000" :box nil))
 (with-eval-after-load 'tab-line
   (set-face-attribute
    'tab-line
-   nil :foreground "#222" :background "#000" :overline t :box nil)
+   nil :foreground "#333" :background "#000" :overline t :box nil)
   (set-face-attribute
    'tab-line-tab ;; active tab in another frame
    nil :box nil :inherit 'tab-line)
   (set-face-attribute
    'tab-line-tab-current
-   nil :foreground "#000" :background "#222" :box nil)
+   nil :foreground "#000" :background "#333" :box nil)
   (set-face-attribute
    'tab-line-tab-modified
-   nil :foreground "#000" :background "#222" :box nil)
+   nil :foreground "#000" :background "#333" :box nil)
   (set-face-attribute
    'tab-line-tab-inactive
-   nil :foreground "#222" :background "#000" :box nil)
+   nil :foreground "#333" :background "#000" :box nil)
   (set-face-attribute
    'tab-line-highlight ;; mouseover
    nil :foreground "#fff" :background "#000" :box nil))
