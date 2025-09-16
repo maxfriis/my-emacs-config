@@ -46,6 +46,12 @@
  'highlight
  nil :background "#f00")
 (set-face-attribute
+ 'lazy-highlight
+ nil :background "#f00")
+(set-face-attribute
+ 'isearch
+ nil :foreground "#000" :background "#fff")
+(set-face-attribute
  'vertical-border
  nil :foreground "#f00")
 (set-face-attribute
@@ -63,6 +69,9 @@
 (set-face-attribute
  'mode-line-inactive
  nil :foreground "#f00" :background "#000" :box nil :overline t)
+(set-face-attribute
+ 'mode-line-highlight
+ nil :box '(:line-width 1 :color "#0ff" :style released-button))
 ;; ----------------------------------------------------------------------------
 ;; font-lock faces
 ;; ----------------------------------------------------------------------------
@@ -317,6 +326,20 @@
   (set-face-attribute
    'dired-ignored
    nil :foreground "#0ff"))
+(with-eval-after-load 'corfu
+  (set-face-attribute
+   'corfu-default
+   nil :foreground "#f00" :background "#000")
+  (set-face-attribute
+   'corfu-current
+   nil :foreground "#000" :background "#f00"))
+(with-eval-after-load 'flyspell
+  (set-face-attribute
+   'flyspell-duplicate
+   nil :underline '(:style wave :color "#ff0"))
+  (set-face-attribute
+   'flyspell-incorrect
+   nil :underline '(:style wave :color "#f0f")))
 (with-eval-after-load 'rainbow-delimiters
   (set-face-attribute
    'rainbow-delimiters-base-error-face
@@ -339,7 +362,10 @@
    nil :foreground "#000" :background "#f00" :box t)
   (set-face-attribute
    'tab-bar-tab-inactive
-   nil :foreground "#f00" :background "#000" :box nil))
+   nil :foreground "#f00" :background "#000" :box nil)
+  (set-face-attribute
+   'tab-bar-tab-highlight
+   nil :foreground "#f00" :background "#000" :box '(:line-width 1 :color "#0ff" :style released-button)))
 (with-eval-after-load 'tab-line
   (set-face-attribute
    'tab-line
@@ -358,5 +384,5 @@
    nil :foreground "#f00" :background "#000" :box nil)
   (set-face-attribute
    'tab-line-highlight ;; mouseover
-   nil :foreground "#fff" :background "#000" :box nil))
+   nil :foreground "#f00" :background "#000" :box '(:line-width 1 :color "#0ff" :style released-button)))
 ;; End of my-ansi-faces.el

@@ -49,6 +49,12 @@
  'highlight
  nil :background "#432")
 (set-face-attribute
+ 'lazy-highlight
+ nil :background "#432")
+(set-face-attribute
+ 'isearch
+ nil :foreground "#210" :background "#dcb")
+(set-face-attribute
  'vertical-border
  nil :foreground "#432")
 (set-face-attribute
@@ -66,6 +72,9 @@
 (set-face-attribute
  'mode-line-inactive
  nil :foreground "#432" :background "#210" :box nil :overline t)
+(set-face-attribute
+ 'mode-line-highlight
+ nil :box '(:line-width 1 :color "#3f7" :style released-button))
 ;; ----------------------------------------------------------------------------
 ;; font-lock faces
 ;; ----------------------------------------------------------------------------
@@ -297,13 +306,6 @@
   (set-face-attribute
    'keycast-key
    nil :foreground "#210" :background "#432" :box t :height 0.8))
-(with-eval-after-load 'corfu
-  (set-face-attribute
-   'corfu-default
-   nil :foreground "#432" :background "#210")
-  (set-face-attribute
-   'corfu-current
-   nil :foreground "#210" :background "#432"))
 (with-eval-after-load 'dired
   (set-face-attribute
    'dired-ignored
@@ -324,6 +326,20 @@
   (set-face-attribute
    'dired-ignored
    nil :foreground "#3f7"))
+(with-eval-after-load 'corfu
+  (set-face-attribute
+   'corfu-default
+   nil :foreground "#432" :background "#210")
+  (set-face-attribute
+   'corfu-current
+   nil :foreground "#210" :background "#432"))
+(with-eval-after-load 'flyspell
+  (set-face-attribute
+   'flyspell-duplicate
+   nil :underline '(:style wave :color "#f73"))
+  (set-face-attribute
+   'flyspell-incorrect
+   nil :underline '(:style wave :color "#f37")))
 (with-eval-after-load 'rainbow-delimiters
   (set-face-attribute
    'rainbow-delimiters-base-error-face
@@ -346,7 +362,10 @@
    nil :foreground "#210" :background "#432" :box t)
   (set-face-attribute
    'tab-bar-tab-inactive
-   nil :foreground "#432" :background "#210" :box nil))
+   nil :foreground "#432" :background "#210" :box nil)
+  (set-face-attribute
+   'tab-bar-tab-highlight
+   nil :foreground "#432" :background "#210" :box '(:line-width 1 :color "#3f7" :style released-button)))
 (with-eval-after-load 'tab-line
   (set-face-attribute
    'tab-line
@@ -365,5 +384,5 @@
    nil :foreground "#432" :background "#210" :box nil)
   (set-face-attribute
    'tab-line-highlight ;; mouseover
-   nil :foreground "#dcb" :background "#210" :box nil))
+   nil :foreground "#432" :background "#210" :box '(:line-width 1 :color "#3f7" :style released-button)))
 ;; End of my-faces.el
