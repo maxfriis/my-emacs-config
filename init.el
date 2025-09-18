@@ -103,7 +103,7 @@
         "\\` Git" " "
         vc-mode))
      " "
-     mode-line-misc-info ; Show `global-mode-string'. Usually it's nil.
+     mode-line-misc-info ; Show `global-mode-string'. It's usually nil.
      ;; Horizontal gap for alignment.
      (propertize
       " "
@@ -215,7 +215,8 @@
  ;; Display
  ;; ----------------------------------------------------------------------------
  display-time-format "[%Y-%m-%d %a %H:%M]" ; The org timestamp format.
- display-line-numbers-type 'visual ; Works best with `outline' and drawers.
+ ;; I swich to 'visual when using `outline'.
+ display-line-numbers-type 'relative ; Works best with wraped lines.
  ;; Popups not associated with a file pop below the current window.
  display-buffer-alist
  '(("\\`\s?\\*.*\\*\s?\\'"
@@ -236,8 +237,17 @@
 (add-hook 'after-save-hook  #'vc-refresh-state)        ; Version control.
 (add-hook 'dired-mode-hook  #'dired-omit-mode)         ; Toggle rebound to "a".
 (add-hook 'dired-mode-hook  #'dired-hide-details-mode) ; Toggle rebound to "s".
-(add-hook 'prog-mode-hook   #'outline-minor-mode)      ; Cycle with "S-<tab>".
 (add-hook 'text-mode-hook   #'visual-line-mode)        ; Soft word line breaks.
+(add-hook 'prog-mode-hook   #'outline-minor-mode)      ; Cycle with "S-<tab>".
+;; Hack: Use visual line numbers when cycling `outline' or `org-mode' headings.
+;; Exiting `evil-insert-state' or similar events will return to the default
+;; relative line numbers which works better with wrapped lines.
+(add-hook
+ 'outline-view-change-hook
+ (lambda ()
+   (when display-line-numbers
+     (setq
+      display-line-numbers 'visual))))
 (add-hook
  'emacs-startup-hook
  (lambda ()
@@ -308,16 +318,17 @@
   (delete-other-windows)
   (split-window-right)
   (other-window 1)
-  (next-buffer) ; Don't understand why this is not `previous-buffer'?!?
+  (next-buffer)        ; Why is this not `previous-buffer'?!?
   (split-window-below) ; `scratch-buffer' don't work if scratch is open.
   (other-window 1)
   (switch-to-buffer "*scratch*")
-  (other-window -2)) ; Back to initial window.
+  (other-window -2))   ; Back to initial window.
 ;; ----------------------------------------------------------------------------
 ;; Ace window swap
 ;; ----------------------------------------------------------------------------
 (defun my/ace-swap-window ()
-  "Swap window contents (prompt if 3+). Keep focusing the current window."
+  "Swap window contents (prompt if 3+). Keep focusing the current window.
+\nThe normal `ace-swap-window' swap two windows, but stays with the current buffer and fucus the new window."
   (interactive)
   (ace-swap-window)
   (aw-flip-window))
@@ -349,7 +360,7 @@
 ;; ----------------------------------------------------------------------------
 (defun my/save-all-kill-emacs-no-prompt ()
   "Save all and quit without a prompt.
-  \nUse `super-save' and `backup-each-save' to make this less risky."
+  \nUse `super-save-mode' and `backup-each-save' to make this less risky."
   (interactive)
   (save-some-buffers t)
   (when (file-newer-than-file-p
@@ -398,7 +409,7 @@
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents))
-(package-install-selected-packages)
+(package-install-selected-packages) ; This will download the packages.
 ;; ============================================================================
 ;;;; Update, save and backup
 ;; ============================================================================
@@ -594,20 +605,24 @@
   (require 'evil-org-agenda)
   (evil-org-agenda-set-keys))
 ;; ============================================================================
-;;;; Hooks to disable `hl-line' while marking a region or "inputing"
+;;;; Hooks to suspend `hl-line'
 ;; ============================================================================
+(defvar
+  my/hl-line-p t
+  "Track if `hl-line' was on or off when an `evil-state' suspending it was entered.")
+;; I disable `hl-line' in visual state so `region' can have the same face.
 (add-hook
  'evil-visual-state-entry-hook
  (lambda ()
    (setq
-    my/hl-line-p global-hl-line-mode)
+    my/hl-line-p global-hl-line-mode) ; Track to preserve `hl-line' on exit.
    (global-hl-line-mode 0)))
 (add-hook
  'evil-visual-state-exit-hook
  (lambda ()
    (when my/hl-line-p
      (global-hl-line-mode 1))))
-;; I like input states to be clearly distinguishable.
+;; Evil "input" states have absolute line numbers and suspend the `hl-line'.
 (dolist
     (hook
      '(evil-insert-state-entry-hook
@@ -616,12 +631,12 @@
   (add-hook
    hook
    (lambda ()
+     (when display-line-numbers
+       (setq
+        display-line-numbers t))
      (setq
       my/hl-line-p global-hl-line-mode)
-     (global-hl-line-mode 0)
-     (when display-line-numbers ; Only do this when line numbers are on.
-       (setq
-        display-line-numbers t)))))
+     (global-hl-line-mode 0))))
 (dolist
     (hook
      '(evil-insert-state-exit-hook
@@ -630,11 +645,11 @@
   (add-hook
    hook
    (lambda ()
-     (when my/hl-line-p
-       (global-hl-line-mode 1))
      (when display-line-numbers
        (setq
-        display-line-numbers 'visual)))))
+        display-line-numbers 'relative))
+     (when my/hl-line-p
+       (global-hl-line-mode 1)))))
 ;; ============================================================================
 ;;;; Evil cursor between model (my controversial sacrilege)
 ;; ============================================================================
@@ -1038,7 +1053,7 @@
 ;; ============================================================================
 ;;; General.el
 ;; ============================================================================
-;; This does not work on Android for some reason?
+;; Does not work on Android for some reason?
 ;; ----------------------------------------------------------------------------
 (setq
  which-key-idle-delay 0)
@@ -1235,8 +1250,7 @@
  :map evil-motion-state-map
  ("<down>"        . evil-next-visual-line)     ; up/down navigate wrapped lines.
  ("<up>"          . evil-previous-visual-line) ; j/k respect Vim's line atoms.
- ("<backspace>"   . next-buffer)               ; Doesn't work in terminal.
- ("S-<backspace>" . previous-buffer)
+ ("´"             . next-buffer)
  ("½"             . other-window)
  ("¨"             . tab-new)
  ("gc"            . evilnc-comment-operator)
@@ -1244,10 +1258,10 @@
  ("C-i"           . outline-cycle)     ; This make <tab> work in terminal too.
  ("<backtab>"     . outline-cycle-buffer)
  ;; Danish keyboard (some keys are not easily accessible).
- ("æ"             . forward-paragraph)   ; "}" also works.
- ("Æ"             . backward-paragraph)  ; "{" also works.
- ("ø"             . end-of-line)         ; "$" also works.
- ("Ø"             . back-to-indentation) ; "^" also works.
+ ("æ"             . forward-paragraph)   ; "}" use the equivalent evil command.
+ ("Æ"             . backward-paragraph)  ; "{" use the equivalent evil command.
+ ("ø"             . end-of-line)         ; "$" use the equivalent evil command.
+ ("Ø"             . back-to-indentation) ; "^" use the equivalent evil command.
  ("å"             . my/org-agenda-custom)
  ("Å"             . my/org-capture-idea)
  ("C-å"           . org-cycle-agenda-files)
@@ -1261,8 +1275,8 @@
  ;; Visual state
  ;; ----------------------------------------------------------------------------
  :map evil-visual-state-map
- ;; "S" is dedicated to `evil-surround'. Use "C-s" for `isearch-forward'.
- ("s"             . isearch-forward-thing-at-point) ; The region as input.
+ ;; "S" is used by `evil-surround' in visual state. Use "C-s" for `isearch'.
+ ("s"             . isearch-forward-thing-at-point) ; With the region as input.
  ;; Don't use "v" to exit visual state. <esc> or a command works.
  ("v"             . exchange-point-and-mark)
  ;; ----------------------------------------------------------------------------
@@ -1322,7 +1336,7 @@
   "l"           #'dired-find-file
   "a"           #'dired-omit-mode           ; Like "ls -a" toggle.
   "s"           #'dired-hide-details-mode   ; Like "ls -l" toggle.
-  ;; Personal swap to make "o" open files externally (e.g. `pdf-files').
+  ;; Personal swap to make "o" open files with system default program.
   "W"           #'dired-sort-toggle-or-edit ; Normally bound to "o".
   "o"           #'browse-url-of-dired-file) ; Normally bound to "W".
 (evil-define-key 'normal org-mode-map
@@ -1330,10 +1344,9 @@
   "T"           #'org-todo-yesterday) ; "ct." (change to ".") work as expected.
 (evil-define-key 'motion org-agenda-mode-map
   (kbd "SPC") nil  ; Make general.el take over <spc>.
-  (kbd "<backspace>")   #'next-buffer ; (kbd... is necessary where it's used.
-  (kbd "S-<backspace>") #'previous-buffer
-  (kbd "S-<left>")      #'org-agenda-earlier
+  (kbd "S-<left>")      #'org-agenda-earlier ; (kbd... is necessary when used.
   (kbd "S-<right>")     #'org-agenda-later
+  "´"           #'next-buffer
   "a"           #'org-agenda-append-agenda
   "A"           #'org-agenda-archive-default
   "R"           #'org-agenda-refile
