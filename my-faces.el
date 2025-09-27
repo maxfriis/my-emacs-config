@@ -363,7 +363,7 @@
   (set-face-attribute
    'tab-bar-tab-inactive
    nil :foreground "#432" :background "#210" :box nil)
-  (when (version<= emacs-version "31.1")
+  (unless (version< emacs-version "31.1")
     (set-face-attribute
      'tab-bar-tab-highlight
      nil :foreground "#432" :background "#210" :box '(:line-width 1 :color "#3f7" :style released-button))))
