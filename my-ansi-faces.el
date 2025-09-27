@@ -363,9 +363,10 @@
   (set-face-attribute
    'tab-bar-tab-inactive
    nil :foreground "#f00" :background "#000" :box nil)
-  (set-face-attribute
-   'tab-bar-tab-highlight
-   nil :foreground "#f00" :background "#000" :box '(:line-width 1 :color "#0ff" :style released-button)))
+  (when (version<= emacs-version "31.1")
+    (set-face-attribute
+     'tab-bar-tab-highlight
+     nil :foreground "#f00" :background "#000" :box '(:line-width 1 :color "#0ff" :style released-button))))
 (with-eval-after-load 'tab-line
   (set-face-attribute
    'tab-line
