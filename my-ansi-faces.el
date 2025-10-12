@@ -4,8 +4,8 @@
 ;; ============================================================================
 ;;; Vanilla faces
 ;; ============================================================================
-;; 3 `sizes': small (4/5=0.8), normal (1.0) and large (5/4=1.25).
-;; 8 `colors': #??? combining f and 0.
+;; 3 sizes:  small (4/5=0.8), normal (1.0) and large (5/4=1.25).
+;; 8 colors: #??? combining f and 0.
 ;; |------+-----------------+------+-----------------|
 ;; | #000 | background      | #fff | default text    |
 ;; |------+-----------------+------+-----------------|
@@ -58,6 +58,9 @@
  'fringe
  nil :foreground "#f00" :background "#000")
 (set-face-attribute
+ 'scroll-bar
+ nil :foreground "#f00")
+(set-face-attribute
  'line-number
  nil :foreground "#f00" :background "#000" :height 0.8)
 (set-face-attribute
@@ -76,34 +79,29 @@
 ;; font-lock faces
 ;; ----------------------------------------------------------------------------
 (set-face-attribute
- 'font-lock-builtin-face
- nil :foreground "#0f0")
+ 'font-lock-keyword-face
+ nil :foreground "#ff0")
 (set-face-attribute
  'font-lock-comment-face
  nil :foreground "#0ff")
 (set-face-attribute
+ 'font-lock-string-face
+ nil :foreground "#0ff")
+(set-face-attribute
  'font-lock-constant-face
- nil :foreground "#ff0")
+ nil :foreground "#00f")
 (set-face-attribute
  'font-lock-function-name-face
  nil :foreground "#0f0")
 (set-face-attribute
- 'font-lock-keyword-face
- nil :foreground "#00f")
+ 'font-lock-variable-name-face
+ nil :foreground "#0f0")
 (set-face-attribute
- 'font-lock-string-face
- nil :foreground "#0ff")
+ 'font-lock-builtin-face
+ nil :foreground "#0f0")
 (set-face-attribute
  'font-lock-warning-face
  nil :underline nil)
-;; ----------------------------------------------------------------------------
-;; Define more keywords
-;; ----------------------------------------------------------------------------
-(font-lock-add-keywords
- 'emacs-lisp-mode
- '(("add-hook"           . font-lock-keyword-face)
-   ("add-to-list"        . font-lock-keyword-face)
-   ("set-face-attribute" . font-lock-keyword-face)))
 
 ;; ============================================================================
 ;;; Org faces
@@ -343,16 +341,16 @@
 (with-eval-after-load 'rainbow-delimiters
   (set-face-attribute
    'rainbow-delimiters-base-error-face
-   nil :foreground "#fff" :background "#f0f" :weight 'bold :underline t)
+   nil :foreground "#fff" :background "#f0f" :weight 'bold)
   (set-face-attribute
    'rainbow-delimiters-depth-1-face
    nil :foreground "#0f0")
   (set-face-attribute
    'rainbow-delimiters-depth-2-face
-   nil :foreground "#f0f")
+   nil :foreground "#00f")
   (set-face-attribute
    'rainbow-delimiters-depth-3-face
-   nil :foreground "#00f"))
+   nil :foreground "#ff0"))
 (with-eval-after-load 'tab-bar
   (set-face-attribute
    'tab-bar
@@ -363,7 +361,7 @@
   (set-face-attribute
    'tab-bar-tab-inactive
    nil :foreground "#f00" :background "#000" :box nil)
-  (when (version< emacs-version "31.1")
+  (unless (version< emacs-version "31.0.50")
     (set-face-attribute
      'tab-bar-tab-highlight
      nil :foreground "#f00" :background "#000" :box '(:line-width 1 :color "#0ff" :style released-button))))

@@ -20,22 +20,22 @@
 ;; ============================================================================
 ;;; Vanilla defaults
 ;; ============================================================================
-;; I clean up some defaults I don't want to see even blink during startup.
+;; Clean up defaults I don't want to see even blink during startup.
 ;; ----------------------------------------------------------------------------
-(set-default-coding-systems 'utf-8)
 (setq
  inhibit-startup-message t
  mode-line-format nil
  frame-title-format "GNU Emacs"
- initial-frame-alist ; Can be `default-frame-alist', but Emacs write to that.
+ initial-frame-alist
  '((fullscreen       . maximized)
    (foreground-color . "#fff")
    (background-color . "#000")
    (cursor-color     . "#0f0")))
+(blink-cursor-mode -1)
 (scroll-bar-mode   -1)
 (menu-bar-mode     -1)
 (tool-bar-mode     -1)
 (tooltip-mode      -1)
-(blink-cursor-mode -1)
 (defalias 'yes-or-no-p 'y-or-n-p)
+(set-default-coding-systems 'utf-8)
 ;; End of early-init.el

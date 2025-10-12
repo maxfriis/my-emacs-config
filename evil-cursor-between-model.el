@@ -1,5 +1,5 @@
 ;; -*- lexical-binding: t; -*-
-;; #+title: evil-cursor-model.el
+;; #+title: evil-cursor-between-model.el
 
 ;; ============================================================================
 ;; Creative Commons Attribution-ShareAlike 4.0 International License
@@ -10,8 +10,7 @@
 ;;; Use Emacs' cursor-between-characters model of cursor positioning in
 ;;; `evil-mode' instead of Vim's normal state cursor-on-characters model.
 ;; ============================================================================
-(unless (package-installed-p
-         'evil)
+(unless (package-installed-p 'evil)
   (require 'evil))
 
 ;; ============================================================================
@@ -53,9 +52,9 @@
 ;; Note that `<shift>' can be replaced by a motion and with some training and
 ;; muscle memory you might already be in the right place for your command.
 ;; Furthermore you avoid a choice between two commands when only one is needed.
-;; "e" is rarely followed by "i" or "w" by "a"? The double set of commands to
-;; enter insert state can be seen as artificial to compensate for an
-;; inpractical cursor model. The increased complexity is unnecessary.
+;; In Vim "e" is rarely followed by "i" or "w" by "a"? The double set of
+;; commands to enter insert state can be seen as artificial to compensate for
+;; an inpractical cursor model. The increased complexity is unnecessary.
 ;; ----------------------------------------------------------------------------
 ;; The alternative bindings are controversial since one of the advantages of
 ;; Vim's bindings is that you can work with an unconfigured Vi install.
@@ -145,8 +144,7 @@ If BIGWORD is non-nil, move by WORDS."
 ;; ----------------------------------------------------------------------------
 (evil-define-type inclusive
   "Return the positions unchanged, with some exceptions.
-If the end position is at the beginning of a line, then:
-
+If the end position is at the beginning of a line, then:\n
 * If the beginning position is at or before the first non-blank
   character on the line, return `line' (expanded)."
   :expand (lambda (beg end) (evil-range beg end))
