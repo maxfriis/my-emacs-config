@@ -21,7 +21,7 @@
    'variable-pitch
    nil :font "Verdana-18"))
 ;; ----------------------------------------------------------------------------
-;; Compile the lisp files
+;; Compile elisp files
 ;; ----------------------------------------------------------------------------
 (when (file-newer-than-file-p
        (locate-user-emacs-file "my-ansi-faces.el")
@@ -56,27 +56,26 @@
  mode-line-format
  '((:eval ; Eval and list everything.
     (list
-     ;; `ace-window-display-mode' put in a number of the window in front.
-     "%e" ; Potentially show a memory error I have never seen.
-     ;; Root indicator. I like to link ~/.emacs.d in /root.
+     ;; `ace-window-display-mode' put a window number here.
+     ;; Root indicator (I link ~/.emacs.d in /root).
      (if (and (eq (user-uid) 0)
-              (mode-line-window-selected-p))
-         (propertize
-          "#"
-          'help-echo "Root access"
-          'face 'warning) ; Emphasize this indicator.
+	      (mode-line-window-selected-p))
+	 (propertize
+	  "#"
+	  'help-echo "Root access"
+	  'face 'warning) ; Emphasize this indicator.
        ;; else
        " ")
      ;; Indicators for writable and modified.
      mode-line-modified
      ;; Custom indicator.
      (if (buffer-narrowed-p)
-         (propertize
-          "="
-          'help-echo "Narrowed, mouse-1: Widen"
-          'mouse-face 'mode-line-highlight
-          'local-map (make-mode-line-mouse-map
-                      'mouse-1 #'mode-line-widen))
+	 (propertize
+	  "="
+	  'help-echo "Narrowed, mouse-1: Widen"
+	  'mouse-face 'mode-line-highlight
+	  'local-map (make-mode-line-mouse-map
+		      'mouse-1 #'mode-line-widen))
        ;; else
        " ")
      " "
@@ -88,201 +87,72 @@
       (concat
        "["
        (string-replace
-        "-" " "
-        (replace-regexp-in-string ; Remove redundant information.
-         "\\`emacs-" "e"
-         (replace-regexp-in-string
-          "\\`org-" ""
-          (replace-regexp-in-string
-           "-buffer\\'" ""
-           (replace-regexp-in-string
-            "-mode\\'" ""
-            (downcase (symbol-name major-mode)))))))
+	"-" " "
+	(replace-regexp-in-string ; Remove redundant information.
+	 "\\`emacs-" "e"
+	 (replace-regexp-in-string
+	  "\\`org-" ""
+	  (replace-regexp-in-string
+	   "-buffer\\'" ""
+	   (replace-regexp-in-string
+	    "-mode\\'" ""
+	    (downcase (symbol-name major-mode)))))))
        "]")
       'help-echo (concat
-                  (symbol-name major-mode) ; Message full name on mouse hover.
-                  ", mouse-1: Toggle last two buffers")
+		  (symbol-name major-mode) ; Message full name on mouse hover.
+		  ", mouse-1: Toggle last two buffers")
       'mouse-face 'mode-line-highlight
       'local-map (make-mode-line-mouse-map
-                  'mouse-1 #'mode-line-other-buffer))
+		  'mouse-1 #'mode-line-other-buffer))
      (if (mode-line-window-selected-p)
-         (list
-          ;; Version control.
-          (if vc-mode
-              (replace-regexp-in-string
-               "\\` Git" ""
-               vc-mode)
-            ;; else
-            "")
-          " "
-          ;; Display `global-mode-string' used by e.g. `display-time-mode'.
-          mode-line-misc-info
-          ;; Gap for alignment.
-          (propertize
-           " "
-           'display '((space
-                       :align-to (- (+ right right-fringe right-margin) 8)))
-           'face    'mode-line-inactive)
-          ;; Cursor position.
-          (if display-line-numbers-mode
-              (list
-               " "
-               '(-3 "%o") ; Show "Bot" rather than "Bottom".
-               " "
-               (propertize
-                "%3c "
-                'help-echo "Column number, mouse-1: Toggle line numbers"
-                'mouse-face 'mode-line-highlight
-                'local-map (make-mode-line-mouse-map
-                            'mouse-1 #'display-line-numbers-mode)))
-            ;; else
-            (list
-             (propertize
-              "%4l,"
-              'help-echo "Line number, mouse-1: Toggle the scroll bar"
-              'mouse-face 'mode-line-highlight
-              'local-map (make-mode-line-mouse-map
-                          'mouse-1 #'scroll-bar-mode))
-             (propertize
-              "%3c "
-              'help-echo "Column number, mouse-1: Toggle line numbers"
-              'mouse-face 'mode-line-highlight
-              'local-map (make-mode-line-mouse-map
-                          'mouse-1 #'display-line-numbers-mode)))))
+	 (list
+	  ;; Version control.
+	  (if vc-mode
+	      (replace-regexp-in-string
+	       "\\` Git" ""
+	       vc-mode)
+	    ;; else
+	    "")
+	  " "
+	  ;; Display `global-mode-string' used by e.g. `display-time-mode'.
+	  mode-line-misc-info
+	  ;; Gap for alignment.
+	  (propertize
+	   " "
+	   'display '((space
+		       :align-to (- (+ right right-fringe right-margin) 7)))
+	   'face    'mode-line-inactive)
+	  ;; Cursor position.
+	  (if display-line-numbers-mode
+	      (list
+	       (propertize
+		"%3c "
+		'help-echo "Column number, mouse-1: Toggle line numbers"
+		'mouse-face 'mode-line-highlight
+		'local-map (make-mode-line-mouse-map
+			    'mouse-1 #'display-line-numbers-mode))
+	       '(-3 "%o")) ; Show "Bot" rather than "Bottom".
+	    ;; else
+	    (list
+	     (propertize
+	      "%3c,"
+	      'help-echo "Column number, mouse-1: Toggle line numbers"
+	      'mouse-face 'mode-line-highlight
+	      'local-map (make-mode-line-mouse-map
+			  'mouse-1 #'display-line-numbers-mode))
+	     (propertize
+	      "%3l "
+	      'help-echo "Line number, mouse-1: Toggle the scroll bar"
+	      'mouse-face 'mode-line-highlight
+	      'local-map (make-mode-line-mouse-map
+			  'mouse-1 #'scroll-bar-mode)))))
        ;; else
        (list
-        (propertize
-         " "
-         'display '((space
-                     :align-to (- (+ right right-fringe right-margin) 3))))
-        '(-3 "%o")))))))
-
-;; ============================================================================
-;;; Other vanilla stuff
-;; ============================================================================
-;; Variables
-;; ----------------------------------------------------------------------------
-(setq-default ; Buffer local variables.
- indent-tabs-mode nil ; No tabulator character pollution please.
- display-line-numbers-width 3 ; Minimum width.
- fill-column 79) ; Used by `display-fill-column-indicator-mode'.
-(setq
- frame-title-format
- '((:eval
-    (if (buffer-file-name)
-        (abbreviate-file-name (buffer-file-name))
-      ;; else
-      "%b")))
- tab-width 4
- warning-minimum-level :error
- visible-bell t
- use-dialog-box nil
- use-short-answers t
- initial-scratch-message nil
- large-file-warning-threshold nil
- delete-by-moving-to-trash t
- trash-directory "~/.local/share/Trash/files"
- custom-file "/dev/null"           ; Don't deal with custom.el.
- truncate-partial-width-windows 59 ; Don't wrap lines in narrow windows.
- shell-default-shell 'eshell       ; I rarely use a terminal inside Emacs.
- eshell-ls-initial-args
- '("-agho")
- recentf-exclude
- '("\\`~/org/agenda/.*\\.org\\'"       ; Agenda files. These are in buffers.
-   "\\`~/org/inbox\\.org\\'"
-   "\\`~/\\.emacs\\.d/.*\\.el[cd]?\\'" ; Config and data files.
-   "\\`~/\\.emacs\\.d/diary\\'"
-   "\\`~/.*\\.pdf\\'"
-   ".*\\.el\\.gz\\'")                  ; Source files browsed via Emacs help.
- ;; ----------------------------------------------------------------------------
- ;; Dired
- ;; ----------------------------------------------------------------------------
- dired-kill-when-opening-new-dired-buffer t
- dired-dwim-target t
- dired-recursive-copies 'always
- dired-listing-switches "-agho --group-directories-first"
- dired-omit-files "\\`[#\\.].*\\'" ; "a" will toggle.
- dired-omit-verbose nil
- auto-revert-verbose nil
- global-auto-revert-non-file-buffers t ; Update dired buffer when files change.
- ;; ----------------------------------------------------------------------------
- ;; Ediff
- ;; ----------------------------------------------------------------------------
- ediff-split-window-function 'split-window-horizontally
- ediff-window-setup-function 'ediff-setup-windows-plain
- ;; ----------------------------------------------------------------------------
- ;; Incremental search (I use Emacs rather than Vim tools for search)
- ;; ----------------------------------------------------------------------------
- search-whitespace-regexp ".*?"
- isearch-lazy-count t
- lazy-count-prefix-format "%s/%s "
- lazy-count-suffix-format nil
- ;; ----------------------------------------------------------------------------
- ;; Tab bar
- ;; ----------------------------------------------------------------------------
- tab-bar-show 1
- tab-bar-close-button-show      nil
- tab-bar-new-button             nil
- tab-bar-close-last-tab-choice 'tab-bar-mode
- tab-bar-close-tab-select      'recent
- tab-bar-new-tab-to            'right
- tab-bar-new-tab-choice        "*scratch*"
- tab-bar-menu-bar-button       "☰"
- tab-bar-separator             " "
- tab-bar-format
- '(tab-bar-format-menu-bar
-   tab-bar-format-history
-   tab-bar-format-tabs
-   tab-bar-separator)
- ;; ----------------------------------------------------------------------------
- ;; Display
- ;; ----------------------------------------------------------------------------
- display-time-format "[%Y-%m-%d %a %H:%M]" ; The org timestamp format.
- display-line-numbers-type 'relative ; Best default for wrapped lines.
- ;; Focus popups. The default is to not switch focus to them.
- display-buffer-alist
- '(("\\`\s?\\*.*\\*\s?\\'"
-    (display-buffer-reuse-mode-window
-     display-buffer-below-selected)
-    (body-function . select-window))))
-;; ============================================================================
-;;;; Native global minor modes (defaults) and hooks
-;; ============================================================================
-(recentf-mode 1)
-(global-auto-revert-mode 1)
-(global-display-line-numbers-mode 1)
-(global-hl-line-mode 1)
-;; ----------------------------------------------------------------------------
-;; Hooks
-;; ----------------------------------------------------------------------------
-(add-hook 'before-save-hook #'whitespace-cleanup)
-(add-hook 'after-save-hook  #'vc-refresh-state)        ; Version control.
-(add-hook 'dired-mode-hook  #'dired-omit-mode)         ; Toggle rebound to "a".
-(add-hook 'dired-mode-hook  #'dired-hide-details-mode) ; Toggle rebound to "s".
-(add-hook 'text-mode-hook   #'visual-line-mode)        ; Line breaks at words
-(add-hook 'prog-mode-hook   #'outline-minor-mode)      ; Cycle with "S-<tab>".
-;; Visual line numbers when `outline-cycle-buffer'.
-(add-hook 'outline-view-change-hook ; Why is this considered obsolete?
-          (lambda ()
-            (when (and display-line-numbers
-                       outline-minor-mode) ; Don't in `org-mode'.
-              ;; With `whitespace-cleanup' the `char-after' the `buffer-size'-
-              ;; position is a single "C-j" (new line char) which ironically
-              ;; is always considered visible. `buffer-size'-1 is not a "C-j".
-              (if (outline-invisible-p (1- (buffer-size)))
-                  (setq
-                   display-line-numbers 'visual)     ; For folded lines.
-                ;; else
-                (setq
-                 display-line-numbers 'relative))))) ; For wrapped lines.
-(add-hook 'emacs-startup-hook
-          (lambda ()
-            (message
-             "Emacs ready in %s with %d garbage collections."
-             (format
-              "%.1f seconds"
-              (float-time (time-subtract after-init-time before-init-time)))
-             gcs-done)))
+	(propertize
+	 " "
+	 'display '((space
+		     :align-to (- (+ right right-fringe right-margin) 4))))
+	'(-3 "%o")))))))
 
 ;; ============================================================================
 ;;; Custom functions
@@ -354,9 +224,9 @@ The function will just switch to the correct buffer."
   (other-window 1)
   (switch-to-buffer "*Messages*") ; For window 3
   (split-window-below)
-  (switch-to-buffer "*scratch*") ; For easy access via `previous-buffer'.
+  (switch-to-buffer "*scratch*")  ; For easier access.
   ;; (split-window-below) ; Will make a 4th window.
-  (next-buffer) ; The initial `previous-buffer' from window 1 in window 2.
+  (next-buffer)
   (other-window -1) ; Back to window 1.
   (message "Three window setup created"))
 ;; ----------------------------------------------------------------------------
@@ -376,7 +246,7 @@ The function will just switch to the correct buffer."
   "Toggle my two default faces.
 \nThe faces are loaded from my-faces.elc and my-ansi-faces.elc respectively."
   (interactive)
-  (if (equal (face-background 'default) "#000") ; (eq... doesn't work?
+  (if (equal (face-background 'default) "#000")
       (load (locate-user-emacs-file "my-faces.elc") nil t)
     ;; else
     (load (locate-user-emacs-file "my-ansi-faces.elc") nil t))
@@ -397,21 +267,155 @@ The function will just switch to the correct buffer."
 ;; ----------------------------------------------------------------------------
 (defun my/save-all-kill-emacs-no-prompt ()
   "Save all and quit without a prompt.
-  \nUse `super-save-mode' and `backup-each-save' to make this less risky."
+  \nUse something like `auto-save-visited-mode' and `backup-each-save' to make this less risky."
   (interactive)
   (save-some-buffers t)
   (when (file-newer-than-file-p
-         (locate-user-emacs-file "early-init.el")
-         (locate-user-emacs-file "early-init.elc"))
+	 (locate-user-emacs-file "early-init.el")
+	 (locate-user-emacs-file "early-init.elc"))
     (byte-compile-file (locate-user-emacs-file "early-init.el")))
   (when (file-newer-than-file-p
-         (locate-user-emacs-file "init.el")
-         (locate-user-emacs-file "init.elc"))
+	 (locate-user-emacs-file "init.el")
+	 (locate-user-emacs-file "init.elc"))
     (when (file-exists-p (locate-user-emacs-file "init.elc"))
       (copy-file (locate-user-emacs-file "init.elc")
-                 (locate-user-emacs-file "init.elc~") t)) ; Overwrite.
+		 (locate-user-emacs-file "init.elc~") t)) ; Overwrite.
     (byte-compile-file (locate-user-emacs-file "init.el")))
   (kill-emacs))
+
+;; ============================================================================
+;;; Native vanilla stuff
+;; ============================================================================
+;; Variables
+;; ----------------------------------------------------------------------------
+(setq-default ; Buffer local variables.
+ display-line-numbers-width 3
+ fill-column 79)
+(setq
+ frame-title-format
+ '((:eval
+    (if (buffer-file-name)
+	(abbreviate-file-name (buffer-file-name))
+      ;; else
+      "%b")))
+ tab-width 4
+ warning-minimum-level :error
+ visible-bell t
+ use-dialog-box nil
+ use-short-answers t
+ initial-scratch-message nil
+ large-file-warning-threshold nil
+ delete-by-moving-to-trash t
+ trash-directory "~/.local/share/Trash/files"
+ custom-file "/dev/null"           ; Don't deal with custom.el.
+ truncate-partial-width-windows 59 ; Only wrap long lines.
+ shell-default-shell 'eshell       ; I rarely use a terminal inside Emacs.
+ eshell-ls-initial-args
+ '("-agho")
+ recentf-exclude
+ '("\\`~/org/agenda/.*\\.org\\'"       ; Agenda files. These are in buffers.
+   "\\`~/org/inbox\\.org\\'"
+   "\\`~/\\.emacs\\.d/.*\\.el[cd]?\\'" ; Elisp config and data files.
+   "\\`~/\\.emacs\\.d/diary\\'"
+   "\\`~/.*\\.pdf\\'"
+   ".*\\.el\\.gz\\'")                  ; Source files browsed via Emacs help.
+ ;; ----------------------------------------------------------------------------
+ ;; Dired
+ ;; ----------------------------------------------------------------------------
+ dired-kill-when-opening-new-dired-buffer t
+ dired-dwim-target t
+ dired-recursive-copies 'always
+ dired-listing-switches "-agho --group-directories-first"
+ dired-omit-files "\\`[#\\.].*\\'" ; "a" will toggle.
+ dired-omit-verbose nil
+ auto-revert-verbose nil
+ global-auto-revert-non-file-buffers t ; Update dired buffer when files change.
+ ;; ----------------------------------------------------------------------------
+ ;; Ediff
+ ;; ----------------------------------------------------------------------------
+ ediff-split-window-function 'split-window-horizontally
+ ediff-window-setup-function 'ediff-setup-windows-plain
+ ;; ----------------------------------------------------------------------------
+ ;; Incremental search (I use Emacs rather than Vim tools for search)
+ ;; ----------------------------------------------------------------------------
+ search-whitespace-regexp ".*?"
+ isearch-lazy-count t
+ lazy-count-prefix-format "%s/%s "
+ lazy-count-suffix-format nil
+ ;; ----------------------------------------------------------------------------
+ ;; Tab bar
+ ;; ----------------------------------------------------------------------------
+ tab-bar-show 1
+ tab-bar-close-button-show      nil
+ tab-bar-new-button             nil
+ tab-bar-close-last-tab-choice 'tab-bar-mode
+ tab-bar-close-tab-select      'recent
+ tab-bar-new-tab-to            'right
+ tab-bar-new-tab-choice        "*scratch*"
+ tab-bar-menu-bar-button       "☰"
+ tab-bar-separator             " "
+ tab-bar-format
+ '(tab-bar-format-menu-bar
+   tab-bar-format-history
+   tab-bar-format-tabs
+   tab-bar-separator)
+ ;; ----------------------------------------------------------------------------
+ ;; Display
+ ;; ----------------------------------------------------------------------------
+ display-time-format "[%Y-%m-%d %a %H:%M]" ; The org timestamp format.
+ display-line-numbers-type 'relative ; Best default for wrapped lines.
+ ;; Focus popups. The default is to not switch focus to them.
+ display-buffer-alist
+ '(("\\`\s?\\*.*\\*\s?\\'"
+    (display-buffer-reuse-mode-window
+     display-buffer-below-selected)
+    (body-function . select-window))))
+;; ============================================================================
+;;;; Native hooks and minor modes
+;; ============================================================================
+;; Hooks
+;; ----------------------------------------------------------------------------
+(add-hook 'before-save-hook
+	  (lambda ()
+	    (unless (memq evil-state '(insert replace emacs))
+	      (whitespace-cleanup)))) ; I use `auto-save-visited-mode'.
+(add-hook 'after-save-hook  #'vc-refresh-state)        ; Version control.
+(add-hook 'dired-mode-hook  #'dired-omit-mode)         ; Toggle rebound to "a".
+(add-hook 'dired-mode-hook  #'dired-hide-details-mode) ; Toggle rebound to "s".
+(add-hook 'text-mode-hook   #'visual-line-mode)        ; Line breaks at words
+(add-hook 'prog-mode-hook   #'outline-minor-mode)      ; Cycle with "S-<tab>".
+;; Visual line numbers when `outline-cycle-buffer'.
+(add-hook 'outline-view-change-hook ; Why is this considered obsolete?
+	  (lambda ()
+	    (when (and display-line-numbers
+		       outline-minor-mode)
+	      ;; With `whitespace-cleanup' the `char-after' the `buffer-size'-
+	      ;; position is a single "C-j" (new line char) which ironically
+	      ;; is always considered visible. `buffer-size'-1 is not a "C-j".
+	      (if (outline-invisible-p (1- (buffer-size)))
+		  (setq
+		   display-line-numbers 'visual)     ; For folded lines.
+		;; else
+		(setq
+		 display-line-numbers 'relative))))) ; For wrapped lines.
+(add-hook 'emacs-startup-hook
+	  (lambda ()
+	    (message
+	     "Emacs ready in %s with %d garbage collections."
+	     (format
+	      "%.1f seconds"
+	      (float-time (time-subtract after-init-time before-init-time)))
+	     gcs-done)))
+;; ----------------------------------------------------------------------------
+;; Minor modes
+;; ----------------------------------------------------------------------------
+(indent-tabs-mode 0) ; No tabulator character pollution please.
+(recentf-mode 1)
+(savehist-mode 1)
+(save-place-mode 1)
+(auto-save-visited-mode 1)
+(global-hl-line-mode 1)
+(global-display-line-numbers-mode 1)
 
 ;; ============================================================================
 ;;; Package.el
@@ -428,28 +432,22 @@ The function will just switch to the correct buffer."
    ("nongnu"       . "https://elpa.nongnu.org/nongnu/")
    ("org"          . "https://orgmode.org/elpa/"))
  package-archive-priorities
- '(("elpa"  . 2)  ; Minimize bleeding edge. Prefer older versions from elpa.
+ '(("elpa"  . 2)  ; Prefer older versions from elpa. Minimize bleeding edge.
    ("melpa" . 1)) ; The remaining archives have priority 0.
  package-selected-packages
- '(evil evil-collection evil-nerd-commenter evil-surround evil-numbers evil-org org-superstar org-appear org-present magit cape corfu nerd-icons-corfu nerd-icons nerd-icons-dired nerd-icons-ibuffer nerd-icons-completion avy vertico marginalia orderless consult embark embark-consult lsp-mode rainbow-delimiters rainbow-mode golden-ratio ace-window transpose-frame recursive-narrow centered-cursor-mode mixed-pitch indent-guide keycast undo-tree counsel helpful flycheck writegood-mode auto-package-update super-save backup-each-save general))
+ '(evil evil-collection evil-nerd-commenter evil-surround evil-numbers evil-org org-superstar org-appear org-present magit cape corfu nerd-icons-corfu nerd-icons nerd-icons-dired nerd-icons-ibuffer nerd-icons-completion avy vertico marginalia orderless consult embark embark-consult lsp-mode rainbow-delimiters rainbow-mode recursive-narrow centered-cursor-mode golden-ratio ace-window transpose-frame mixed-pitch indent-guide keycast undo-tree counsel helpful flycheck writegood-mode auto-package-update backup-each-save general))
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents))
 (package-install-selected-packages t)
 ;; ============================================================================
-;;;; Update, save and backup
+;;;; Update, backup and undo
 ;; ============================================================================
 (require 'auto-package-update)
 (setq
  auto-package-update-interval 30
  auto-package-update-hide-results t)
 (auto-package-update-maybe)
-(require 'savehist)
-(savehist-mode 1)
-(require 'saveplace)
-(save-place-mode 1)
-(require 'super-save)
-(super-save-mode 1)
 (require 'backup-each-save)
 (setq
  backup-each-save-mirror-location "~/.backup-emacs-saved")
@@ -461,12 +459,21 @@ The function will just switch to the correct buffer."
 (with-eval-after-load 'evil
   (add-hook 'git-commit-mode-hook #'evil-insert-state)
   (evil-set-initial-state 'magit-log-edit-mode 'insert))
-(add-hook 'magit-run-post-commit-hook  #'vc-refresh-state)
+(add-hook 'magit-run-post-commit-hook #'vc-refresh-state)
+;; ----------------------------------------------------------------------------
+;; Undo
+;; ----------------------------------------------------------------------------
+(require 'undo-tree)
+(setq
+ undo-tree-visualizer-timestamps t
+ undo-tree-auto-save-history t
+ undo-tree-visualizer-buffer-name "*undo-tree*") ; The default include a space.
+(global-undo-tree-mode 1)
 ;; ============================================================================
 ;;;; Help and guides
 ;; ============================================================================
-(require 'counsel)
 (require 'helpful)
+(require 'counsel)
 (require 'keycast)
 (keycast-tab-bar-mode 1)
 ;; ----------------------------------------------------------------------------
@@ -510,9 +517,8 @@ The function will just switch to the correct buffer."
 (require 'avy)
 (setq
  avy-timeout-seconds 1) ; I'm slow.
-(with-eval-after-load 'org
-  (require 'recursive-narrow)
-  (put 'narrow-to-region 'disabled nil)) ; Disable a warning somehow?
+(require 'recursive-narrow)
+(put 'narrow-to-region 'disabled nil) ; Disable a warning somehow?
 (require 'mixed-pitch)
 (setq
  mixed-pitch-set-height t)
@@ -525,15 +531,6 @@ The function will just switch to the correct buffer."
        org-tag
        org-todo))
   (add-to-list 'mixed-pitch-fixed-pitch-faces face))
-;; ----------------------------------------------------------------------------
-;; Undo
-;; ----------------------------------------------------------------------------
-(require 'undo-tree)
-(setq
- undo-tree-visualizer-timestamps t
- undo-tree-auto-save-history t
- undo-tree-visualizer-buffer-name "*undo-tree*") ; The default include a space.
-(global-undo-tree-mode 1)
 ;; ----------------------------------------------------------------------------
 ;; Mini buffer
 ;; ----------------------------------------------------------------------------
@@ -553,7 +550,7 @@ The function will just switch to the correct buffer."
 (require 'consult)   ; Combine functionality (e.g. buffers + recentf).
 (require 'embark)    ; I don't really use this yet.
 ;; ----------------------------------------------------------------------------
-;; Buffer completion
+;; Completion
 ;; ----------------------------------------------------------------------------
 (require 'corfu)
 (setq
@@ -610,16 +607,16 @@ The function will just switch to the correct buffer."
 (evil-collection-init)
 (require 'evil-surround)
 (add-hook 'emacs-lisp-mode-hook
-          (lambda ()
-            (push '(?` . ("`" . "'")) evil-surround-pairs-alist)))
+	  (lambda ()
+	    (push '(?` . ("`" . "'")) evil-surround-pairs-alist)))
 (global-evil-surround-mode 1)
 (require 'evil-nerd-commenter)
 (require 'evil-numbers)
 (require 'evil-org)
 (evil-org-set-key-theme '(navigation insert textobjects additional calendar))
 (add-hook 'org-mode-hook
-          (lambda ()
-            (evil-org-mode 1)))
+	  (lambda ()
+	    (evil-org-mode 1)))
 (require 'evil-org-agenda)
 (evil-org-agenda-set-keys)
 ;; ============================================================================
@@ -628,14 +625,14 @@ The function will just switch to the correct buffer."
 ;; Suspend `hl-line' if it's on, so `region' can use the same face.
 ;; ----------------------------------------------------------------------------
 (add-hook 'evil-visual-state-entry-hook
-          (lambda ()
-            (setq
-             my/hl-line global-hl-line-mode) ; Preserve `hl-line' on exit.
-            (global-hl-line-mode 0)))
+	  (lambda ()
+	    (setq
+	     my/hl-line global-hl-line-mode) ; Preserve `hl-line' on exit.
+	    (global-hl-line-mode 0)))
 (add-hook 'evil-visual-state-exit-hook
-          (lambda ()
-            (when my/hl-line
-              (global-hl-line-mode 1))))
+	  (lambda ()
+	    (when my/hl-line
+	      (global-hl-line-mode 1))))
 ;; ----------------------------------------------------------------------------
 ;; Evil "input" states suspend the `hl-line' and have absolute line numbers.
 ;; ----------------------------------------------------------------------------
@@ -645,25 +642,25 @@ The function will just switch to the correct buffer."
        evil-replace-state-entry-hook
        evil-emacs-state-entry-hook))
   (add-hook hook
-            (lambda ()
-              (when display-line-numbers
-                (setq
-                 display-line-numbers t)) ; No j/k navigation in these states.
-              (setq
-               my/hl-line global-hl-line-mode)
-              (global-hl-line-mode 0))))
+	    (lambda ()
+	      (when display-line-numbers
+		(setq
+		 display-line-numbers t)) ; No j/k navigation in these states.
+	      (setq
+	       my/hl-line global-hl-line-mode)
+	      (global-hl-line-mode 0))))
 (dolist
     (hook
      '(evil-insert-state-exit-hook
        evil-replace-state-exit-hook
        evil-emacs-state-exit-hook))
   (add-hook hook
-            (lambda ()
-              (when display-line-numbers
-                (setq
-                 display-line-numbers 'relative)) ; Back to the default.
-              (when my/hl-line
-                (global-hl-line-mode 1)))))
+	    (lambda ()
+	      (when display-line-numbers
+		(setq
+		 display-line-numbers 'relative)) ; Back to the default.
+	      (when my/hl-line
+		(global-hl-line-mode 1)))))
 ;; ============================================================================
 ;;;; Evil cursor between model (my controversial sacrilege)
 ;; ============================================================================
@@ -691,8 +688,8 @@ The function will just switch to the correct buffer."
 ;; ============================================================================
 ;;; Org.el
 ;; ============================================================================
-(unless (package-installed-p 'org) ; It should be since it's native now.
-  (require 'org))
+(unless (package-installed-p 'org)
+  (require 'org)) ; Old Emacs versions might need this.
 ;; ----------------------------------------------------------------------------
 ;; Create `org-agenda' directories and basic files unless they exist.
 ;; ----------------------------------------------------------------------------
@@ -789,7 +786,7 @@ The function will just switch to the correct buffer."
  org-log-refile      'time
  org-log-reschedule  'time
  org-log-note-headings
- '((state       . "State %6s from %-9S %t") ; Align timestamps (with capture).
+ '((state       . "State %6s from %-9S %t") ; Align with capture.
    (note        . "Note                        %t")
    (refile      . "Refiled                     %t")
    (done        . "Closing note                %t")
@@ -810,9 +807,28 @@ The function will just switch to the correct buffer."
  '(("\\.docx\\'"    . default)
    ("\\.mm\\'"      . default)
    ("\\.x?html?\\'" . default)
-   ("\\.pdf\\'"     . "evince %s") ; External pdf viewer.
+   ("\\.pdf\\'"     . "evince %s")
    (directory       . emacs)
-   (auto-mode       . emacs)))
+   (auto-mode       . emacs))
+;; ----------------------------------------------------------------------------
+;; Diary
+;; ----------------------------------------------------------------------------
+;; "D" to toggle `org-agenda-include-diary' in agenda.
+ holiday-bahai-holidays    nil
+ holiday-hebrew-holidays   nil
+ holiday-islamic-holidays  nil
+ holiday-oriental-holidays nil
+ holiday-general-holidays  nil
+ holiday-other-holidays ; Custom diary.
+ '((holiday-float  5  0  2 "Mors dag")
+   (holiday-float 12  0 -5 "1. søndag i advent")
+   (holiday-fixed  3  8    "Kvindernes kamp dag")
+   (holiday-fixed  3 14    "π dag")
+   (holiday-fixed  4  1    "Aprilsnar")
+   (holiday-fixed  5  1    "Arbejdernes kamp dag")
+   (holiday-fixed  6  5    "Grundlovs og fars dag")
+   (holiday-fixed  6 23    "Sanct Hans")
+   (holiday-fixed 12 24    "Juleaften")))
 ;; ============================================================================
 ;;;; Capture
 ;; ============================================================================
@@ -885,7 +901,7 @@ The function will just switch to the correct buffer."
  `((,(concat org-agenda-directory "agenda.org") :maxlevel . 1)
    (,(concat org-agenda-directory "plan.org")   :maxlevel . 1))
  org-agenda-files (list org-agenda-directory ; All org files in the directory.
-                        (concat org-directory "inbox.org"))
+			(concat org-directory "inbox.org"))
  calendar-week-start-day 1
  org-agenda-time-grid nil
  org-agenda-prefix-format
@@ -913,7 +929,8 @@ The function will just switch to the correct buffer."
  '(15 15)
  org-agenda-format-date " [%F %a] "
  org-agenda-block-separator ?﹋ ; ﹌⎺̅‾﹉
- org-agenda-span 'month ; Default for appending the agenda.
+ org-agenda-span 'day)
+(setq
  org-agenda-custom-commands
  '(("c" "Custom agenda setup"
     ((todo
@@ -925,104 +942,56 @@ The function will just switch to the correct buffer."
       ((org-agenda-span 'week)))
      ;; TODOs without a timestamp.
      (todo
-      "TODO" ; With [/] cookies. This is typically categories.
+      "TODO" ; Sort [/] cookies on top. This is typically categories.
       ((org-agenda-overriding-header "No timestamp TODO or HOLD:")
        (org-agenda-skip-function
-        '(org-agenda-skip-entry-if
-          'notregexp "\\[[0-9]+/[0-9]+\\]"
-          ;; or
-          'timestamp))))
+	'(org-agenda-skip-entry-if
+	  'notregexp "\\[[0-9]+/[0-9]+\\]"
+	  ;; or
+	  'timestamp))))
      (todo
       "TODO" ; Others. Not all TODOs have or should have a timestamp.
-      ((org-agenda-overriding-header "") ; share heading (same block)
-       (org-agenda-block-separator nil)  ; don't separate
+      ((org-agenda-overriding-header "") ; Share heading (same block).
+       (org-agenda-block-separator nil)  ; Don't separate.
        (org-agenda-skip-function
-        '(org-agenda-skip-entry-if
-          'regexp "\\[[0-9]+/[0-9]+\\]"
-          ;; or
-          'timestamp))))
+	'(org-agenda-skip-entry-if
+	  'regexp "\\[[0-9]+/[0-9]+\\]"
+	  ;; or
+	  'timestamp))))
      ;; Inactive states. Not in the agenda even if scheduled.
      (todo
       "HOLD" ; For third party action pending.
-      ((org-agenda-overriding-header "") ; same block
+      ((org-agenda-overriding-header "") ; Same block.
        (org-agenda-block-separator nil)))
      (todo
       "DONE" ; Only prioritized.
-      ((org-agenda-overriding-header "") ; same block
+      ((org-agenda-overriding-header "") ; Same block.
        (org-agenda-block-separator nil)
        (org-agenda-skip-function
-        '(org-agenda-skip-entry-if
-          'notregexp org-priority-regexp))))))
+	'(org-agenda-skip-entry-if
+	  'notregexp org-priority-regexp))))))
+   ("f" "Fortnight agenda"
+    ((agenda
+      ""
+      ((org-agenda-span 14)
+       (org-agenda-start-with-log-mode t)))))
    ;; Custom options for maintainance. Append to agenda with "a".
    ("d" "DONE TODOs"
     ;; For archiving done tasks.
     ((todo
       "DONE"
-      ((org-agenda-overriding-header "DONE TODOs")))))
+      ((org-agenda-overriding-header "DONE TODOs")
+       (org-agenda-skip-function
+	'(org-agenda-skip-entry-if
+	  'regexp org-priority-regexp))))))
    ("u" "Untagged TODOs"
     ;; For adding tags.
     ((tags-todo
       "-{.*}"
-      ((org-agenda-overriding-header "Untagged TODOs"))))))
- ;; ----------------------------------------------------------------------------
- ;; Diary
- ;; ----------------------------------------------------------------------------
- holiday-bahai-holidays    nil
- holiday-hebrew-holidays   nil
- holiday-islamic-holidays  nil
- holiday-oriental-holidays nil
- holiday-general-holidays  nil
- holiday-other-holidays ; Custom diary formatted.
- '((holiday-float  5  0  2 "Mors dag")
-   (holiday-float 12  0 -5 "1. søndag i advent")
-   (holiday-fixed  3  8    "Kvindernes kamp dag")
-   (holiday-fixed  3 14    "π dag")
-   (holiday-fixed  4  1    "Aprilsnar")
-   (holiday-fixed  5  1    "Arbejdernes kamp dag")
-   (holiday-fixed  6  5    "Grundlovs og fars dag")
-   (holiday-fixed  6 23    "Sanct Hans")
-   (holiday-fixed 12 24    "Juleaften"))
- org-agenda-include-diary nil) ; Toggle with "D" in agenda.
-;; ----------------------------------------------------------------------------
-;; A pictogram is often better than a word
-;; ----------------------------------------------------------------------------
-(add-hook 'org-mode-hook
-          (lambda ()
-            (setq
-             prettify-symbols-alist ; ⧈⧇⊡⧆⊞⊟⧄⧅⊠⟏⟎ ▸▾▴◂ ☑☐☒ ✏✎✐
-             '(("[ ]"            . ?⊡)
-               ("[-]"            . ?⊟)
-               ("[X]"            . ?⊠)
-               ("SCHEDULED:"     . ?⧄)
-               ("DEADLINE:"      . ?⧅)
-               ("CLOSED:"        . ?⊠)
-               (":PROPERTIES:"   . ?⚙) ; Settings.
-               (":LOGBOOK:"      . ?☰) ; Meta data.
-               ("CLOCK:"         . ?–) ; Like other items in the logbook.
-               (":END:"          . ?▴)
-               ("#+begin_export" . ?▾)
-               ("#+end_export"   . ?▴)
-               ("#+begin_src"    . ?▾)
-               ("#+end_src"      . ?▴))
-             prettify-symbols-unprettify-at-point t)
-            (prettify-symbols-mode 1)))
-;; ----------------------------------------------------------------------------
-;; Update "[/]" cookies in all open org buffers after a TODO state change
-;; ----------------------------------------------------------------------------
-(add-hook 'org-after-todo-state-change-hook
-          (lambda ()
-            (mapcar
-             (lambda (buffer)
-               (with-current-buffer buffer
-                 (org-update-statistics-cookies t)))
-             (org-buffer-list))))
-;; ----------------------------------------------------------------------------
-;; Insert state in "C-c C-c" buffers
-;; ----------------------------------------------------------------------------
-(with-eval-after-load 'evil
-  (add-hook 'org-capture-mode-hook     #'evil-insert-state)
-  (add-hook 'org-log-buffer-setup-hook #'evil-insert-state))
-;; ----------------------------------------------------------------------------
+      ((org-agenda-overriding-header "Untagged TODOs")))))))
+;; ============================================================================
+;;;; Addons
+;; ============================================================================
 ;; Bullets
 ;; ----------------------------------------------------------------------------
 (require 'org-superstar)
@@ -1051,14 +1020,53 @@ The function will just switch to the correct buffer."
  '((heading . t)
    (plain-list-item . nil)))
 (evil-collection-org-present-setup)
+;; ----------------------------------------------------------------------------
+;; A pictogram is often better than a word
+;; ----------------------------------------------------------------------------
+(add-hook 'org-mode-hook
+	  (lambda ()
+	    (setq
+	     prettify-symbols-alist ; ⧈⧇⊡⧆⊞⊟⧄⧅⊠⟏⟎ ▸▾▴◂ ☑☐☒ ✏✎✐
+	     '(("[ ]"            . ?⊡)
+	       ("[-]"            . ?⊟)
+	       ("[X]"            . ?⊠)
+	       ("SCHEDULED:"     . ?⧄)
+	       ("DEADLINE:"      . ?⧅)
+	       ("CLOSED:"        . ?⊠)
+	       (":PROPERTIES:"   . ?⚙) ; Settings.
+	       (":LOGBOOK:"      . ?☰) ; Meta data.
+	       ("CLOCK:"         . ?–) ; Like other items in the logbook.
+	       (":END:"          . ?▴)
+	       ("#+begin_export" . ?▾)
+	       ("#+end_export"   . ?▴)
+	       ("#+begin_src"    . ?▾)
+	       ("#+end_src"      . ?▴))
+	     prettify-symbols-unprettify-at-point t)
+	    (prettify-symbols-mode 1)))
+;; ----------------------------------------------------------------------------
+;; Update "[/]" cookies in all open org buffers after a TODO state change
+;; ----------------------------------------------------------------------------
+(add-hook 'org-after-todo-state-change-hook
+	  (lambda ()
+	    (mapcar
+	     (lambda (buffer)
+	       (with-current-buffer buffer
+		 (org-update-statistics-cookies t)))
+	     (org-buffer-list))))
+;; ----------------------------------------------------------------------------
+;; Insert state in "C-c C-c" buffers
+;; ----------------------------------------------------------------------------
+(with-eval-after-load 'evil
+  (add-hook 'org-capture-mode-hook     #'evil-insert-state)
+  (add-hook 'org-log-buffer-setup-hook #'evil-insert-state))
 
 ;; ============================================================================
 ;;; General.el
 ;; ============================================================================
-;; Does not work on Android for some reason?
+;; Does not work on Android for some reason? I should make my own maps.
 ;; ----------------------------------------------------------------------------
-(unless (package-installed-p 'which-key) ; It's native.
-  (require 'which-key))
+(unless (package-installed-p 'which-key)
+  (require 'which-key)) ; Old Emacs versions might need this.
 (setq
  which-key-idle-delay 0)
 (which-key-mode 1)
@@ -1082,10 +1090,9 @@ The function will just switch to the correct buffer."
   "4"   '(my/3-windows                            :which-key "Three")
   "5"   '(my/ace-swap-window                      :which-key "Swap")
   "6"   '(ace-window                              :which-key "Select")
-  "7"   '(other-window-prefix                     :which-key "Prefix")
-  "8"   '(transpose-frame                         :which-key "Transpose")
-  "9"   '(rotate-frame-clockwise                  :which-key "Rotate")
-  "¨"   '(tab-bar-close-tab-by-name               :which-key "Close tab")
+  "7"   '(transpose-frame                         :which-key "Transpose")
+  "8"   '(rotate-frame-anticlockwise              :which-key "Rotate")
+  "9"   '(other-window-prefix                     :which-key "Prefix")
   "a"   '(:ignore t                               :which-key "App")
   "aC"  '(full-calc                               :which-key "Full calc")
   "ac"  '(calc                                    :which-key "Calc")
@@ -1195,13 +1202,15 @@ The function will just switch to the correct buffer."
   "ti"  '(:ignore t                               :which-key "Indicate")
   "tic" '(display-fill-column-indicator-mode      :which-key "Column 79")
   "tii" '(indent-guide-mode                       :which-key "Indentation")
+  "tin" '(whitespace-newline-mode                 :which-key "Newline")
+  "tis" '(whitespace-mode                         :which-key "Spaces")
   "tk"  '(:ignore t                               :which-key "Keycast")
   "tkh" '(keycast-header-line-mode                :which-key "Header")
   "tkl" '(keycast-log-mode                        :which-key "Log frame")
   "tkm" '(keycast-mode-line-mode                  :which-key "Mode line")
   "tkt" '(keycast-tab-bar-mode                    :which-key "Tab bar")
+  "tl"  '(display-line-numbers-mode               :which-key "Line numbers")
   "tm"  '(mode-line-invisible-mode                :which-key "Mode line")
-  "tn"  '(display-line-numbers-mode               :which-key "Line numbers")
   "to"  '(outline-minor-mode                      :which-key "Outline")
   "tp"  '(prettify-symbols-mode                   :which-key "Prettify")
   "tr"  '(rainbow-mode                            :which-key "Rainbow")
@@ -1210,7 +1219,7 @@ The function will just switch to the correct buffer."
   "tv"  '(visual-line-mode                        :which-key "Visual lines")
   "tw"  '(writegood-mode                          :which-key "Write good")
   "t¨"  '(tab-bar-mode                            :which-key "Tab bar")
-  "u"   '(universal-argument                      :which-key "Uni. arg.")
+  "u"   '(universal-argument                      :which-key "Uni.arg.")
   "v"   '(:ignore t                               :which-key "v")
   "w"   '(evil-window-map                         :which-key "Window")
   "x"   '(:ignore t                               :which-key "Text")
@@ -1220,11 +1229,10 @@ The function will just switch to the correct buffer."
   "xp"  '(transpose-chars                         :which-key "Swap chars")
   "xu"  '(insert-char                             :which-key "Unicode")
   "xx"  '(just-one-space                          :which-key "One space")
-  "xz"  '(:ignore t                               :which-key "Zoom")
-  "xzg" '(global-text-scale-adjust                :which-key "Global")
-  "xzl" '(text-scale-adjust                       :which-key "Local")
+  "xz"  '(global-text-scale-adjust                :which-key "Zoom")
   "y"   '(:ignore t                               :which-key "y")
-  "z"   '(:ignore t                               :which-key "z"))
+  "z"   '(:ignore t                               :which-key "z")
+  "¨"   '(tab-bar-close-tab-by-name               :which-key "Close tab"))
 
 ;; ============================================================================
 ;;; Keybindings
@@ -1236,8 +1244,8 @@ The function will just switch to the correct buffer."
  :map global-map
  ("<escape>"      . keyboard-escape-quit)
  ("<Scroll_Lock>" . centered-cursor-mode)
- ("<C-tab>"       . tab-next)
- ("<C-backtab>"   . tab-previous)
+ ("<C-tab>"       . tab-next) ; This does not work in terminal atm.
+ ("<C-backtab>"   . tab-previous) ; This does not work in terminal atm.
  ("C-¨"           . tab-line-mode)
  ("M-p"           . consult-yank-pop) ; Paste with `kill-ring' dialog.
  ;; ----------------------------------------------------------------------------
@@ -1260,6 +1268,7 @@ The function will just switch to the correct buffer."
  ("C-S-o"         . evil-jump-forward)   ; "C-i" is used for <tab>.
  ("gc"            . evilnc-comment-operator)
  ;; I `isearch' so I don't need "n"/"N" for `evil-search'. I use it to scroll.
+ ;;
  ("n"             . evil-scroll-down)    ; Use "C-s" to repeat `isearch'.
  ("N"             . evil-scroll-up)      ; In `isearch' "C-r" search backward.
  ;; Danish keyboard (some keys are not easily accessible).
@@ -1281,7 +1290,7 @@ The function will just switch to the correct buffer."
  ;; ----------------------------------------------------------------------------
  :map evil-visual-state-map
  ;; "S" is used by `evil-surround'. Use "C-s" for normal `isearch'.
- ("s"             . isearch-forward-thing-at-point) ; The region as input.
+ ("s"             . isearch-forward-thing-at-point) ; Input the visual region.
  ;; Don't use "v" to exit visual state. <esc> or a command works.
  ("v"             . exchange-point-and-mark)
  ;; ----------------------------------------------------------------------------
@@ -1292,10 +1301,9 @@ The function will just switch to the correct buffer."
  ("C-g"           . evil-normal-state)
  ("C-b"           . evil-backward-word-begin)
  ("C-B"           . evil-backward-WORD-begin)
- ("C-d"           . backward-kill-word) ; I use "C-w" for evil's forward word.
+ ("C-d"           . backward-kill-word) ; Normally bound to "C-w".
  ("C-e"           . forward-word)       ; Emacs command for end of the word.
  ("C-p"           . yank)               ; "M-p" is in the `global-map'.
- ("C-u"           . universal-argument)
  ("C-w"           . evil-forward-word-begin)
  ("C-W"           . evil-forward-WORD-begin)
  ("C-v"           . set-mark-command)   ; "C-<spc>" is used by general.el.
@@ -1330,11 +1338,13 @@ The function will just switch to the correct buffer."
   "s"           #'isearch-forward ; I prefer `isearch'. "C-s" to repeat.
   "S"           #'isearch-forward-thing-at-point) ; This is like Vim's "*".
 (evil-define-key 'normal help-mode-map
-  (kbd "SPC") nil) ; Make general.el take over <spc>.
+  (kbd "SPC") nil ; Make general.el take over <spc>.
+  (kbd "<escape>") #'quit-window)
 (evil-define-key 'normal Info-mode-map
-  (kbd "SPC") nil) ; Make general.el take over <spc>.
+  (kbd "SPC") nil ; Make general.el take over <spc>.
+  (kbd "<escape>") #'quit-window)
 (evil-define-key 'normal dired-mode-map
-  (kbd "SPC") nil  ; Make general.el take over <spc>.
+  (kbd "SPC") nil ; Make general.el take over <spc>.
   "h"           #'dired-up-directory
   "l"           #'dired-find-file
   "a"           #'dired-omit-mode           ; Like "ls -a" toggle.
@@ -1346,7 +1356,7 @@ The function will just switch to the correct buffer."
   "t"           #'org-todo            ; In operator state "t" work as in Vim.
   "T"           #'org-todo-yesterday) ; "ct." (change to ".") work as expected.
 (evil-define-key 'motion org-agenda-mode-map
-  (kbd "SPC") nil  ; Make general.el take over <spc>.
+  (kbd "SPC") nil ; Make general.el take over <spc>.
   (kbd "<S-left>")  #'org-agenda-earlier ; Need (kbd...
   (kbd "<S-right>") #'org-agenda-later
   "´"           #'next-buffer
