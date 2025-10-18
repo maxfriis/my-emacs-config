@@ -22,8 +22,10 @@
 
 (define-minor-mode evil-cursor-between-mode
   "Mode for using Emacs' cursor model in evil's normal state.
-\n\"a\", \"o\" and \"p\" is swapped with their capital bindings."
-  :init-value nil
+\n\"a\"/\"A\", \"o\"/\"O\" and \"p\"/\"P\" is swapped for less use of capital bindings.
+Adobt the mindset of the cursor being between charactors in normal state and
+you will need few layered bindings."
+  :global t
   :group 'evil
   :lighter nil
   (cond
@@ -64,7 +66,7 @@
      evil-move-cursor-back evil-move-cursor-back-default
      evil-move-beyond-eol evil-move-beyond-eol-default
      evil-highlight-closing-paren-at-point-states evil-highlight-closing-paren-at-point-states-default)
-    ;; Evil motion commands.
+    ;; Motion commands.
     (evil-define-key 'motion global-map
       "t"  #'evil-find-char-to
       "f"  #'evil-find-char
@@ -73,7 +75,7 @@
       "ge" #'evil-backward-word-end
       "gE" #'evil-backward-WORD-end
       "%"  #'evil-jump-item)
-    ;; Swap "a", "o" and "p" back to their evil defaults.
+    ;; Swap "a", "o" and "p" with their capital bindings.
     (evil-define-key 'normal global-map
       "a"  #'evil-append
       "A"  #'evil-append-line
