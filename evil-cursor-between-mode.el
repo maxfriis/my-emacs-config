@@ -1,5 +1,5 @@
 ;; -*- lexical-binding: t; -*-
-;; #+title: evil-cursor-between.el
+;; #+title: evil-cursor-between-mode.el
 
 ;; ============================================================================
 ;; Creative Commons Attribution-ShareAlike 4.0 International License
@@ -23,14 +23,15 @@
 (define-minor-mode evil-cursor-between-mode
   "Mode for using Emacs' cursor model in evil's normal state.
 \n\"a\"/\"A\", \"o\"/\"O\" and \"p\"/\"P\" is swapped for less use of capital bindings.
-Adobt the mindset of the cursor being between charactors in normal state and
-you will need few layered bindings."
+Adobt the mindset of the cursor being between characters in normal state and
+you will need few layered bindings. Maybe this is good for your emacs pinky?"
   :global t
   :group 'evil
   :lighter nil
   (cond
-   ((and evil-cursor-between-mode
-         evil-mode)
+   (evil-cursor-between-mode
+    (unless evil-mode
+      (evil-mode 1))
     ;; ============================================================================
     ;; Cursor related `evil-mode' settings
     ;; ============================================================================
@@ -50,22 +51,29 @@ you will need few layered bindings."
       "ge" #'evil-backward-after-word-end
       "gE" #'evil-backward-after-WORD-end
       "%"  #'evil-jump-item-before)
+    ;; ----------------------------------------------------------------------------
     ;; Swap "a", "o" and "p" with their capital bindings.
+    ;; ----------------------------------------------------------------------------
+    ;; This is based on a line atom philosophy. The new small letter bindings deal
+    ;; with the current line. The line after does and should require a motion imo.
+    ;; The key efficiency is roughly as Vim's if the <shift> layer count as a key.
     (evil-define-key 'normal global-map
-      "a"  #'evil-append-line   ; swapped because it's only used to edit from eol.
-      "A"  #'evil-append        ; "li" does the same thing.
-      "o"  #'evil-open-above    ; swapped to be consistent with paste and e.g. "cc".
-      "O"  #'evil-open-below    ; "jo" does the same thing.
-      "p"  #'evil-paste-before  ; swapped because only "p" is used to paste.
+      "a"  #'evil-append-line   ; Swapped so append is used to edit from eol.
+      "A"  #'evil-append        ; Useless in this mode. "li" makes more sense.
+      "o"  #'evil-open-above    ; Swapped to be consistent with paste and e.g."cc".
+      "O"  #'evil-open-below    ; "jo" does the same thing as "O".
+      "p"  #'evil-paste-before  ; Swapped because almost only "p" is used to paste.
       "P"  #'evil-paste-after)) ; "jp" or "lp" does the same thing.
-   (evil-mode
+   ;; ----------------------------------------------------------------------------
+   (t ; else
     ;; ============================================================================
-    ;; Back to `evil-mode' defaults.
+    ;; Back to `evil-mode' defaults when `evil-cursor-between-mode' is turned off
     ;; ============================================================================
     (setq
      evil-move-cursor-back evil-move-cursor-back-default
      evil-move-beyond-eol evil-move-beyond-eol-default
      evil-highlight-closing-paren-at-point-states evil-highlight-closing-paren-at-point-states-default)
+    ;; ----------------------------------------------------------------------------
     ;; Motion commands.
     (evil-define-key 'motion global-map
       "t"  #'evil-find-char-to
@@ -75,15 +83,15 @@ you will need few layered bindings."
       "ge" #'evil-backward-word-end
       "gE" #'evil-backward-WORD-end
       "%"  #'evil-jump-item)
-    ;; Swap "a", "o" and "p" with their capital bindings.
+    ;; ----------------------------------------------------------------------------
+    ;; Swap "a", "o" and "p" back to their evil defaults.
     (evil-define-key 'normal global-map
       "a"  #'evil-append
       "A"  #'evil-append-line
       "o"  #'evil-open-below
       "O"  #'evil-open-above
       "p"  #'evil-paste-after
-      "P"  #'evil-paste-before))
-   (t (message "This mode is only useful when `evil-mode' is eabled"))))
+      "P"  #'evil-paste-before))))
 
 ;; ============================================================================
 ;;; Evil commands implementing Emacs' cursor model
@@ -225,5 +233,7 @@ or somewhere after the cursor and jump to the corresponding one."
       (evil-jump-item count)
       (when (> (point) pos) (forward-char)))))
 
-(provide 'evil-cursor-between)
-;; End of evil-cursor-between.el
+(evil-cursor-between-mode 1) ; For now.
+
+(provide 'evil-cursor-between-mode)
+;; End of evil-cursor-between-mode.el
