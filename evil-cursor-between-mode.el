@@ -63,7 +63,12 @@ you will need few layered bindings. Maybe this is good for your emacs pinky?"
       "o"  #'evil-open-above    ; Swapped to be consistent with paste and e.g."cc".
       "O"  #'evil-open-below    ; "jo" does the same thing as "O".
       "p"  #'evil-paste-before  ; Swapped because almost only "p" is used to paste.
-      "P"  #'evil-paste-after)) ; "jp" or "lp" does the same thing.
+      "P"  #'evil-paste-after) ; "jp" or "lp" does the same thing.
+    (evil-define-key 'normal 'evil-org-mode
+      "a"  #'evil-org-append-line
+      "A"  nil
+      "o"  #'evil-org-open-above
+      "O"  #'evil-org-open-below))
    ;; ----------------------------------------------------------------------------
    (t ; else
     ;; ============================================================================
@@ -91,7 +96,12 @@ you will need few layered bindings. Maybe this is good for your emacs pinky?"
       "o"  #'evil-open-below
       "O"  #'evil-open-above
       "p"  #'evil-paste-after
-      "P"  #'evil-paste-before))))
+      "P"  #'evil-paste-before)
+    (evil-define-key 'normal 'evil-org-mode
+      "a"  nil
+      "A"  #'evil-org-append-line
+      "o"  #'evil-org-open-below
+      "O"  #'evil-org-open-above))))
 
 ;; ============================================================================
 ;;; Evil commands implementing Emacs' cursor model
