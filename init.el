@@ -4,24 +4,15 @@
 ;; ============================================================================
 ;;; Fonts and faces (my themes)
 ;; ============================================================================
-(cond
- ((find-font (font-spec :name "Ubuntu Mono"))
-  (set-face-attribute
-   'default
-   nil :font "Ubuntu Mono-18"))
- ;; Fallback mono space font which is often installed.
- ((find-font (font-spec :name "DejaVu Sans Mono"))
-  (set-face-attribute
-   'default
-   nil :font "DejaVu Sans Mono"))
- (t (message "Emacs chose the default font")))
+(if (find-font (font-spec :name "Ubuntu Mono"))
+    (set-face-font 'default "Ubuntu Mono 18")
+  ;; else
+  (message "The default font is set to %s" (font-get-system-font)))
 ;; The variable width Ubuntu font doesn't look good with Ubuntu Mono imo.
 (when (find-font (font-spec :name "Verdana"))
-  (set-face-attribute
-   'variable-pitch
-   nil :font "Verdana-18"))
+  (set-face-font 'variable-pitch "Verdana 18"))
 ;; ----------------------------------------------------------------------------
-;; Compile some elisp files
+;; I use files for faces rather than variables so I see the colors when I edit.
 ;; ----------------------------------------------------------------------------
 (when (file-newer-than-file-p
        (locate-user-emacs-file "my-ansi-faces.el")
@@ -31,23 +22,43 @@
        (locate-user-emacs-file "my-faces.el")
        (locate-user-emacs-file "my-faces.elc"))
   (byte-compile-file (locate-user-emacs-file "my-faces.el")))
-;; ----------------------------------------------------------------------------
-;; Use files for faces rather than variables so I see the colors when I edit.
-;; ----------------------------------------------------------------------------
 (if (eq (user-uid) 0) ; Ansi colors as root.
     (load (locate-user-emacs-file "my-ansi-faces.elc") nil t)
   ;; else
   (load (locate-user-emacs-file "my-faces.elc") nil t))
 ;; ----------------------------------------------------------------------------
-;; Additional keywords for coloring
+;; Additional keywords for more coloring.
 ;; ----------------------------------------------------------------------------
 (font-lock-add-keywords
  'emacs-lisp-mode
- '(("propertize"             . font-lock-builtin-face)
-   ("add-hook"               . font-lock-keyword-face)
-   ("add-to-list"            . font-lock-keyword-face)
-   ("font-lock-add-keywords" . font-lock-keyword-face)
-   ("set-face-attribute"     . font-lock-keyword-face)))
+ '(;; ----------------------------------------------------------------------------
+   ;; Booleans and Logic.
+   ("\\(\\(\s+(*\\(nil\\|t\\)\\)*\\)[\s\n)]"
+    . (1 'font-lock-warning-face))
+   ("(\\(not\\|and\\|x?or\\)[\s\n]"    . (1 'font-lock-builtin-face))
+   ("(\\([<>=]\\|[<>/]=\\)[\s\n]"      . (1 'font-lock-builtin-face))
+   ("(\\(eq\\(\\(ua\\)?l\\)?\\)[\s\n]" . (1 'font-lock-builtin-face))
+   ("(\\(mem\\(ber\\|ql?\\)\\)[\s\n]"  . (1 'font-lock-builtin-face))
+   ("(\\([^\s]*-p\\)[\s\n)]"           . (1 'font-lock-builtin-face))
+   ("(\\([be]o[bl]p\\))"               . (1 'font-lock-builtin-face))
+   ;; ----------------------------------------------------------------------------
+   ;; Numbers and calculation.
+   ("\\(\\(\\(\s-\\)?\\.?[0-9]+\\)*\\)[\s\n)]"
+    . (1 'font-lock-number-face))
+   ("(\\(1[\\+-]\\)[\s\n]"             . (1 'font-lock-number-face))
+   ("(\\([\\+-\\*/]\\)[\s\n]"          . (1 'font-lock-number-face))
+   ;; ----------------------------------------------------------------------------
+   ;; Functions.
+   ("(\\(cons\\)[\s\n]"                . (1 'font-lock-keyword-face))
+   ("(\\(list\\)[\s\n]"                . (1 'font-lock-keyword-face))
+   ("(\\(load\\)[\s\n]"                . (1 'font-lock-keyword-face))
+   ("(\\(add-[^\s]*\\)[\s\n]"          . (1 'font-lock-keyword-face))
+   ("(\\(set-[^\s]*\\)[\s\n]"          . (1 'font-lock-keyword-face))
+   ;; ----------------------------------------------------------------------------
+   ;; Functions closely related to strings.
+   ("(\\(concat\\)[\s\n]"              . (1 'font-lock-string-face))
+   ("(\\(format\\)[\s\n]"              . (1 'font-lock-string-face))
+   ("(\\(propertize\\)[\s\n]"          . (1 'font-lock-string-face))))
 
 ;; ============================================================================
 ;;; Mode line
@@ -56,7 +67,7 @@
  mode-line-format
  '((:eval ; Eval and list everything.
     (list
-     ;; `ace-window-display-mode' put a window number here.
+     ;; `ace-window-display-mode' write a window number on the mode line here.
      ;; Root indicator (I link ~/.emacs.d in /root).
      (if (and (eq (user-uid) 0)
               (mode-line-window-selected-p))
@@ -148,6 +159,7 @@
                           'mouse-1 #'scroll-bar-mode)))))
        ;; else
        (list
+        ;; Gap for alignment.
         (propertize
          " "
          'display '((space
@@ -159,11 +171,12 @@
 ;; ============================================================================
 ;; Misc variables
 ;; ----------------------------------------------------------------------------
-(defvar org-agenda-directory nil ; I set it latter.
-  "Default `org-agenda' directory.
-\nAll org files in this directory will be included in the agenda.")
 (defvar my/hl-line t
   "Track what `hl-line-mode' was, when it's temporarily suspended.")
+(defvar org-agenda-directory nil ; Set latter.
+  "Default `org-agenda' directory.
+\nInclude this directory in the list `org-agenda-files'.
+All org files in the directory will be in the agenda.")
 ;; ----------------------------------------------------------------------------
 ;; Open init files
 ;; ----------------------------------------------------------------------------
@@ -177,29 +190,29 @@
 ;; ----------------------------------------------------------------------------
 (defun my/find-agenda-file ()
   "Open my agenda file agenda.org.
-\nThese agenda files are usually open in buffers.
-The function will just switch to the correct buffer."
+\nThese agenda files are usually opened in buffers by `org-agenda'.
+The function will organize the `buffer-list' and focus agenda.org."
   (interactive)
-  (find-file (concat org-agenda-directory "plan.org"))
-  (find-file (concat org-agenda-directory "agenda.org")))
+  (find-file (concat org-agenda-directory "/plan.org"))
+  (find-file (concat org-agenda-directory "/agenda.org")))
 ;; ----------------------------------------------------------------------------
 ;; Open note and date file
 ;; ----------------------------------------------------------------------------
 (defun my/find-note-file ()
   "Open my notes file note.org.
-\nThese agenda files are usually open in buffers.
-The function will just switch to the correct buffer."
+\nThese agenda files are usually opened in buffers by `org-agenda'.
+The function will organize the `buffer-list' and focus note.org."
   (interactive)
-  (find-file (concat org-agenda-directory "date.org"))
-  (find-file (concat org-agenda-directory "note.org")))
+  (find-file (concat org-agenda-directory "/date.org"))
+  (find-file (concat org-agenda-directory "/note.org")))
 ;; ----------------------------------------------------------------------------
 ;; Custom agenda
 ;; ----------------------------------------------------------------------------
 (defun my/org-agenda-custom ()
   "Custom agenda with NEXT items, this weeks agenda and TODO/HOLD items."
   (interactive)
-  (org-agenda nil "c")
   (delete-other-windows)
+  (org-agenda nil "c")
   (unless (eq (char-after) ?\s) ; If on a heading, not a space.
     (org-agenda-goto-today)))
 ;; ----------------------------------------------------------------------------
@@ -210,7 +223,7 @@ The function will just switch to the correct buffer."
   (interactive)
   (org-capture nil "i")
   (org-save-all-org-buffers)
-  (with-current-buffer "*Org Agenda*"
+  (when (equal (buffer-name) "*Org Agenda*")
     (org-agenda-redo) ; Might turn `hl-line-mode' off for some reason?!?
     (when my/hl-line  ; Hack to often turn it back on when it was on.
       (global-hl-line-mode 1))
@@ -226,45 +239,55 @@ The function will just switch to the correct buffer."
       (load (locate-user-emacs-file "my-faces.elc") nil t)
     ;; else
     (load (locate-user-emacs-file "my-ansi-faces.elc") nil t))
-  (message "Faces toggled"))
+  (message "Toggled to the faces with \"%s\" background" (face-background 'default)))
 ;; ----------------------------------------------------------------------------
 ;; Toggle maximized window
 ;; ----------------------------------------------------------------------------
 (defvar my/window-configuration nil
   "Track window configuration, when it's suspended.")
 (defun my/toggle-window-maximize ()
-  "Toggle one window and the window configuration from when you last toggled."
+  "Toggle one window and the window configuration from last maximize."
   (interactive)
   (if (one-window-p)
       (when my/window-configuration
-        (set-window-configuration my/window-configuration))
+        (set-window-configuration my/window-configuration)
+        (message "Window configuration restored"))
     (setq
      my/window-configuration (current-window-configuration))
-    (delete-other-windows)))
+    (delete-other-windows)
+    (message "Window maximized")))
 ;; ----------------------------------------------------------------------------
-;; Three window setup
+;; Four window setup
 ;; ----------------------------------------------------------------------------
-(defun my/3-windows ()
-  "Three windows, two on the right and the left focused.
-  \nThis nice window setup is surprisingly hard to create without this function."
+(defun my/4-windows ()
+  "Four windows, three on the right and the left focused.
+  \nThis nice window setup is surprisingly hard to create without this function.
+\nThe content of window 1 will be unchanged. By default the day-agenda goes in
+window 2, Messages in window 3 and window 1's `next-buffer' in window 4.
+An existing \"*Org Agenda*\" buffer might change the configuration a bit."
   (interactive)
   (delete-other-windows)
+  (when (equal (buffer-name) "*Org Agenda*") ; Would affect `org-agenda-list'.
+    (org-agenda-Quit)
+    (ibuffer))
   (split-window-right)
   (other-window 1)
-  (switch-to-buffer "*Messages*") ; For window 3
+  (next-buffer)                   ; 4th window.
+  (when (equal (buffer-name) "*Org Agenda*") ; Check on 4th window buffer too.
+    (switch-to-buffer "*scratch*"))
   (split-window-below)
-  (switch-to-buffer "*scratch*")  ; For easier access.
-  ;; (split-window-below) ; Will make a 4th window.
-  (next-buffer)
-  (other-window -1) ; Back to window 1.
-  (message "Three window setup created"))
+  (switch-to-buffer "*Messages*") ; 3rd window.
+  (split-window-below)
+  (org-agenda-list)               ; Agenda in 2nd window.
+  (other-window -1)               ; Back to 1st window.
+  (message "4 window setup created"))
 ;; ----------------------------------------------------------------------------
 ;; Ace window swap
 ;; ----------------------------------------------------------------------------
 (defun my/ace-swap-window ()
   "Swap two window contents (prompt if 3+). Keep focus on the current window.
 \nThe normal `ace-swap-window' swap two windows, but stays with the current buffer
- and focus the window you swapped to."
+and focus the window you swapped to."
   (interactive)
   (ace-swap-window)
   (aw-flip-window)
@@ -284,9 +307,9 @@ The function will just switch to the correct buffer."
 ;; Save and quit
 ;; ----------------------------------------------------------------------------
 (defun my/save-all-kill-emacs-no-prompt ()
-  "Clean whitespaces, save all and quit without a prompt.
-  \nUse something like `auto-save-visited-mode' and `backup-each-save' to make this
- less risky."
+  "Save all and quit without a prompt.
+  \nUse something like `auto-save-mode' and `backup-each-save' to make this
+less risky."
   (interactive)
   (save-some-buffers t)
   (when (file-newer-than-file-p
@@ -344,7 +367,7 @@ The function will just switch to the correct buffer."
  dired-recursive-copies 'always
  dired-listing-switches "-agho --group-directories-first"
  dired-omit-files "\\`[#\\.].*\\'" ; "a" will toggle.
- dired-omit-verbose nil
+ dired-omit-verbose  nil
  auto-revert-verbose nil
  global-auto-revert-non-file-buffers t ; Update dired buffer when files change.
  ;; ----------------------------------------------------------------------------
@@ -362,9 +385,9 @@ The function will just switch to the correct buffer."
  ;; ----------------------------------------------------------------------------
  ;; Tab bar
  ;; ----------------------------------------------------------------------------
- tab-bar-show 1
- tab-bar-close-button-show      nil
- tab-bar-new-button             nil
+ tab-bar-show                  1
+ tab-bar-close-button-show     nil
+ tab-bar-new-button            nil
  tab-bar-close-last-tab-choice 'tab-bar-mode
  tab-bar-close-tab-select      'recent
  tab-bar-new-tab-to            'right
@@ -383,7 +406,10 @@ The function will just switch to the correct buffer."
  display-line-numbers-type 'relative ; Best default for wrapped lines.
  ;; Focus popups. The default is to not switch focus to them.
  display-buffer-alist
- '(("\\`\s?\\*.*\\*\s?\\'"
+ '(("\\`\\*Org\sAgenda\\*\\'"
+    (display-buffer-same-window)
+    (body-function . select-window))
+   ("\\`\s?\\*.*\\*\s?\\'"
     (display-buffer-reuse-mode-window
      display-buffer-below-selected)
     (body-function . select-window))))
@@ -490,14 +516,12 @@ The function will just switch to the correct buffer."
 (require 'mixed-pitch)
 (setq
  mixed-pitch-set-height t)
-(dolist
-    (face
-     '(org-date
-       org-priority
-       org-special-keyword
-       org-table
-       org-tag
-       org-todo))
+(dolist (face '(org-date
+                org-priority
+                org-special-keyword
+                org-table
+                org-tag
+                org-todo))
   (add-to-list 'mixed-pitch-fixed-pitch-faces face))
 ;; ----------------------------------------------------------------------------
 ;; Mini buffer
@@ -523,7 +547,7 @@ The function will just switch to the correct buffer."
 (require 'corfu)
 (setq
  corfu-auto t
- corfu-auto-delay 0.1
+ corfu-auto-delay .1
  corfu-auto-prefix 3
  corfu-count 5
  corfu-quit-at-boundary 'separator)
@@ -570,7 +594,7 @@ The function will just switch to the correct buffer."
 (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
 (add-hook 'org-mode-hook  #'rainbow-delimiters-mode)
 (require 'rainbow-mode)
-(add-hook 'prog-mode-hook #'rainbow-mode 1)
+(add-hook 'prog-mode-hook #'rainbow-mode)
 ;; ----------------------------------------------------------------------------
 ;; Thumbnails
 ;; ----------------------------------------------------------------------------
@@ -592,23 +616,23 @@ The function will just switch to the correct buffer."
 ;;; Evil.el
 ;; ============================================================================
 (setq
- evil-want-integration t  ; Set these variables before loading evil!
- evil-want-keybinding nil ; `evil-collection' need this.
- evil-undo-system 'undo-tree)
+ evil-undo-system 'undo-tree ; Set these variables before loading evil!
+ evil-want-keybinding nil    ; `evil-collection' need this.
+ evil-want-integration t)
 (require 'evil)
 ;; ----------------------------------------------------------------------------
 ;; Cursor colors. I combine f and 0 to indicate the evil state.
 ;; ----------------------------------------------------------------------------
 (setq
- evil-operator-state-cursor '(box        "#f00")
- evil-normal-state-cursor   '(box        "#0f0")
  evil-motion-state-cursor   '(box        "#00f")
+ evil-normal-state-cursor   '(box        "#0f0")
+ evil-operator-state-cursor '(box        "#f00")
  evil-insert-state-cursor   '((bar  . 4) "#ff0")
- evil-replace-state-cursor  '((hbar . 4) "#0ff")
  evil-emacs-state-cursor    '((bar  . 4) "#f0f")
+ evil-replace-state-cursor  '((hbar . 4) "#0ff")
  evil-visual-state-cursor   '(hollow     "#fff")
  ;; Make <tab> work in terminal:
- evil-want-C-i-jump nil) ; "C-i" is <tab>. I rebind "C-S-o" to jump forward.
+ evil-want-C-i-jump nil) ; "C-i" is <tab>. I rebind jump forward to "C-S-o".
 (evil-mode 1)
 ;; ============================================================================
 ;;;; Addons
@@ -674,23 +698,24 @@ The function will just switch to the correct buffer."
 (add-hook 'before-save-hook
           (lambda ()
             (unless (memq evil-state '(insert replace emacs))
-              (whitespace-cleanup)))) ; I use `auto-save-mode'.
+              (whitespace-cleanup))))
 ;; ============================================================================
 ;;;; `evil-cursor-between-mode' (my controversial sacrilege)
 ;; ============================================================================
 ;; I use Emacs' cursor between characters model for cursor positioning in
 ;; `evil-mode' instead of Vim `normal-state's cursor on characters model.
 ;; ----------------------------------------------------------------------------
-;; <shift> just like <ctrl> is a layer and I minimize the use of layers.
-;; "a"/"A", "o"/"O" and "p"/"P" is swapped for less use of capital letters.
+;; <shift> just like <ctrl> is a layer and I try to minimize the use of layers.
+;; "a"/"A", "o"/"O" and "p"/"P" is swapped for less use of capital bindings.
 ;; Just use "p" to paste and "o", "I/i/a" or "c" to enter insert state.
 ;; ----------------------------------------------------------------------------
 (when (file-newer-than-file-p
-       (locate-user-emacs-file "evil-cursor-between.el")
-       (locate-user-emacs-file "evil-cursor-between.elc"))
-  (byte-compile-file (locate-user-emacs-file "evil-cursor-between.el")))
-(load (locate-user-emacs-file "evil-cursor-between.elc") nil t)
-(evil-cursor-between-mode 1)
+       (locate-user-emacs-file "evil-cursor-between-mode.el")
+       (locate-user-emacs-file "evil-cursor-between-mode.elc"))
+  (byte-compile-file (locate-user-emacs-file "evil-cursor-between-mode.el")))
+(load (locate-user-emacs-file "evil-cursor-between-mode.elc") nil t)
+;; (require 'evil-cursor-between-mode)
+;; (evil-cursor-between-mode 1) ; I do this in the file to avoid a warning.
 
 ;; ============================================================================
 ;;; Org.el
@@ -698,13 +723,13 @@ The function will just switch to the correct buffer."
 ;; Create `org-agenda' directories and basic files unless they exist.
 ;; ----------------------------------------------------------------------------
 (setq
- org-directory "~/org/"
- org-agenda-directory (concat org-directory "agenda/"))
+ org-directory "~/org/" ; I prefer a trailing slash on directory names.
+ org-agenda-directory (concat org-directory "agenda/")) ; Defined earlier.
 (unless (file-exists-p org-directory)
   (make-directory org-directory))
 (unless (file-exists-p org-agenda-directory)
   (make-directory org-agenda-directory))
-;; Create empty capture and refile files.
+;; Create empty capture and refile targets.
 (unless (file-exists-p (concat org-directory "archive.org"))
   (make-empty-file (concat org-directory "archive.org")))
 (unless (file-exists-p (concat org-directory "inbox.org"))
@@ -744,24 +769,21 @@ The function will just switch to the correct buffer."
 ;; ============================================================================
 (setq
  org-default-notes-file (concat org-directory "inbox.org")
- org-ellipsis " … " ; ▾⤵⮷
- ;; ----------------------------------------------------------------------------
- ;; 4 todo states. I use categories and refile rather than more keywords.
- ;; ----------------------------------------------------------------------------
- org-todo-keywords
+ org-ellipsis " … " ; ⤵⮷▾
+ org-todo-keywords ; I use categories and refile rather than more keywords.
  '((type     "NEXT(n!/!)" "TODO(t!/!)" "|") ; Active states.
    (type "|" "HOLD(h@/!)" "DONE(d!/!)"))  ; Inactive states.
  org-priority-default ?C
  org-priority-faces                ; This affects rendering in the agenda.
- '((?A . (:slant nil :height 0.8)) ; For some reason the default is slanted.
-   (?B . (:slant nil :height 0.8))
-   (?C . (:slant nil :height 0.8)))
+ '((?A . (:slant nil :height .8)) ; For some reason the default is slanted.
+   (?B . (:slant nil :height .8))
+   (?C . (:slant nil :height .8)))
  org-list-allow-alphabetical t
  org-list-demote-modify-bullet
  '(("+" . "*")
    ("*" . "-")
    ("-" . "+"))
- org-tags-column -75 ; Minus align tags right.
+ org-tags-column -75 ; The minus align tags right.
  org-tag-alist
  '(("pc"       . ?c) ; c for computer.
    ("family"   . ?f)
@@ -815,7 +837,7 @@ The function will just switch to the correct buffer."
  ;; ----------------------------------------------------------------------------
  ;; Diary
  ;; ----------------------------------------------------------------------------
- ;; "D" to toggle `org-agenda-include-diary' in agenda.
+ ;; "D" in agenda to toggle `org-agenda-include-diary'.
  holiday-bahai-holidays    nil
  holiday-hebrew-holidays   nil
  holiday-islamic-holidays  nil
@@ -831,6 +853,107 @@ The function will just switch to the correct buffer."
    (holiday-fixed  6  5    "Grundlovs og fars dag")
    (holiday-fixed  6 23    "Sanct Hans")
    (holiday-fixed 12 24    "Juleaften")))
+;; ============================================================================
+;;;; Agenda
+;; ============================================================================
+;; System to organize tasks and suppress out of date information.
+;; ----------------------------------------------------------------------------
+(setq
+ org-agenda-window-setup 'current-window
+ org-archive-location (concat org-directory "archive.org::* Archive")
+ org-reverse-note-order t ; Prepend refiles.
+ org-refile-targets
+ `((,(concat org-agenda-directory "agenda.org") :maxlevel . 1)
+   (,(concat org-agenda-directory "plan.org")   :maxlevel . 1))
+ org-agenda-files (list org-agenda-directory ; All org files in the directory.
+                        (concat org-directory "inbox.org"))
+ calendar-week-start-day 1
+ org-agenda-format-date " [%F %a] "
+ org-agenda-block-separator ?﹋ ; ﹌⎺̅‾﹉
+ org-agenda-span 'day
+ org-agenda-time-grid nil
+ org-agenda-prefix-format
+ '((agenda   . "  %-6c%-12t%?-6s")
+   (timeline . "  %-6c%-12t%?-6s")
+   (todo     . "  %-6c%-12e")
+   (tags     . "  %-6c%-12e")
+   (search   . "  %-6c%-12e"))
+ org-agenda-timerange-leaders
+ '("Range" "%2d/%d")
+ org-agenda-scheduled-leaders
+ '("⧄" "⧄%3dx")
+ org-agenda-deadline-leaders
+ '("⧅" "⧅%3dd" "⧅%3dx")
+ org-deadline-warning-days 7
+ org-agenda-skip-scheduled-if-done t
+ org-agenda-skip-deadline-if-done t
+ org-agenda-skip-deadline-prewarning-if-scheduled t
+ org-columns-default-format "%30Item %Clocksum(Used) %Effort(Plan) %Category(Cat.) %Tags %Priority(#) %Todo(Todo)"
+ org-global-properties
+ '(("effort_all" . "0:05 0:10 0:15 0:20 0:30 0:45 1:00 1:30 2:00"))
+ org-clock-in-switch-to-state "NEXT"
+ org-clock-out-when-done t
+ org-time-stamp-rounding-minutes
+ '(15 15))
+(setq
+ org-agenda-custom-commands
+ '(("c" "Custom agenda setup"
+    ((todo
+      "NEXT" ; Unblocked short tasks. Often pending scheduling and refiling.
+      ((org-agenda-overriding-header "")))
+     ;; Agenda supress timestamped active state items that are not current.
+     (agenda
+      ""
+      ((org-agenda-span 'week)))
+     ;; TODOs without a timestamp.
+     (todo
+      "TODO" ; Sort [/] cookies on top. This is typically categories.
+      ((org-agenda-overriding-header "No timestamp TODO or HOLD:")
+       (org-agenda-skip-function
+        '(org-agenda-skip-entry-if
+          'notregexp "\\[[0-9]+/[0-9]+\\]"
+          ;; or
+          'timestamp))))
+     (todo
+      "TODO" ; Others. Not all TODOs have or should have a timestamp.
+      ((org-agenda-overriding-header "") ; Share heading (same block).
+       (org-agenda-block-separator nil)  ; Don't separate.
+       (org-agenda-skip-function
+        '(org-agenda-skip-entry-if
+          'regexp "\\[[0-9]+/[0-9]+\\]"
+          ;; or
+          'timestamp))))
+     ;; Inactive states. Not in the agenda even if scheduled.
+     (todo
+      "HOLD" ; For third party action pending.
+      ((org-agenda-overriding-header "") ; Same block.
+       (org-agenda-block-separator nil)))
+     (todo
+      "DONE" ; Only prioritized.
+      ((org-agenda-overriding-header "") ; Same block.
+       (org-agenda-block-separator nil)
+       (org-agenda-skip-function
+        '(org-agenda-skip-entry-if
+          'notregexp org-priority-regexp))))))
+   ;; Custom options. Append to agenda with "a".
+   ("f" "Fortnight agenda"
+    ((agenda
+      ""
+      ((org-agenda-span 14)
+       (org-agenda-start-with-log-mode t)))))
+   ("d" "DONE TODOs"
+    ;; For archiving done tasks.
+    ((todo
+      "DONE"
+      ((org-agenda-overriding-header "DONE TODOs")
+       (org-agenda-skip-function
+        '(org-agenda-skip-entry-if
+          'regexp org-priority-regexp))))))
+   ("u" "Untagged TODOs"
+    ;; For adding tags.
+    ((tags-todo
+      "-{.*}"
+      ((org-agenda-overriding-header "Untagged TODOs")))))))
 ;; ============================================================================
 ;;;; Capture
 ;; ============================================================================
@@ -890,107 +1013,6 @@ The function will just switch to the correct buffer."
       "%x")
     :immediate-finish t)))
 ;; ============================================================================
-;;;; Agenda
-;; ============================================================================
-;; System to organize tasks and suppress out of date information.
-;; ----------------------------------------------------------------------------
-(setq
- org-agenda-window-setup 'current-window
- org-archive-location (concat org-directory "archive.org::* Archive")
- org-reverse-note-order t ; Prepend refiles.
- org-refile-targets
- `((,(concat org-agenda-directory "agenda.org") :maxlevel . 1)
-   (,(concat org-agenda-directory "plan.org")   :maxlevel . 1))
- org-agenda-files (list org-agenda-directory ; All org files in the directory.
-                        (concat org-directory "inbox.org"))
- calendar-week-start-day 1
- org-agenda-time-grid nil
- org-agenda-prefix-format
- '((agenda   . "  %-6c%-12t%?-6s")
-   (timeline . "  %-6c%-12t%?-6s")
-   (todo     . "  %-6c%-12e")
-   (tags     . "  %-6c%-12e")
-   (search   . "  %-6c%-12e"))
- org-agenda-timerange-leaders
- '("Range" "%2d/%d")
- org-agenda-scheduled-leaders
- '("⧄" "⧄%3dx")
- org-agenda-deadline-leaders
- '("⧅" "⧅%3dd" "⧅%3dx")
- org-deadline-warning-days 7
- org-agenda-skip-scheduled-if-done t
- org-agenda-skip-deadline-if-done t
- org-agenda-skip-deadline-prewarning-if-scheduled t
- org-columns-default-format "%30Item %Clocksum(Used) %Effort(Plan) %Category(Cat.) %Tags %Priority(#) %Todo(Todo)"
- org-global-properties
- '(("effort_all" . "0:05 0:10 0:15 0:20 0:30 0:45 1:00 1:30 2:00"))
- org-clock-in-switch-to-state "NEXT"
- org-clock-out-when-done t
- org-time-stamp-rounding-minutes
- '(15 15)
- org-agenda-format-date " [%F %a] "
- org-agenda-block-separator ?﹋ ; ﹌⎺̅‾﹉
- org-agenda-span 'day)
-(setq
- org-agenda-custom-commands
- '(("c" "Custom agenda setup"
-    ((todo
-      "NEXT" ; Unblocked short tasks. Often pending scheduling and refiling.
-      ((org-agenda-overriding-header "")))
-     ;; Agenda supress timestamped active state items that are not current.
-     (agenda
-      ""
-      ((org-agenda-span 'week)))
-     ;; TODOs without a timestamp.
-     (todo
-      "TODO" ; Sort [/] cookies on top. This is typically categories.
-      ((org-agenda-overriding-header "No timestamp TODO or HOLD:")
-       (org-agenda-skip-function
-        '(org-agenda-skip-entry-if
-          'notregexp "\\[[0-9]+/[0-9]+\\]"
-          ;; or
-          'timestamp))))
-     (todo
-      "TODO" ; Others. Not all TODOs have or should have a timestamp.
-      ((org-agenda-overriding-header "") ; Share heading (same block).
-       (org-agenda-block-separator nil)  ; Don't separate.
-       (org-agenda-skip-function
-        '(org-agenda-skip-entry-if
-          'regexp "\\[[0-9]+/[0-9]+\\]"
-          ;; or
-          'timestamp))))
-     ;; Inactive states. Not in the agenda even if scheduled.
-     (todo
-      "HOLD" ; For third party action pending.
-      ((org-agenda-overriding-header "") ; Same block.
-       (org-agenda-block-separator nil)))
-     (todo
-      "DONE" ; Only prioritized.
-      ((org-agenda-overriding-header "") ; Same block.
-       (org-agenda-block-separator nil)
-       (org-agenda-skip-function
-        '(org-agenda-skip-entry-if
-          'notregexp org-priority-regexp))))))
-   ("f" "Fortnight agenda"
-    ((agenda
-      ""
-      ((org-agenda-span 14)
-       (org-agenda-start-with-log-mode t)))))
-   ;; Custom options for maintainance. Append to agenda with "a".
-   ("d" "DONE TODOs"
-    ;; For archiving done tasks.
-    ((todo
-      "DONE"
-      ((org-agenda-overriding-header "DONE TODOs")
-       (org-agenda-skip-function
-        '(org-agenda-skip-entry-if
-          'regexp org-priority-regexp))))))
-   ("u" "Untagged TODOs"
-    ;; For adding tags.
-    ((tags-todo
-      "-{.*}"
-      ((org-agenda-overriding-header "Untagged TODOs")))))))
-;; ============================================================================
 ;;;; Addons
 ;; ============================================================================
 ;; Bullets
@@ -1004,13 +1026,13 @@ The function will just switch to the correct buffer."
 ;; ----------------------------------------------------------------------------
 ;; Habits
 ;; ----------------------------------------------------------------------------
-(require 'org-agenda)
-(add-to-list 'org-modules 'org-habit)
+(require 'org-habit)
 (require 'org-appear)
 (setq
  org-habit-preceding-days 28
  org-habit-graph-column   60
  org-appear-autolinks t)
+(add-to-list 'org-modules 'org-habit)
 (add-hook 'org-mode-hook #'org-appear-mode)
 ;; ----------------------------------------------------------------------------
 ;; Present
@@ -1020,7 +1042,8 @@ The function will just switch to the correct buffer."
  org-blank-before-new-entry
  '((heading . t)
    (plain-list-item . nil)))
-(evil-collection-org-present-setup)
+(with-eval-after-load 'evil
+  (evil-collection-org-present-setup))
 ;; ----------------------------------------------------------------------------
 ;; A pictogram is often better than a word
 ;; ----------------------------------------------------------------------------
@@ -1066,10 +1089,8 @@ The function will just switch to the correct buffer."
 ;; ============================================================================
 ;; Does not work on Android for some reason? I should make my own maps.
 ;; ----------------------------------------------------------------------------
-;; (unless (package-installed-p 'which-key)
-;;   (require 'which-key)) ; Old Emacs versions might need this.
 (setq
- which-key-idle-delay 0)
+ which-key-idle-delay 1)
 (which-key-mode 1)
 (require 'general)
 (general-evil-setup t)
@@ -1088,7 +1109,7 @@ The function will just switch to the correct buffer."
   "1"   '(my/toggle-window-maximize               :which-key "Maximize")
   "2"   '(split-window-below                      :which-key "Below")
   "3"   '(split-window-right                      :which-key "Right")
-  "4"   '(my/3-windows                            :which-key "Three")
+  "4"   '(my/4-windows                            :which-key "Four")
   "5"   '(my/ace-swap-window                      :which-key "Swap")
   "6"   '(ace-window                              :which-key "Select")
   "7"   '(transpose-frame                         :which-key "Transpose")
@@ -1143,7 +1164,9 @@ The function will just switch to the correct buffer."
   "l"   '(:ignore t                               :which-key "Lisp")
   "lb"  '(eval-buffer                             :which-key "Buffer")
   "le"  '(eval-expression                         :which-key "Expression")
-  "ll"  '(eval-last-sexp                          :which-key "Sexp@point")
+  "ll"  '(eval-last-sexp                          :which-key "Last sexp")
+  "lp"  '(eval-print-last-sexp                    :which-key "Print result")
+  "lr"  '(elisp-eval-region-or-buffer             :which-key "Region")
   "m"   '(:ignore t                               :which-key "m")
   "n"   '(:ignore t                               :which-key "Narrow")
   "nf"  '(narrow-to-defun                         :which-key "Function")
@@ -1197,6 +1220,7 @@ The function will just switch to the correct buffer."
   "tb"  '(toggle-truncate-lines                   :which-key "Line breaks")
   "tc"  '(centered-cursor-mode                    :which-key "Vert.center")
   "td"  '(display-time-mode                       :which-key "Date/time")
+  "te"  '(evil-cursor-between-mode                :which-key "Evil between")
   "tf"  '(mixed-pitch-mode                        :which-key "Font pitch")
   "tg"  '(golden-ratio-mode                       :which-key "Gold. ratio")
   "th"  '(global-hl-line-mode                     :which-key "Hl line")
@@ -1204,6 +1228,7 @@ The function will just switch to the correct buffer."
   "tic" '(display-fill-column-indicator-mode      :which-key "Column 79")
   "tii" '(indent-guide-mode                       :which-key "Indentation")
   "tin" '(whitespace-newline-mode                 :which-key "Newline")
+  "tip" '(whitespace-page-delimiters-mode         :which-key "Newline")
   "tis" '(whitespace-mode                         :which-key "Spaces")
   "tk"  '(:ignore t                               :which-key "Keycast")
   "tkh" '(keycast-header-line-mode                :which-key "Header")
@@ -1245,7 +1270,7 @@ The function will just switch to the correct buffer."
  :map global-map
  ("<escape>"      . keyboard-escape-quit)
  ("<Scroll_Lock>" . centered-cursor-mode)
- ("<C-tab>"       . tab-next) ; This does not work in terminal atm.
+ ("<C-tab>"       . tab-next)     ; This does not work in terminal atm.
  ("<C-backtab>"   . tab-previous) ; This does not work in terminal atm.
  ("C-¨"           . tab-line-mode)
  ("M-p"           . consult-yank-pop) ; Paste with `kill-ring' dialog.
@@ -1269,7 +1294,6 @@ The function will just switch to the correct buffer."
  ("C-S-o"         . evil-jump-forward)   ; "C-i" is used for <tab>.
  ("gc"            . evilnc-comment-operator)
  ;; I `isearch' so I don't need "n"/"N" for `evil-search'. I use it to scroll.
- ;;
  ("n"             . evil-scroll-down)    ; Use "C-s" to repeat `isearch'.
  ("N"             . evil-scroll-up)      ; In `isearch' "C-r" search backward.
  ;; Danish keyboard (some keys are not easily accessible).
@@ -1292,7 +1316,7 @@ The function will just switch to the correct buffer."
  :map evil-visual-state-map
  ;; "S" is used by `evil-surround'. Use "C-s" for normal `isearch'.
  ("s"             . isearch-forward-thing-at-point) ; Input the visual region.
- ;; Don't use "v" to exit visual state. <esc> or a command works.
+ ;; Don't use "v" to exit visual state. <escape> or a command works.
  ("v"             . exchange-point-and-mark)
  ;; ----------------------------------------------------------------------------
  ;; Insert state
@@ -1303,11 +1327,11 @@ The function will just switch to the correct buffer."
  ("C-b"           . evil-backward-word-begin)
  ("C-B"           . evil-backward-WORD-begin)
  ("C-d"           . backward-kill-word) ; Normally bound to "C-w".
- ("C-e"           . forward-word)       ; Emacs command for end of the word.
+ ("C-e"           . forward-word)
  ("C-p"           . yank)               ; "M-p" is in the `global-map'.
+ ("C-v"           . set-mark-command)   ; "<C-SPC>" is used by general.el.
  ("C-w"           . evil-forward-word-begin)
  ("C-W"           . evil-forward-WORD-begin)
- ("C-v"           . set-mark-command)   ; "C-<spc>" is used by general.el.
  ("C-0"           . beginning-of-line)
  ;; Danish keyboard.
  ("C-æ"           . forward-paragraph)
@@ -1330,7 +1354,7 @@ The function will just switch to the correct buffer."
  :map minibuffer-local-map
  ("C-."           . embark-act)
  ("M-."           . embark-dwim)
- ("<next>"        . marginalia-cycle))
+ ("<backtab>"     . marginalia-cycle))
 ;; ============================================================================
 ;;;; Keybindings in maps depending on the evil state with `evil-define-key'
 ;; ============================================================================
@@ -1339,26 +1363,29 @@ The function will just switch to the correct buffer."
   "s"           #'isearch-forward ; I prefer `isearch'. "C-s" to repeat.
   "S"           #'isearch-forward-thing-at-point) ; This is like Vim's "*".
 (evil-define-key 'normal help-mode-map
-  (kbd "SPC") nil ; Make general.el take over <spc>.
+  (kbd "SPC") nil ; Make general.el take over <SPC>.
+  (kbd "<escape>") #'quit-window)
+(evil-define-key 'normal helpful-mode-map
+  (kbd "SPC") nil
   (kbd "<escape>") #'quit-window)
 (evil-define-key 'normal Info-mode-map
-  (kbd "SPC") nil ; Make general.el take over <spc>.
+  (kbd "SPC") nil
   (kbd "<escape>") #'quit-window)
 (evil-define-key 'normal dired-mode-map
-  (kbd "SPC") nil ; Make general.el take over <spc>.
+  (kbd "SPC") nil
   "h"           #'dired-up-directory
   "l"           #'dired-find-file
-  "a"           #'dired-omit-mode           ; Like "ls -a" toggle.
-  "s"           #'dired-hide-details-mode   ; Like "ls -l" toggle.
+  "a"           #'dired-omit-mode            ; Like "ls -a" toggle.
+  "s"           #'dired-hide-details-mode    ; Like "ls -l" toggle.
   ;; Personal swap to make "o" open files with system default program.
-  "W"           #'dired-sort-toggle-or-edit ; Normally bound to "o".
-  "o"           #'browse-url-of-dired-file) ; Normally bound to "W".
+  "o"           #'browse-url-of-dired-file   ; Normally bound to "W".
+  "W"           #'dired-sort-toggle-or-edit) ; Normally bound to "o".
 (evil-define-key 'normal org-mode-map
   "t"           #'org-todo            ; In operator state "t" work as in Vim.
   "T"           #'org-todo-yesterday) ; "ct." (change to ".") work as expected.
 (evil-define-key 'motion org-agenda-mode-map
-  (kbd "SPC") nil ; Make general.el take over <spc>.
-  (kbd "<S-left>")  #'org-agenda-earlier ; Need (kbd...
+  (kbd "SPC") nil
+  (kbd "<S-left>")  #'org-agenda-earlier
   (kbd "<S-right>") #'org-agenda-later
   "´"           #'next-buffer
   "a"           #'org-agenda-append-agenda
