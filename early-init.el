@@ -6,10 +6,9 @@
 ;; ============================================================================
 ;; Modern computers are able to handle more than the defaults.
 ;; Garbage collection start at 50MB rather than 800k etc.
-;; ----------------------------------------------------------------------------
 (setq
  gc-cons-threshold (* 50 1024 1024)
- gc-cons-percentage 0.5
+ gc-cons-percentage .5
  ;; The recommended max read chunk for my system:
  read-process-output-max (* 1024 1024)
  ;; Recalculating frame size is expencive if fonts/modeline change.
@@ -21,7 +20,6 @@
 ;;; Vanilla defaults
 ;; ============================================================================
 ;; Clean up defaults I don't want to see even blink during startup.
-;; ----------------------------------------------------------------------------
 (setq
  inhibit-startup-message t
  mode-line-format nil

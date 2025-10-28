@@ -7,8 +7,9 @@
 ;; ============================================================================
 
 ;; ============================================================================
-;;; Use Emacs' cursor-between-characters model of cursor positioning in
-;;; `evil-mode' instead of Vim's normal state cursor-on-characters model.
+;; Use Emacs' cursor-between-characters model of cursor positioning in
+;; `evil-mode' instead of Vim's normal state cursor-on-characters model.
+;; A special thanks to Toby Cubitt who initiated this code.
 ;; ============================================================================
 (unless (package-installed-p 'evil)
   (require 'evil))
@@ -20,11 +21,16 @@
 (defvar evil-highlight-closing-paren-at-point-states-default evil-highlight-closing-paren-at-point-states
   "For toggling the variable with `evil-cursor-between-mode'")
 
+;; ============================================================================
+;;; The minor mode
+;; ============================================================================
 (define-minor-mode evil-cursor-between-mode
-  "Mode for using Emacs' cursor model in evil's normal state.
-\n\"a\"/\"A\", \"o\"/\"O\" and \"p\"/\"P\" is swapped for less use of capital bindings.
-Adobt the mindset of the cursor being between characters in normal state and
-you will need few layered bindings. Maybe this is good for your emacs pinky?"
+  "Mode for using Emacs' cursor model in `evil-mode's normal state.
+\nThe mode swap \"a\"/\"A\", \"o\"/\"O\" and \"p\"/\"P\" compared to Vim's normal state keys.
+The idea is to avoid the <shift> layer when dealing with the current line atom.
+With Emacs' cursor between model you can naturally replace layers with a motion.
+\nTry to adobt the mindset of motions among line atoms with Emacs' cursor model.
+Maybe this is better for your Emacs pinky?"
   :global t
   :group 'evil
   :lighter nil
@@ -53,23 +59,19 @@ you will need few layered bindings. Maybe this is good for your emacs pinky?"
       "%"  #'evil-jump-item-before)
     ;; ----------------------------------------------------------------------------
     ;; Swap "a", "o" and "p" with their capital bindings.
-    ;; ----------------------------------------------------------------------------
-    ;; This is based on a line atom philosophy. The new small letter bindings deal
-    ;; with the current line. The line after does and should require a motion imo.
-    ;; The key efficiency is roughly as Vim's if the <shift> layer count as a key.
     (evil-define-key 'normal global-map
-      "a"  #'evil-append-line   ; Swapped so append is used to edit from eol.
-      "A"  #'evil-append        ; Useless in this mode. "li" makes more sense.
-      "o"  #'evil-open-above    ; Swapped to be consistent with paste and e.g."cc".
-      "O"  #'evil-open-below    ; "jo" does the same thing as "O".
-      "p"  #'evil-paste-before  ; Swapped because almost only "p" is used to paste.
+      "a"  #'evil-append-line  ; Swapped so append is used to edit from eol.
+      "A"  #'evil-append       ; Useless in this mode. "li" makes more sense.
+      "o"  #'evil-open-above   ; Swapped to be consistent with paste and e.g."cc".
+      "O"  #'evil-open-below   ; "jo" or "a<RET>" does the same thing.
+      "p"  #'evil-paste-before ; Swapped because almost only "p" is used to paste.
       "P"  #'evil-paste-after) ; "jp" or "lp" does the same thing.
-    (evil-define-key 'normal 'evil-org-mode
-      "a"  #'evil-org-append-line
-      "A"  nil
-      "o"  #'evil-org-open-above
-      "O"  #'evil-org-open-below))
-   ;; ----------------------------------------------------------------------------
+    (with-eval-after-load 'evil-org
+      (evil-define-key 'normal 'evil-org-mode
+        "a"  #'evil-org-append-line
+        "A"  nil
+        "o"  #'evil-org-open-above
+        "O"  #'evil-org-open-below)))
    (t ; else
     ;; ============================================================================
     ;; Back to `evil-mode' defaults when `evil-cursor-between-mode' is turned off
@@ -237,13 +239,13 @@ or somewhere after the cursor and jump to the corresponding one."
     (unless (or (bolp) (bobp)) (backward-char))
     (condition-case nil
         (evil-jump-item count)
-      ('user-error (goto-char pos)))
+      (user-error (goto-char pos)))
     (unless (< (point) pos)
       (goto-char pos)
       (evil-jump-item count)
       (when (> (point) pos) (forward-char)))))
 
-(evil-cursor-between-mode 1) ; For now.
+(evil-cursor-between-mode 1) ; For now so I can just load this file.
 
 (provide 'evil-cursor-between-mode)
 ;; End of evil-cursor-between-mode.el
