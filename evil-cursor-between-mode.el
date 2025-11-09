@@ -1,15 +1,22 @@
-;; -*- lexical-binding: t; -*-
-;; #+title: evil-cursor-between-mode.el
+;;; evil-cursor-between-mode.el --- Emacs' cursor model in `evil-mode' -*- lexical-binding: t; -*-
 
 ;; ============================================================================
 ;; Creative Commons Attribution-ShareAlike 4.0 International License
 ;; [[https://creativecommons.org/licenses/by-sa/4.0/]]
 ;; ============================================================================
+;; A special thanks to Toby Cubitt who coded the cursor model.
+;; Peter Friis Jensen made it a mode with three swapped keybindings.
+
+;; Author: Peter Friis Jensen <maxfriis@gmail.com>
+;; Maintainer: Peter Friis Jensen <maxfriis@gmail.com>
+;; URL: https://github.com/maxfriis/evil-cursor-between-mode
+;; Version: 0.1.0
+;; Package-Requires: ((evil ""))
+;; Keywords: cursor, point
 
 ;; ============================================================================
-;; Use Emacs' cursor-between-characters model of cursor positioning in
-;; `evil-mode' instead of Vim's normal state cursor-on-characters model.
-;; A special thanks to Toby Cubitt who initiated this code.
+;; I use Emacs' cursor between characters model for cursor positioning in
+;; `evil-mode' instead of Vim `normal-state's cursor on characters model.
 ;; ============================================================================
 (unless (package-installed-p 'evil)
   (require 'evil))
@@ -28,9 +35,9 @@
   "Mode for using Emacs' cursor model in `evil-mode's normal state.
 \nThe mode swap \"a\"/\"A\", \"o\"/\"O\" and \"p\"/\"P\" compared to Vim's normal state keys.
 The idea is to avoid the <shift> layer when dealing with the current line atom.
-With Emacs' cursor between model you can naturally replace layers with a motion.
-\nTry to adobt the mindset of motions among line atoms with Emacs' cursor model.
-Maybe this is better for your Emacs pinky?"
+Layers can then be replaced with a motion with equivalent efficiency.
+\nTry to embrace the mindset of Emacs' cursor model and motions among line atoms.
+Maybe fewer layers are better for your Emacs pinky?"
   :global t
   :group 'evil
   :lighter nil
@@ -48,7 +55,7 @@ Maybe this is better for your Emacs pinky?"
     ;; ============================================================================
     ;; Command rebindings
     ;; ============================================================================
-    ;; Motion commands "w", "b", "F" and "T" works out of the evil box.
+    ;; Motion commands "w"/"W", "b"/"B", "F" and "T" works out of the evil box.
     (evil-define-key 'motion global-map
       "t"  #'evil-find-char
       "f"  #'evil-find-char-after
@@ -63,7 +70,7 @@ Maybe this is better for your Emacs pinky?"
       "a"  #'evil-append-line  ; Swapped so append is used to edit from eol.
       "A"  #'evil-append       ; Useless in this mode. "li" makes more sense.
       "o"  #'evil-open-above   ; Swapped to be consistent with paste and e.g."cc".
-      "O"  #'evil-open-below   ; "jo" or "a<RET>" does the same thing.
+      "O"  #'evil-open-below   ; "jo" and "a<RET>" does the same thing.
       "p"  #'evil-paste-before ; Swapped because almost only "p" is used to paste.
       "P"  #'evil-paste-after) ; "jp" or "lp" does the same thing.
     (with-eval-after-load 'evil-org
@@ -74,7 +81,7 @@ Maybe this is better for your Emacs pinky?"
         "O"  #'evil-org-open-below)))
    (t ; else
     ;; ============================================================================
-    ;; Back to `evil-mode' defaults when `evil-cursor-between-mode' is turned off
+    ;; Back to `evil-mode' defaults when `evil-cursor-between-mode' is disabled
     ;; ============================================================================
     (setq
      evil-move-cursor-back evil-move-cursor-back-default
@@ -217,7 +224,7 @@ If the end position is at the beginning of a line, then:
   (unless (zerop (length offset))
     (save-match-data
       (string-match
-       "^\\([esb]\\)?\\(\\([-+]\\)?\\([0-9]*\\)\\)$"
+       "^\\([esb]\\)?\\(\\([+-]\\)?\\([0-9]*\\)\\)$"
        offset)
       (when (and (= (aref offset (match-beginning 1)) ?e)
                  (not (bobp)))
@@ -245,7 +252,7 @@ or somewhere after the cursor and jump to the corresponding one."
       (evil-jump-item count)
       (when (> (point) pos) (forward-char)))))
 
-(evil-cursor-between-mode 1) ; For now so I can just load this file.
+(evil-cursor-between-mode 1) ; For now, so enabled when I load this file.
 
 (provide 'evil-cursor-between-mode)
-;; End of evil-cursor-between-mode.el
+;;; evil-cursor-between-mode.el ends here

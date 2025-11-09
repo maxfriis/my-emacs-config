@@ -1,5 +1,4 @@
-;; -*- lexical-binding: t; -*-
-;; #+title: Emacs early-init.el
+;;; early-init.el --- -*- lexical-binding: t; -*-
 
 ;; ============================================================================
 ;;; Early variables
@@ -36,4 +35,4 @@
 (tooltip-mode      -1)
 (defalias 'yes-or-no-p 'y-or-n-p)
 (set-default-coding-systems 'utf-8)
-;; End of early-init.el
+;;; early-init.el ends here

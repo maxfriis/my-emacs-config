@@ -1,5 +1,4 @@
-;; -*- lexical-binding: t; -*-
-;; #+title: my-ansi-faces.el
+;;; my-ansi-faces.el --- -*- lexical-binding: t; -*-
 
 ;; ============================================================================
 ;;; Vanilla faces
@@ -359,7 +358,7 @@
   (set-face-attribute
    'tab-bar-tab-inactive
    nil :foreground "#f00" :background "#000" :box nil)
-  (unless (version< emacs-version "31.0.50")
+  (unless (version<= emacs-version "31.0")
     (set-face-attribute
      'tab-bar-tab-highlight
      nil :foreground "#000" :background "#f00" :box '(:line-width 1 :color "#0ff" :style released-button))))
@@ -382,4 +381,4 @@
   (set-face-attribute
    'tab-line-highlight ;; mouseover
    nil :foreground "#f00" :background "#000" :box '(:line-width 1 :color "#0ff" :style released-button)))
-;; End of my-ansi-faces.el
+;;; my-ansi-faces.el ends here
