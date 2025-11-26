@@ -2,8 +2,7 @@
 #+startup: showall hideblocks
 #+options: toc:nil
 
-This configuration is not complex.
-It's a great start if you want to make your own configuration.
+This configuration is a great start if you want to make your own configuration.
 The few custom functions I use are simple and short.
 
 The bad thing for a fresh start is that the configuration is customized for my Danish keyboard.
@@ -33,14 +32,14 @@ Examples of their use are:
 | #7f3  | success/done   |   | #3f7  | comment/tags    |
 | #37f  | link/timestamp |   | #432  | shadow/hl-line  |
 |-------+----------------+---+-------+-----------------|
-Unspecified faces are handled by the vanilla theme.
+Unspecified faces are handled by the dark vanilla theme.
 Note that I don't use #73f (bad color contrast).
 
 *** Screenshot
 
 [[https://github.com/maxfriis/my-emacs-config/blob/38e43cdf451fdf72d8ec684b803a325e4e6eae73/emacs_screenshot.png]]
 
-** Root
+** Ansi faces
 
 As root I use 8 ansi colors for the theme.
 | Color | Use            |   | Color | Use             |
@@ -69,14 +68,14 @@ I tax the eyes a bit with extreme colors to help keeping track of the evil state
 | #000  | Not used |   | #fff  | visual  |
 |-------+----------+---+-------+---------|
 | #f00  | operator |   | #ff0  | insert  |
-| #0f0  | normal   |   | #0ff  | emacs   |
-| #00f  | motion   |   | #f0f  | replace |
+| #0f0  | normal   |   | #0ff  | replace |
+| #00f  | motion   |   | #f0f  | emacs   |
 |-------+----------+---+-------+---------|
+Normal state is a green color.
 Operator state is red to alert.
-Normal state has the opposite green color.
-Insert state is the last traffic light color (yellow) and use a bar.
-Replace state has the opposite color of insert state and use an hbar.
-Emacs and motion states have the remaining rgb colors.
+Insert state is the last yellow traffic light color and use a bar.
+Replace state is cyan and use an hbar.
+Motion and Emacs states have the remaining rgb colors.
 "Input" states have colors with 2 f's and bars in common.
 The visual state is hollow and can be filled with the region color.
 
@@ -182,6 +181,7 @@ I very much dislike holding down two keys at once just as if I were using vanill
 
 In my configuration the between characters behavior is isolated in evil-cursor-model.el, which I have slightly modified compared to [[https://www.dr-qubit.org/Evil_cursor_model.html][the author's original version]].
 Standard evil behavior is easy to achieve by simply not loading that file.
+I'm working on turning this into a minor mode.
 
 ** Org.el
 
@@ -250,4 +250,6 @@ If you have an /empty/ or deleted ~/.emacs.d directory and have git installed yo
   git clone https://github.com/maxfriis/my-emacs-config ~/.emacs.d
 #+end_src
 After that you simply start emacs and it should install all the packages, load them and create a minimal directory structure for org-agenda.
-The only thing left is to install nerd fonts (nerd-icons-install-fonts) and restart.
+The only thing left is to install nerd fonts with (nerd-icons-install-fonts) and restart.
+
+Last you might want to make a link to .emacs.d/ in the /root folder to use emacs as superuser.

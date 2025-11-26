@@ -12,9 +12,8 @@
 ;; | #7f3 | success/done    | #3f7 | comment/tag     |
 ;; | #37f | link/timestamp  | #432 | shadow/hl-line  |
 ;; |------+-----------------+------+-----------------|
-;; Dark, warm, systematic, simple and aesthetically pleasing.
+;; Dark, warm, systematic, simple and aesthetically pleasing.  Not #73f.
 ;; ----------------------------------------------------------------------------
-;; I don't use #73f.
 ;; I add 7 cursor colors indicating the `evil-state' when I configure evil.
 ;; Unspecified faces are handled by the dark part of the vanilla theme.
 ;; ----------------------------------------------------------------------------
@@ -76,7 +75,7 @@
  'mode-line-highlight
  nil :box '(:line-width 1 :color "#3f7" :style released-button))
 ;; ----------------------------------------------------------------------------
-;; font-lock faces.
+;; font-lock.
 (set-face-attribute
  'font-lock-comment-face
  nil :foreground "#3f7")
@@ -106,7 +105,7 @@
  nil :weight 'normal :underline nil)
 
 ;; ============================================================================
-;;; Org faces
+;;; Org
 ;; ============================================================================
 (with-eval-after-load 'org
   (set-face-attribute
@@ -320,6 +319,10 @@
 (with-eval-after-load 'dired
   (set-face-attribute
    'dired-ignored
+   nil :foreground "#3f7"))
+(with-eval-after-load 'marginalia
+  (set-face-attribute
+   'marginalia-documentation
    nil :foreground "#3f7"))
 (with-eval-after-load 'corfu
   (set-face-attribute

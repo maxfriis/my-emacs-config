@@ -321,6 +321,10 @@
   (set-face-attribute
    'dired-ignored
    nil :foreground "#0ff"))
+(with-eval-after-load 'marginalia
+  (set-face-attribute
+   'marginalia-documentation
+   nil :foreground "#0ff"))
 (with-eval-after-load 'corfu
   (set-face-attribute
    'corfu-default
