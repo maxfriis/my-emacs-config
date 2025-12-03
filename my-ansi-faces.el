@@ -29,6 +29,35 @@
  'success
  nil :foreground "#0f0")
 ;; ----------------------------------------------------------------------------
+;; font-lock faces.
+(set-face-attribute
+ 'font-lock-comment-face
+ nil :foreground "#0ff")
+(set-face-attribute
+ 'font-lock-string-face
+ nil :foreground "#0ff")
+(set-face-attribute
+ 'font-lock-builtin-face
+ nil :foreground "#00f")
+(set-face-attribute
+ 'font-lock-constant-face
+ nil :foreground "#00f")
+(set-face-attribute
+ 'font-lock-function-name-face
+ nil :foreground "#0f0")
+(set-face-attribute
+ 'font-lock-variable-name-face
+ nil :foreground "#0f0")
+(set-face-attribute
+ 'font-lock-keyword-face
+ nil :foreground "#ff0")
+(set-face-attribute
+ 'font-lock-number-face
+ nil :foreground "#f0f")
+(set-face-attribute
+ 'font-lock-warning-face
+ nil :weight 'normal :underline nil)
+;; ----------------------------------------------------------------------------
 ;; Decorations.
 (set-face-attribute
  'region
@@ -72,35 +101,6 @@
 (set-face-attribute
  'mode-line-highlight
  nil :box '(:line-width 1 :color "#0ff" :style released-button))
-;; ----------------------------------------------------------------------------
-;; font-lock faces.
-(set-face-attribute
- 'font-lock-comment-face
- nil :foreground "#0ff")
-(set-face-attribute
- 'font-lock-string-face
- nil :foreground "#0ff")
-(set-face-attribute
- 'font-lock-builtin-face
- nil :foreground "#00f")
-(set-face-attribute
- 'font-lock-constant-face
- nil :foreground "#00f")
-(set-face-attribute
- 'font-lock-function-name-face
- nil :foreground "#0f0")
-(set-face-attribute
- 'font-lock-variable-name-face
- nil :foreground "#0f0")
-(set-face-attribute
- 'font-lock-keyword-face
- nil :foreground "#ff0")
-(set-face-attribute
- 'font-lock-number-face
- nil :foreground "#f0f")
-(set-face-attribute
- 'font-lock-warning-face
- nil :weight 'normal :underline nil)
 
 ;; ============================================================================
 ;;; Org faces
@@ -198,7 +198,7 @@
    nil :foreground "#f00" :height .8) ; the dots marking the deapt
   (set-face-attribute
    'org-superstar-header-bullet
-   nil :foreground "#ff0" :height .8) ; the header bullet face
+   nil :foreground "#0ff" :height .8) ; the header bullet face
   (set-face-attribute
    'org-superstar-item
    nil :foreground "#ff0" :height .8)) ; the item bullet face

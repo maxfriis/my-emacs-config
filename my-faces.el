@@ -12,7 +12,7 @@
 ;; | #7f3 | success/done    | #3f7 | comment/tag     |
 ;; | #37f | link/timestamp  | #432 | shadow/hl-line  |
 ;; |------+-----------------+------+-----------------|
-;; Dark, warm, systematic, simple and aesthetically pleasing.  Not #73f.
+;; Dark, warm, systematic, simple and aesthetically pleasing.  No "#73f".
 ;; ----------------------------------------------------------------------------
 ;; I add 7 cursor colors indicating the `evil-state' when I configure evil.
 ;; Unspecified faces are handled by the dark part of the vanilla theme.
@@ -30,6 +30,35 @@
 (set-face-attribute
  'success
  nil :foreground "#7f3")
+;; ----------------------------------------------------------------------------
+;; font-lock.
+(set-face-attribute
+ 'font-lock-comment-face
+ nil :foreground "#3f7")
+(set-face-attribute
+ 'font-lock-string-face
+ nil :foreground "#3f7")
+(set-face-attribute
+ 'font-lock-builtin-face
+ nil :foreground "#37f")
+(set-face-attribute
+ 'font-lock-constant-face
+ nil :foreground "#37f")
+(set-face-attribute
+ 'font-lock-function-name-face
+ nil :foreground "#7f3")
+(set-face-attribute
+ 'font-lock-variable-name-face
+ nil :foreground "#7f3")
+(set-face-attribute
+ 'font-lock-keyword-face
+ nil :foreground "#f73")
+(set-face-attribute
+ 'font-lock-number-face
+ nil :foreground "#f37")
+(set-face-attribute
+ 'font-lock-warning-face
+ nil :weight 'normal :underline nil)
 ;; ----------------------------------------------------------------------------
 ;; Decorations.
 (set-face-attribute
@@ -74,35 +103,6 @@
 (set-face-attribute
  'mode-line-highlight
  nil :box '(:line-width 1 :color "#3f7" :style released-button))
-;; ----------------------------------------------------------------------------
-;; font-lock.
-(set-face-attribute
- 'font-lock-comment-face
- nil :foreground "#3f7")
-(set-face-attribute
- 'font-lock-string-face
- nil :foreground "#3f7")
-(set-face-attribute
- 'font-lock-builtin-face
- nil :foreground "#37f")
-(set-face-attribute
- 'font-lock-constant-face
- nil :foreground "#37f")
-(set-face-attribute
- 'font-lock-function-name-face
- nil :foreground "#7f3")
-(set-face-attribute
- 'font-lock-variable-name-face
- nil :foreground "#7f3")
-(set-face-attribute
- 'font-lock-keyword-face
- nil :foreground "#f73")
-(set-face-attribute
- 'font-lock-number-face
- nil :foreground "#f37")
-(set-face-attribute
- 'font-lock-warning-face
- nil :weight 'normal :underline nil)
 
 ;; ============================================================================
 ;;; Org
@@ -200,7 +200,7 @@
    nil :foreground "#432" :height .8) ; the dots marking the deapt
   (set-face-attribute
    'org-superstar-header-bullet
-   nil :foreground "#f73" :height .8) ; the header bullet face
+   nil :foreground "#3f7" :height .8) ; the header bullet face
   (set-face-attribute
    'org-superstar-item
    nil :foreground "#f73" :height .8)) ; the item bullet face

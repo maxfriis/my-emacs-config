@@ -17,6 +17,16 @@
 ;; Keywords: convenience, files
 ;; Package-Requires: ((emacs "24.4") (evil "0"))
 
+;; TODO: Make keybindings respect user configuration. I want a map where the
+;; user can rebind "A" so it is not affected by toggling the mode.
+;; The challange is that minor-mode maps override maps like `dired-mode-map'.
+;; I want a map like `global-map' that get overridden by major-mode maps.
+;; I don't know how. Maybe it's not even the right solution. I want it to be
+;; able to handle an unknown major mode so I can't handle individual modes.
+;; I can't make (use-global-map...) work and it's not recommended.
+;; And the global-map is dynamic and hard to keep track of for the toggle.
+;; For now bindings are hard coded and toggling the mode will rebind them.
+
 ;; ============================================================================
 ;;; Commentary:
 ;; ============================================================================
@@ -26,6 +36,8 @@
 ;; ============================================================================
 ;;; Code:
 ;; ============================================================================
+(unless (package-installed-p 'evil)
+  (package-install 'evil))
 (require 'evil)
 
 (defvar evil-cursor-between-move-cursor-back-init evil-move-cursor-back
@@ -34,6 +46,36 @@
   "For toggling the variable with `evil-cursor-between-mode'.")
 (defvar evil-cursor-between-highlight-closing-paren-at-point-states-init evil-highlight-closing-paren-at-point-states
   "For toggling the variable with `evil-cursor-between-mode'.")
+
+;; Experimental code:
+;; (defvar evil-cursor-between-mode-map (make-sparse-keymap)
+;;   "Keymap for `evil-cursor-between-mode'.")
+;; (add-to-list 'minor-mode-map-alist (cons 'evil-cursor-between-mode
+;;                                          'evil-cursor-between-mode-map)) ; This will override major mode maps.
+;; (add-to-list 'minor-mode-overriding-map-alist (cons 'evil-cursor-between-mode
+;;                                                     'dired-mode-map)) ; Everything seems to be tuned to increase map priority.
+;; ;; ----------------------------------------------------------------------------
+;; ;; Motion commands "w"/"W", "b"/"B", "F" and "T" works out of the evil box.
+;; (evil-define-key 'motion evil-cursor-between-mode-map
+;;   "t"  #'evil-find-char
+;;   "f"  #'evil-cursor-between-find-char-after
+;;   "e"  #'evil-cursor-between-forward-after-word-end
+;;   "E"  #'evil-cursor-between-forward-after-WORD-end
+;;   "ge" #'evil-cursor-between-backward-after-word-end
+;;   "gE" #'evil-cursor-between-backward-after-WORD-end
+;;   "%"  #'evil-cursor-between-jump-after-item)
+;; ;; ----------------------------------------------------------------------------
+;; ;; Swap "a", "o" and "p" with their capital bindings.
+;; (evil-define-key 'normal evil-cursor-between-mode-map
+;;   "a"  #'evil-append-line  ; Swapped so append is used to edit from eol.
+;;   "A"  #'evil-append       ; Useless in this mode. "li" makes more sense.
+;;   "o"  #'evil-open-above   ; Swapped to be consistent with paste and e.g."cc".
+;;   "O"  #'evil-open-below   ; "jo" and "a<RET>" does the same thing.
+;;   "p"  #'evil-paste-before ; Swapped because almost only "p" is used to paste.
+;;   "P"  #'evil-paste-after) ; "jp" or "lp" does the same thing.
+;; (defvar evil-cursor-between-global-map (make-composed-keymap evil-cursor-between-mode-map global-map)
+;;   "Global keymap for `evil-cursor-between-mode'.")
+;; (use-global-map evil-cursor-between-global-map) ; I can't make working with two global maps work.
 
 ;; ============================================================================
 ;;; The minor mode
@@ -46,6 +88,7 @@ Layers can then be replaced with a motion with equivalent efficiency.
 \nEmbrace the mindset of Emacs' cursor model and motions among line nuggets.
 Maybe fewer layers are better for your Emacs pinky?"
   :global t ; Without this the mode will not sync up with it's variable.
+  ;; :keymap 'evil-cursor-between-mode-map
   :group 'evil
   :lighter nil
   (cond
@@ -59,8 +102,7 @@ Maybe fewer layers are better for your Emacs pinky?"
      evil-move-beyond-eol t
      evil-highlight-closing-paren-at-point-states nil)
     ;; ----------------------------------------------------------------------------
-    ;; Command rebindings.
-    ;; Motion commands "w"/"W", "b"/"B", "F" and "T" works out of the evil box.
+    ;; Motion commands "w", "b", "F" and "T" works out of the evil box.
     (evil-define-key 'motion global-map
       "t"  #'evil-find-char
       "f"  #'evil-cursor-between-find-char-after
@@ -72,12 +114,14 @@ Maybe fewer layers are better for your Emacs pinky?"
     ;; ----------------------------------------------------------------------------
     ;; Swap "a", "o" and "p" with their capital bindings.
     (evil-define-key 'normal global-map
-      "a"  #'evil-append-line  ; Swapped so append is used to edit from eol.
-      "A"  #'evil-append       ; Useless in this mode. "li" makes more sense.
-      "o"  #'evil-open-above   ; Swapped to be consistent with paste and e.g."cc".
-      "O"  #'evil-open-below   ; "jo" and "a<RET>" does the same thing.
-      "p"  #'evil-paste-before ; Swapped because almost only "p" is used to paste.
+      "a"  #'evil-append-line   ; swapped because it's only used to edit from eol.
+      "A"  #'evil-append        ; "li" does the same thing.
+      "o"  #'evil-open-above    ; swapped to be consistent with paste.g. "cc".
+      "O"  #'evil-open-below    ; "jo" does the same thing.
+      "p"  #'evil-paste-before  ; swapped because only "p" is used to paste.
       "P"  #'evil-paste-after) ; "jp" or "lp" does the same thing.
+    ;; ----------------------------------------------------------------------------
+    ;; Swap "a" and "o" with their `evil-org-mode' capital bindings.
     (evil-define-key 'normal 'evil-org-mode
       "a"  #'evil-org-append-line
       "A"  nil
@@ -91,7 +135,7 @@ Maybe fewer layers are better for your Emacs pinky?"
      evil-move-beyond-eol evil-cursor-between-move-beyond-eol-init
      evil-highlight-closing-paren-at-point-states evil-cursor-between-highlight-closing-paren-at-point-states-init)
     ;; ----------------------------------------------------------------------------
-    ;; Motion commands.
+    ;; Motion commands back to evil defaults.
     (evil-define-key 'motion global-map
       "t"  #'evil-find-char-to
       "f"  #'evil-find-char
@@ -101,7 +145,7 @@ Maybe fewer layers are better for your Emacs pinky?"
       "gE" #'evil-backward-WORD-end
       "%"  #'evil-jump-item)
     ;; ----------------------------------------------------------------------------
-    ;; Swap "a", "o" and "p" back to their evil defaults.
+    ;; Swap "a", "o" and "p" back to evil defaults.
     (evil-define-key 'normal global-map
       "a"  #'evil-append
       "A"  #'evil-append-line
@@ -109,6 +153,8 @@ Maybe fewer layers are better for your Emacs pinky?"
       "O"  #'evil-open-above
       "p"  #'evil-paste-after
       "P"  #'evil-paste-before)
+    ;; ----------------------------------------------------------------------------
+    ;; Swap "a" and "o" back to their `evil-org-mode' defaults.
     (evil-define-key 'normal 'evil-org-mode
       "a"  nil
       "A"  #'evil-org-append-line
