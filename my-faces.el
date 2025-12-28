@@ -17,7 +17,7 @@
 ;; I add 7 cursor colors indicating the `evil-state' when I configure evil.
 ;; Unspecified faces are handled by the dark part of the vanilla theme.
 ;; ----------------------------------------------------------------------------
-;; Special faces.
+;;;; Special faces.
 (set-face-attribute
  'default
  nil :foreground "#dcb" :background "#210")
@@ -31,7 +31,7 @@
  'success
  nil :foreground "#7f3")
 ;; ----------------------------------------------------------------------------
-;; font-lock.
+;;;; font-lock.
 (set-face-attribute
  'font-lock-comment-face
  nil :foreground "#3f7")
@@ -40,6 +40,9 @@
  nil :foreground "#3f7")
 (set-face-attribute
  'font-lock-builtin-face
+ nil :foreground "#37f")
+(set-face-attribute
+ 'font-lock-type-face
  nil :foreground "#37f")
 (set-face-attribute
  'font-lock-constant-face
@@ -58,9 +61,15 @@
  nil :foreground "#f37")
 (set-face-attribute
  'font-lock-warning-face
- nil :weight 'normal :underline nil)
+ nil :underline nil)
 ;; ----------------------------------------------------------------------------
-;; Decorations.
+;;;; Decorations.
+(set-face-attribute
+ 'vertical-border
+ nil :foreground "#432")
+(set-face-attribute
+ 'scroll-bar
+ nil :foreground "#432")
 (set-face-attribute
  'region
  nil :background "#432")
@@ -80,14 +89,8 @@
  'isearch
  nil :foreground "#210" :background "#dcb")
 (set-face-attribute
- 'vertical-border
- nil :foreground "#432")
-(set-face-attribute
  'fringe
  nil :foreground "#432" :background "#210")
-(set-face-attribute
- 'scroll-bar
- nil :foreground "#432")
 (set-face-attribute
  'line-number
  nil :foreground "#432" :background "#210" :height .8)
@@ -160,6 +163,9 @@
    'org-tag
    nil :foreground "#3f7" :weight 'normal)
   (set-face-attribute
+   'org-table
+   nil :foreground "#3f7" :height .8)
+  (set-face-attribute
    'org-formula
    nil :foreground "#3f7" :height .8)
   (set-face-attribute
@@ -167,10 +173,7 @@
    nil :foreground "#3f7" :height .8)
   (set-face-attribute
    'org-verbatim
-   nil :foreground "#3f7" :height .8)
-  (set-face-attribute
-   'org-table
-   nil :foreground "#3f7" :height .8)
+   nil :foreground "#37f" :box '(:line-width 1 :color "#3f7" :style released-button) :height .8)
   (set-face-attribute
    'org-block
    nil :foreground "#dcb")
@@ -193,7 +196,7 @@
    'org-link
    nil :foreground "#37f"))
 ;; ----------------------------------------------------------------------------
-;; Bullets.
+;;;; Bullets.
 (with-eval-after-load 'org-superstar
   (set-face-attribute
    'org-superstar-leading
@@ -263,32 +266,32 @@
    'org-scheduled-previously
    nil :foreground "#f73"))
 ;; ----------------------------------------------------------------------------
-;; Habit.
+;;;; Habit.
 (with-eval-after-load 'org-habit
   (set-face-attribute
    'org-habit-alert-face
-   nil :foreground "#f37" :background "#f73" :weight 'bold :height .8)
+   nil :foreground "#f37" :background "#f73" :weight 'bold)
   (set-face-attribute
    'org-habit-alert-future-face
-   nil :background "#f73" :height .8)
+   nil :background "#f73")
   (set-face-attribute
    'org-habit-overdue-face
-   nil :foreground "#f73" :background "#f37" :weight 'bold :height .8)
+   nil :foreground "#f73" :background "#f37" :weight 'bold)
   (set-face-attribute
    'org-habit-overdue-future-face
-   nil :background "#432" :height .8)
+   nil :background "#432")
   (set-face-attribute
    'org-habit-ready-face
-   nil :foreground "#f73" :background "#7f3" :weight 'bold :height .8)
+   nil :foreground "#f73" :background "#7f3" :weight 'bold)
   (set-face-attribute
    'org-habit-ready-future-face
-   nil :background "#7f3" :height .8)
+   nil :background "#7f3")
   (set-face-attribute
    'org-habit-clear-face
-   nil :foreground "#f73" :background "#432" :weight 'bold :height .8)
+   nil :foreground "#f73" :background "#432" :weight 'bold)
   (set-face-attribute
    'org-habit-clear-future-face
-   nil :background "#432" :height .8))
+   nil :background "#432"))
 
 ;; ============================================================================
 ;;; Misc. other package faces

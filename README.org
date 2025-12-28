@@ -2,25 +2,33 @@
 #+startup: showall hideblocks
 #+options: toc:nil
 
-This configuration is a great start if you want to make your own configuration.
-The few custom functions I use are simple and short.
+Publication of this configuration is mainly inspirational.
+You can install the whole thing but might experience an overload of oddities.
+The custom functions I use are simple and short so everything should be easy to understand.
 
-The bad thing for a fresh start is that the configuration is customized for my Danish keyboard.
-That should be easy to adjust to your own keyboard.
+I have changed some keybindings and even modify the default evil-mode behavior with a mode I have composed.
+The mode can be toggled with =<spc> t e= but it can be confusing and it is on by default.
+It is my configuration after all.
+
+** Version
+
+Most of the configuration is fine with Emacs version 29.1, but my which-key configuration requires version 30.1.
+I think which-key was made native in that version because I know the which-key package is much older.
 
 ** Early init
 
 Here I set some variables that influence the startup process.
 This is both about performance but also about seeing defaults I don't end up using.
-E.g. I don't want a white background to blink on startup when I prefer a dark theme.
+E.g. I don't want a white background to blink on startup since I prefer dark themes.
 
 * My font faces
 
 I don't use a theme package.
 I simply change faces if I don't like them.
+I should probably use (deftheme...) and I will at some point.
 
 I use (set-face-attribute...) because (custom-set-faces...) is hard to change for packages I might load in the future (red text is hard to read on a red background).
-I don't like or use custom.el.
+I don't like or use custom.el for anything.
 
 I restrict myself to use 8 dark theme colors.
 Examples of their use are:
@@ -79,7 +87,7 @@ Motion and Emacs states have the remaining rgb colors.
 "Input" states have colors with 2 f's and bars in common.
 The visual state is hollow and can be filled with the region color.
 
-* Modeline
+* Mode-line
 
 I don't use a package for my modeline.
 It consist of a window number, information about writable/modified status, the buffer name and the major mode.
@@ -131,7 +139,7 @@ All this should make it fairly easy to convert my config to use use-package or s
 *** Honorable mentions
 
 I will only comment on the 3 packages: evil, org and general.
-Honorable mentions are vertico, corfu, ace-window, recursive-narrow and magit but I use many more.
+Honorable mentions are vertico, corfu, ace-window, recursive-narrow and magit but I use more.
 
 ** Evil.el
 
@@ -146,11 +154,11 @@ I prefer modal bindings and try to minimize the use of layers.
 *** Cursor model (my sacrilege)
 
 Besides the modal approach Vim has a unique cursor model.
-When in insert state it works with the standard cursor between characters approach that all other editors use.
+When in insert state it works with the standard cursor between characters approach that other editors use.
 In normal state this model is changed to something no other editor I know have picked up on.
 The cursor is considered on characters rather than between them.
 
-I chose to use a modification of evil where the cursor is between characters in normal state.
+I use my evil-cursor-between-mode to modify evil to use a cursor is between characters in normal state.
 This has the advantage of fewer keys being used (e.g. no need for =a=) at little to no cost in efficiency.
 
 You might want to rebind some keys but with few exceptions I just leave the evil bindings be.
@@ -179,14 +187,15 @@ The cursor model in normal state will be more consistent both with it's insert s
 If you dislike layers and try to minimize their use, you gain a lot from not needing capitalized bindings.
 I very much dislike holding down two keys at once just as if I were using vanilla Emacs (take that, Vim out of the box lovers).
 
-In my configuration the between characters behavior is isolated in evil-cursor-model.el, which I have slightly modified compared to [[https://www.dr-qubit.org/Evil_cursor_model.html][the author's original version]].
-Standard evil behavior is easy to achieve by simply not loading that file.
-I'm working on turning this into a minor mode.
+In my configuration the between characters behavior is isolated in evil-cursor-between-mode.el, which I have modified compared to [[https://www.dr-qubit.org/Evil_cursor_model.html][the author's original version]].
+Standard evil behavior is easy to achieve by simply not loading that file or toggling the mode off.
+
+You can find the mode on github at [[https://github.com/maxfriis/evil-cursor-between-mode][evil-cursor-between-mode]].
 
 ** Org.el
 
 I customize this native package with a large set of variables.
-I extend it with a few external packages, the native prettify.el and a few hooks.
+Furthermore I extend it with a few external packages and some hooks.
 
 *** Org-agenda
 
@@ -194,8 +203,8 @@ I restrict myself to the 4 todo-states *NEXT*, *TODO*, *HOLD* and *DONE*.
 
 NEXT is an unblocked task that can be done in less than 5 minutes.
 HOLD is an inactive state that can be translated to "pending third party action".
-The default states are self explanatory.
-I don't have a canceled state because I just archive those items in an active state.
+I also use HOLD combined with archive for canceled tasks.
+The default TODO and DONE states are self explanatory.
 
 Besides the states I use refile and an unrestricted number of categories for todo items.
 When I have a project I introduce a new category with a capture.
@@ -217,13 +226,12 @@ I configure my custom agenda to have 4 sections:
 The main two capture templates is a simple idea capture and a category capture that I can refile to.
 That is all I need for my agenda.
 
-** General.el
+** Leader key setup
 
-As with my theme and modeline I could and perhaps should do my leader key keybindings with "-maps", but I'm not there yet.
-Prot has a nice Youtube video about it: [[https://www.youtube.com/watch?v=gojOZ3k1mmk][Emacs: define prefix/leader key]].
+Prot has a video about creating a leader key: [[https://www.youtube.com/watch?v=gojOZ3k1mmk][Emacs: define prefix/leader key]].
 
-For now I use general.el to handle my leader keybindings.
-Inspired by Spacemacs I use =<SPC>= as my leader key and part of the structure in my leader keybindings are also inspired by this project.
+Inspired by Spacemacs I use =<spc>= as my leader key and part of the structure in my leader keybindings are also inspired by this project.
+I do this with maps defined in keymaps.el.
 
 *** Other keybindings
 
@@ -231,7 +239,11 @@ I like to have my keybindings in a section rather than distributed out among my 
 I find it more useful to spot collisions by gathering these bindings in one place.
 Use-package might be able to defer stuff based on :bind but I don't use use-package.
 
-A few evil bindings specific to the change in cursor model are rebound inside evil-cursor-model.el.
+A few evil bindings specific to the change in cursor model are rebound inside evil-cursor-between-mode.el.
+Besides that I choose to use Emacs' isearch and I have it bound to =s=.
+evil-substitute can be mimicked with =cl=.
+This comes natural to me since =c= is the most common way I enter insert state.
+I often press =c= almost before I have figured out what motion I need.
 
 * Youtube videos
 

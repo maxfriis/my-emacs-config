@@ -15,7 +15,7 @@
 ;; These colors will display nicely in an 8 or 16 color ansi terminal.
 ;; Unspecified faces are handled by the dark part of the vanilla theme.
 ;; ----------------------------------------------------------------------------
-;; Special faces.
+;;;; Special faces.
 (set-face-attribute
  'default
  nil :foreground "#fff" :background "#000")
@@ -29,7 +29,7 @@
  'success
  nil :foreground "#0f0")
 ;; ----------------------------------------------------------------------------
-;; font-lock faces.
+;;;; font-lock faces.
 (set-face-attribute
  'font-lock-comment-face
  nil :foreground "#0ff")
@@ -38,6 +38,9 @@
  nil :foreground "#0ff")
 (set-face-attribute
  'font-lock-builtin-face
+ nil :foreground "#00f")
+(set-face-attribute
+ 'font-lock-type-face
  nil :foreground "#00f")
 (set-face-attribute
  'font-lock-constant-face
@@ -56,9 +59,15 @@
  nil :foreground "#f0f")
 (set-face-attribute
  'font-lock-warning-face
- nil :weight 'normal :underline nil)
+ nil :underline nil)
 ;; ----------------------------------------------------------------------------
-;; Decorations.
+;;;; Decorations.
+(set-face-attribute
+ 'vertical-border
+ nil :foreground "#f00")
+(set-face-attribute
+ 'scroll-bar
+ nil :foreground "#f00")
 (set-face-attribute
  'region
  nil :background "#f00")
@@ -78,14 +87,8 @@
  'isearch
  nil :foreground "#000" :background "#fff")
 (set-face-attribute
- 'vertical-border
- nil :foreground "#f00")
-(set-face-attribute
  'fringe
  nil :foreground "#f00" :background "#000")
-(set-face-attribute
- 'scroll-bar
- nil :foreground "#f00")
 (set-face-attribute
  'line-number
  nil :foreground "#f00" :background "#000" :height .8)
@@ -158,6 +161,9 @@
    'org-tag
    nil :foreground "#0ff" :weight 'normal)
   (set-face-attribute
+   'org-table
+   nil :foreground "#0ff" :height .8)
+  (set-face-attribute
    'org-formula
    nil :foreground "#0ff" :height .8)
   (set-face-attribute
@@ -165,10 +171,7 @@
    nil :foreground "#0ff" :height .8)
   (set-face-attribute
    'org-verbatim
-   nil :foreground "#0ff" :height .8)
-  (set-face-attribute
-   'org-table
-   nil :foreground "#0ff" :height .8)
+   nil :foreground "#00f" :box '(:line-width 1 :color "#0ff" :style released-button) :height .8)
   (set-face-attribute
    'org-block
    nil :foreground "#fff")
@@ -191,7 +194,7 @@
    'org-link
    nil :foreground "#00f"))
 ;; ----------------------------------------------------------------------------
-;; Bullets.
+;;;; Bullets.
 (with-eval-after-load 'org-superstar
   (set-face-attribute
    'org-superstar-leading
@@ -261,32 +264,32 @@
    'org-scheduled-previously
    nil :foreground "#ff0"))
 ;; ----------------------------------------------------------------------------
-;; Habit.
+;;;; Habit.
 (with-eval-after-load 'org-habit
   (set-face-attribute
    'org-habit-alert-face
-   nil :foreground "#f0f" :background "#ff0" :weight 'bold :height .8)
+   nil :foreground "#f0f" :background "#ff0" :weight 'bold)
   (set-face-attribute
    'org-habit-alert-future-face
-   nil :background "#ff0" :height .8)
+   nil :background "#ff0")
   (set-face-attribute
    'org-habit-overdue-face
-   nil :foreground "#ff0" :background "#f0f" :weight 'bold :height .8)
+   nil :foreground "#ff0" :background "#f0f" :weight 'bold)
   (set-face-attribute
    'org-habit-overdue-future-face
-   nil :background "#f00" :height .8)
+   nil :background "#f00")
   (set-face-attribute
    'org-habit-ready-face
-   nil :foreground "#ff0" :background "#0f0" :weight 'bold :height .8)
+   nil :foreground "#ff0" :background "#0f0" :weight 'bold)
   (set-face-attribute
    'org-habit-ready-future-face
-   nil :background "#0f0" :height .8)
+   nil :background "#0f0")
   (set-face-attribute
    'org-habit-clear-face
-   nil :foreground "#ff0" :background "#f00" :weight 'bold :height .8)
+   nil :foreground "#ff0" :background "#f00" :weight 'bold)
   (set-face-attribute
    'org-habit-clear-future-face
-   nil :background "#f00" :height .8))
+   nil :background "#f00"))
 
 ;; ============================================================================
 ;;; Misc. other package faces
