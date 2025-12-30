@@ -22,7 +22,6 @@
 ;; ============================================================================
 ;; Emacs' cursor between characters model for cursor positioning in
 ;; `evil-mode' instead of Vim's normal-state cursor on top of characters model.
-
 ;; ============================================================================
 ;;; TODO:
 ;; ============================================================================

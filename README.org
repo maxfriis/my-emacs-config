@@ -10,7 +10,7 @@ I have changed some keybindings and even modify the default evil-mode behavior w
 The mode can be toggled with =<spc> t e= but it can be confusing and it is on by default.
 It is my configuration after all.
 
-** Version
+** Version requirement
 
 Most of the configuration is fine with Emacs version 29.1, but my which-key configuration requires version 30.1.
 I think which-key was made native in that version because I know the which-key package is much older.
@@ -41,7 +41,7 @@ Examples of their use are:
 | #37f  | link/timestamp |   | #432  | shadow/hl-line  |
 |-------+----------------+---+-------+-----------------|
 Unspecified faces are handled by the dark vanilla theme.
-Note that I don't use #73f (bad color contrast).
+Note that I don't use #73f.
 
 *** Screenshot
 
@@ -49,21 +49,21 @@ Note that I don't use #73f (bad color contrast).
 
 ** Ansi faces
 
-As root I use 8 ansi colors for the theme.
+As root and sometimes on my laptop I use 8 ansi colors for the theme.
 | Color | Use            |   | Color | Use             |
 |-------+----------------+---+-------+-----------------|
 | #000  | background     |   | #fff  | default text    |
 |-------+----------------+---+-------+-----------------|
-| #f00  | shadow/hl-line |   | #ff0  | warning/heading |
-| #0f0  | success/done   |   | #0ff  | comment/tags    |
-| #00f  | link/timestamp |   | #f0f  | error/todo      |
+| #f00  | shadow/hl-line |   | #0ff  | comment/tags    |
+| #0f0  | success/done   |   | #f0f  | error/todo      |
+| #00f  | link/timestamp |   | #ff0  | warning/heading |
 |-------+----------------+---+-------+-----------------|
-Operator state is automatically converted to cyan when shown on the red hl-line background.
+Operator state is automatically converted when shown on the red hl-line background.
 The idea is to have something clearly indicating that I have root privileges and have a fallback theme I can use with an ansi color terminal.
 
 *** Ansi screenshot
 
-With my "space-menu".
+These screenshots are quite old but this one show an old leader key "space-menu".
 
 [[https://github.com/maxfriis/my-emacs-config/blob/e54ebe124c60b8b1413f3c456c2887c9cf2befde/emacs_ansi_screenshot.png]]
 
@@ -75,17 +75,16 @@ I tax the eyes a bit with extreme colors to help keeping track of the evil state
 |-------+----------+---+-------+---------|
 | #000  | Not used |   | #fff  | visual  |
 |-------+----------+---+-------+---------|
-| #f00  | operator |   | #ff0  | insert  |
-| #0f0  | normal   |   | #0ff  | replace |
-| #00f  | motion   |   | #f0f  | emacs   |
+| #f00  | operator |   | #0ff  | replace |
+| #0f0  | normal   |   | #f0f  | emacs   |
+| #00f  | motion   |   | #ff0  | insert  |
 |-------+----------+---+-------+---------|
 Normal state is a green color.
 Operator state is red to alert.
-Insert state is the last yellow traffic light color and use a bar.
-Replace state is cyan and use an hbar.
-Motion and Emacs states have the remaining rgb colors.
+Insert state is the last yellow traffic light color and has a bar cursor.
+Replace state is cyan and has an hbar cursor.
+Emacs and Motion states have the remaining rgb colors.
 "Input" states have colors with 2 f's and bars in common.
-The visual state is hollow and can be filled with the region color.
 
 * Mode-line
 
@@ -158,7 +157,7 @@ When in insert state it works with the standard cursor between characters approa
 In normal state this model is changed to something no other editor I know have picked up on.
 The cursor is considered on characters rather than between them.
 
-I use my evil-cursor-between-mode to modify evil to use a cursor is between characters in normal state.
+I use my evil-emacs-cursor-model-mode to modify evil to use a cursor is between characters in normal state.
 This has the advantage of fewer keys being used (e.g. no need for =a=) at little to no cost in efficiency.
 
 You might want to rebind some keys but with few exceptions I just leave the evil bindings be.
@@ -187,10 +186,10 @@ The cursor model in normal state will be more consistent both with it's insert s
 If you dislike layers and try to minimize their use, you gain a lot from not needing capitalized bindings.
 I very much dislike holding down two keys at once just as if I were using vanilla Emacs (take that, Vim out of the box lovers).
 
-In my configuration the between characters behavior is isolated in evil-cursor-between-mode.el, which I have modified compared to [[https://www.dr-qubit.org/Evil_cursor_model.html][the author's original version]].
-Standard evil behavior is easy to achieve by simply not loading that file or toggling the mode off.
+In my configuration the between characters behavior is isolated in evil-emacs-cursor-model-mode.el, which I have modified compared to [[https://www.dr-qubit.org/Evil_cursor_model.html][the author's original version]].
+Standard evil behavior is easy to achieve by not loading the mode or simply toggling the mode off.
 
-You can find the mode on github at [[https://github.com/maxfriis/evil-cursor-between-mode][evil-cursor-between-mode]].
+You can find the mode on github at [[https://github.com/maxfriis/evil-emacs-cursor-model-mode][evil-emacs-cursor-model-mode]].
 
 ** Org.el
 
@@ -239,11 +238,11 @@ I like to have my keybindings in a section rather than distributed out among my 
 I find it more useful to spot collisions by gathering these bindings in one place.
 Use-package might be able to defer stuff based on :bind but I don't use use-package.
 
-A few evil bindings specific to the change in cursor model are rebound inside evil-cursor-between-mode.el.
+A few evil bindings specific to the change in cursor model are rebound inside evil-emacs-cursor-model-mode.el.
 Besides that I choose to use Emacs' isearch and I have it bound to =s=.
 evil-substitute can be mimicked with =cl=.
 This comes natural to me since =c= is the most common way I enter insert state.
-I often press =c= almost before I have figured out what motion I need.
+I often press =c= even before I have fully figured out what motion I need.
 
 * Youtube videos
 
@@ -262,6 +261,5 @@ If you have an /empty/ or deleted ~/.emacs.d directory and have git installed yo
   git clone https://github.com/maxfriis/my-emacs-config ~/.emacs.d
 #+end_src
 After that you simply start emacs and it should install all the packages, load them and create a minimal directory structure for org-agenda.
-The only thing left is to install nerd fonts with (nerd-icons-install-fonts) and restart.
 
 Last you might want to make a link to .emacs.d/ in the /root folder to use emacs as superuser.
