@@ -13,8 +13,6 @@
 ;; | #37f | link/timestamp  | #432 | shadow/hl-line  |
 ;; |------+-----------------+------+-----------------|
 ;; Dark, warm, systematic, simple and aesthetically pleasing.  No #73f.
-;; ----------------------------------------------------------------------------
-;; I add 7 cursor colors indicating the `evil-state' when I configure evil.
 ;; Unspecified faces are handled by the dark part of the vanilla theme.
 ;; ----------------------------------------------------------------------------
 ;;;; Special faces.

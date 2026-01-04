@@ -81,10 +81,11 @@
   "s"   #'save-buffers-kill-emacs)
 (defvar-keymap my-r-spc-map
   :doc "My <spc> prefix keys."
+  "e"   #'evil-set-marker
+  "j"   #'evil-goto-mark
   "l"   #'consult-register-load
   "r"   #'counsel-mark-ring
-  "s"   #'consult-register-store
-  "v"   #'exchange-point-and-mark)
+  "s"   #'consult-register-store)
 (defvar-keymap my-s-spc-map
   :doc "My <spc> prefix keys."
   "O"   #'occur
@@ -95,10 +96,16 @@
   "w"   #'eww)
 (defvar-keymap my-tb-spc-map
   :doc "My <spc> prefix keys."
-  "c"   #'tab-bar-close-tab-by-name
+  "b"   #'tab-bar-mode
+  "c"   #'tab-bar-close-tab
+  "d"   #'tab-bar-duplicate-tab
   "m"   #'tab-bar-move-tab
   "n"   #'tab-bar-new-tab
-  "t"   #'tab-bar-mode)
+  "o"   #'tab-bar-close-other-tabs
+  "p"   #'tab-bar-close-tab-by-name
+  "r"   #'tab-undo
+  "s"   #'tab-bar-select-tab-by-name
+  "t"   #'tab-bar-switch-to-next-tab)
 (defvar-keymap my-tc-spc-map
   :doc "My <spc> prefix keys."
   "h"   #'keycast-header-line-mode
@@ -114,9 +121,9 @@
   "s"   #'whitespace-mode)
 (defvar-keymap my-tl-spc-map
   :doc "My <spc> prefix keys."
-  "b"   #'toggle-truncate-lines
+  "l"   #'visual-line-mode
   "n"   #'display-line-numbers-mode
-  "v"   #'visual-line-mode)
+  "t"   #'toggle-truncate-lines)
 (defvar-keymap my-t-spc-map
   :doc "My <spc> prefix keys."
   "d"   #'display-time-mode
@@ -134,7 +141,7 @@
   "c"   my-tc-spc-map
   "i"   my-ti-spc-map
   "l"   my-tl-spc-map)
-(defvar-keymap my-xz-spc-map
+(defvar-keymap my-z-spc-map
   :doc "My <spc> prefix keys."
   "g"   #'global-text-scale-adjust
   "l"   #'text-scale-adjust)
@@ -148,22 +155,21 @@
   "s"   #'transpose-sentences
   "u"   #'insert-char
   "w"   #'transpose-words
-  "x"   #'just-one-space
-  "z"   my-xz-spc-map)
+  "x"   #'just-one-space)
 (defvar-keymap my-root-spc-map
   :doc "The root of my <spc> prefix keys."
   "SPC" #'counsel-M-x
-  "TAB" #'mode-line-other-buffer
+  "TAB" #'tab-bar-select-tab-by-name
   "0"   #'delete-window
   "1"   #'my-toggle-window-maximize
   "2"   #'split-window-below
   "3"   #'split-window-right
   "4"   #'my-4-windows
   "5"   #'my-ace-swap-window
-  "6"   #'rotate-frame-anticlockwise
+  "6"   #'rotate-frame-clockwise
   "7"   #'transpose-frame
-  "8"   #'dired-other-tab
-  "9"   #'other-window-prefix
+  "8"   #'my-split-dired-tab
+  "9"   #'tab-bar-close-tab-by-name
   "e"   #'embark-act
   "j"   #'evil-avy-goto-char-timer
   "u"   #'universal-argument
@@ -180,7 +186,8 @@
   "s"   my-s-spc-map
   "t"   my-t-spc-map
   "w"   evil-window-map
-  "x"   my-x-spc-map)
+  "x"   my-x-spc-map
+  "z"   my-z-spc-map)
 
 ;; ----------------------------------------------------------------------------
 ;; `which-key' leader key replacements.
@@ -257,10 +264,11 @@
     "q"   '("Save&kill"    . my-save-all-kill-emacs-no-prompt)
     "s"   '("Prompt&kill"  . save-buffers-kill-emacs))
   (which-key-add-keymap-based-replacements my-r-spc-map
+    "e"   '("Evil mark"    . evil-set-marker)
+    "j"   '("Jump mark"    . evil-goto-mark)
     "l"   '("Load"         . consult-register-load)
-    "r"   '("Mini marks"   . counsel-mark-ring)
-    "s"   '("Store"        . consult-register-store)
-    "v"   '("Visual mark"  . exchange-point-and-mark))
+    "r"   '("Emacs marks"  . counsel-mark-ring)
+    "s"   '("Store"        . consult-register-store))
   (which-key-add-keymap-based-replacements my-s-spc-map
     "O"   '("Occur"        . occur)
     "R"   '("Rep. regex"   . query-replace-regexp)
@@ -269,10 +277,16 @@
     "s"   '("Swiper"       . swiper)
     "w"   '("Web (eww)"    . eww))
   (which-key-add-keymap-based-replacements my-tb-spc-map
-    "c"   '("Close tab"    . tab-bar-close-tab-by-name)
-    "m"   '("Move tab"     . tab-bar-move-tab)
-    "n"   '("New tab"      . tab-bar-new-tab)
-    "t"   '("Toggle mode"  . tab-bar-mode))
+    "b"   '("Toggle bar"   . tab-bar-mode)
+    "c"   '("Close"        . tab-bar-close-tab)
+    "d"   '("Duplicate"    . tab-bar-duplicate-tab)
+    "m"   '("Move"         . tab-bar-move-tab)
+    "n"   '("New"          . tab-bar-new-tab)
+    "o"   '("Close others" . tab-bar-close-other-tabs)
+    "p"   '("Close prompt" . tab-bar-close-tab-by-name)
+    "r"   '("Restore"      . tab-undo)
+    "s"   '("Select"       . tab-bar-select-tab-by-name)
+    "t"   '("Next"         . tab-bar-switch-to-next-tab))
   (which-key-add-keymap-based-replacements my-tc-spc-map
     "h"   '("Header"       . keycast-header-line-mode)
     "l"   '("Log frame"    . keycast-log-mode)
@@ -285,9 +299,9 @@
     "p"   '("Page"         . whitespace-page-delimiters-mode)
     "s"   '("Spaces"       . whitespace-mode))
   (which-key-add-keymap-based-replacements my-tl-spc-map
-    "b"   '("Breaks"       . toggle-truncate-lines)
+    "l"   '("Visual"       . visual-line-mode)
     "n"   '("Numbers"      . display-line-numbers-mode)
-    "v"   '("Visual"       . visual-line-mode))
+    "t"   '("Truncate"     . toggle-truncate-lines))
   (which-key-add-keymap-based-replacements my-t-spc-map
     "d"   '("Date/time"    . display-time-mode)
     "e"   '("Evil cursor"  . evil-emacs-cursor-model-mode)
@@ -304,9 +318,6 @@
     "c"   `("Cast keys"    . ,my-tc-spc-map)
     "i"   `("Indicate"     . ,my-ti-spc-map)
     "l"   `("Line"         . ,my-tl-spc-map))
-  (which-key-add-keymap-based-replacements my-xz-spc-map
-    "g"   '("Global"       . global-text-scale-adjust)
-    "l"   '("Local"        . text-scale-adjust))
   (which-key-add-keymap-based-replacements my-x-spc-map
     "D"   '("Downcase"     . evil-downcase)
     "U"   '("Upcase"       . evil-upcase)
@@ -316,23 +327,25 @@
     "s"   '("S.sentences"  . transpose-sentences)
     "u"   '("Unicode"      . insert-char)
     "w"   '("Swap words"   . transpose-words)
-    "x"   '("One space"    . just-one-space)
-    "z"   `("Zoom"         . ,my-xz-spc-map))
+    "x"   '("One space"    . just-one-space))
+  (which-key-add-keymap-based-replacements my-z-spc-map
+    "g"   '("Global"       . global-text-scale-adjust)
+    "l"   '("Local"        . text-scale-adjust))
   (which-key-add-keymap-based-replacements my-root-spc-map
     "SPC" '("M-x"          . counsel-M-x)
-    "TAB" '("Swap buffer"  . mode-line-other-buffer)
-    "0"   '("Del.window"   . delete-window)
+    "TAB" '("Select tab"   . tab-bar-select-tab-by-name)
+    "0"   '("Close window" . delete-window)
     "1"   '("Maximize"     . my-toggle-window-maximize)
     "2"   '("Below"        . split-window-below)
     "3"   '("Right"        . split-window-right)
     "4"   '("Four"         . my-4-windows)
     "5"   '("Swap"         . my-ace-swap-window)
-    "6"   '("Rotate"       . rotate-frame-anticlockwise)
+    "6"   '("Rotate"       . rotate-frame-clockwise)
     "7"   '("Transpose"    . transpose-frame)
-    "8"   '("Dired tab"    . dired-other-tab)
-    "9"   '("Pre.other"    . other-window-prefix)
+    "8"   '("Dired tab"    . my-split-dired-tab)
+    "9"   '("Close tab"    . tab-bar-close-tab-by-name)
     "e"   '("Embark"       . embark-act)
-    "j"   '("Jump"         . evil-avy-goto-char-timer)
+    "j"   '("Avy jump"     . evil-avy-goto-char-timer)
     "u"   '("Uni.arg."     . universal-argument)
     "a"   `("Apps"         . ,my-a-spc-map)
     "b"   `("Buffers"      . ,my-b-spc-map)
@@ -347,6 +360,8 @@
     "s"   `("Search"       . ,my-s-spc-map)
     "t"   `("Toggle"       . ,my-t-spc-map)
     "w"   `("Window"       . ,evil-window-map)
-    "x"   `("Text"         . ,my-x-spc-map)))
+    "x"   `("Text"         . ,my-x-spc-map)
+    "z"   `("Zoom"         . ,my-z-spc-map)))
 
+(provide 'keymaps)
 ;;; keymaps.el ends here
