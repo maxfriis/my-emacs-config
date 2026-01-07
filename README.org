@@ -12,8 +12,9 @@ It is my configuration after all.
 
 ** Version requirement
 
-Most of the configuration is fine with Emacs version 29.1, but my which-key configuration requires version 30.1.
-I think which-key was made native in that version because I know the which-key package is much older.
+Most of the configuration is fine with Emacs version 29.1, but my which-key
+configuration requires version 30.1.  I think which-key was made native in that
+version because I know the which-key package is much older.
 
 ** Early init
 
@@ -69,11 +70,9 @@ These screenshots are quite old but this one show an old leader key "space-menu"
 
 ** Cursor and evil state
 
-When I configure evil I add 7 ansi colors reserved for the cursor.
+When I configure evil I add 6 ansi colors reserved for the cursor.
 I tax the eyes a bit with extreme colors to keep track of the cursor and evil state.
 | Color | State    |   | Color | State   |
-|-------+----------+---+-------+---------|
-| #000  | Not used |   | #fff  | emacs   |
 |-------+----------+---+-------+---------|
 | #f00  | operator |   | #0ff  | visual  |
 | #0f0  | normal   |   | #f0f  | replace |
@@ -82,7 +81,6 @@ I tax the eyes a bit with extreme colors to keep track of the cursor and evil st
 Normal state is green.
 Operator state is red to alert.
 Insert state is the remaining yellow traffic light color and has a bar cursor.
-Other states are also configured sensibly.
 
 * Mode-line
 
@@ -228,7 +226,7 @@ A few evil bindings specific to the change in cursor model are rebound inside ev
 Besides that I choose to use Emacs' isearch and I have it bound to =s=.
 evil-substitute can be mimicked with =cl=.
 This comes natural to me since =c= is the most common way I enter insert state.
-I often press =c= even before I have fully figured out what motion I need.
+I often press =c= even before I have fully decided what motion I need to use.
 
 * Youtube videos
 
@@ -246,6 +244,7 @@ If you have an /empty/ or deleted ~/.emacs.d directory and have git installed yo
 #+begin_src bash
   git clone https://github.com/maxfriis/my-emacs-config ~/.emacs.d
 #+end_src
-After that you simply start emacs and it should install all the packages, load them and create a minimal directory structure for org-agenda.
+After that you simply start Emacs and it should install all the packages plus some nerd fonts.
+Init.el will load relevant packages and create a minimal directory structure for org-agenda.
 
-Last you might want to make a link to .emacs.d/ in the /root folder to use emacs as superuser.
+Last you might want to make a link to .emacs.d/ in the /root folder to enable the config for a superuser.

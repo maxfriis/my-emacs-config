@@ -13,7 +13,7 @@
 ;; Maintainer: Peter Friis Jensen <maxfriis@gmail.com>
 ;; URL: https://github.com/maxfriis/evil-emacs-cursor-model-mode
 ;; Created: 2025-11-15
-;; Version: 0.1.1
+;; Version: 0.1.2
 ;; Keywords: convenience, files
 ;; Package-Requires: ((emacs "29.1") (evil "1.15.0"))
 
@@ -97,10 +97,10 @@ Maybe fewer layers are better for your Emacs pinky?"
 ;; Motions.
 (keymap-set evil-emacs-cursor-model-mode-map
             "<remap> <evil-find-char-to>"
-            #'evil-find-char)
+            #'evil-emacs-cursor-model-find-before-char)
 (keymap-set evil-emacs-cursor-model-mode-map
             "<remap> <evil-find-char>"
-            #'evil-emacs-cursor-model-find-char-after)
+            #'evil-emacs-cursor-model-find-after-char)
 (keymap-set evil-emacs-cursor-model-mode-map
             "<remap> <evil-forward-word-end>"
             #'evil-emacs-cursor-model-forward-after-word-end)
@@ -143,20 +143,36 @@ Maybe fewer layers are better for your Emacs pinky?"
 ;; ============================================================================
 ;;; Evil commands implementing Emacs' cursor model
 ;; ============================================================================
-(evil-define-motion evil-emacs-cursor-model-find-char-after (count char)
+(evil-define-motion evil-emacs-cursor-model-find-before-char (count char)
+  "Move point immediately before the next COUNT'th occurrence of CHAR.
+Movement is restricted to the current line unless `evil-cross-lines' is non-nil."
+  :type inclusive
+  (interactive "<c><C>")
+  (unless count (setq count 1))
+  (cond
+   ((> count 0)
+    (if (= (char-after) char)
+        (evil-find-char (1- count) char)
+      (evil-find-char count char)))
+   ((< count 0)
+    (evil-find-char-to-backward (- count) char)))
+  (setq evil-last-find (list #'evil-emacs-cursor-model-find-before-char char (> count 0))))
+
+(evil-define-motion evil-emacs-cursor-model-find-after-char (count char)
   "Move point immediately after the next COUNT'th occurrence of CHAR.
 Movement is restricted to the current line unless `evil-cross-lines' is non-nil."
   :type inclusive
   (interactive "<c><C>")
   (unless count (setq count 1))
-  (if (< count 0)
-      (evil-find-char-backward (- count) char)
-    ;; else
-    (when (= (char-after) char)
-      (cl-decf count))
-    (evil-find-char count char)
+  (cond
+   ((> count 0)
+    (if (= (char-after) char)
+        (evil-find-char (1- count) char)
+      (evil-find-char count char))
     (forward-char))
-  (setq evil-last-find (list #'evil-emacs-cursor-model-find-char-after char (> count 0))))
+   ((< count 0)
+    (evil-find-char-backward (- count) char)))
+  (setq evil-last-find (list #'evil-emacs-cursor-model-find-after-char char (> count 0))))
 
 (defun evil-emacs-cursor-model-forward-after-end (thing &optional count)
   "Move forward to end of THING.

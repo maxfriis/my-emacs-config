@@ -29,7 +29,7 @@
  'error
  nil :foreground "#f0f" :underline t)
 ;; ----------------------------------------------------------------------------
-;;;; font-lock faces.
+;;;; font-lock.
 (set-face-attribute
  'font-lock-comment-face
  nil :foreground "#0ff")
@@ -106,7 +106,7 @@
  nil :box '(:line-width 1 :color "#0ff" :style released-button))
 
 ;; ============================================================================
-;;; Org faces
+;;; Org
 ;; ============================================================================
 (with-eval-after-load 'org
   (set-face-attribute
@@ -292,7 +292,7 @@
    nil :background "#f00"))
 
 ;; ============================================================================
-;;; Misc. other package faces
+;;; Misc. other packages
 ;; ============================================================================
 (set-face-attribute ; matching parenthesis get cursor colors
  'show-paren-match

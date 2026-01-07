@@ -149,6 +149,7 @@
   :doc "My <spc> prefix keys."
   "D"   #'evil-downcase
   "U"   #'evil-upcase
+  "W"   #'flyspell-word
   "c"   #'transpose-chars
   "l"   #'transpose-lines
   "p"   #'transpose-paragraphs
@@ -311,7 +312,7 @@
     "o"   '("Outline"      . outline-minor-mode)
     "p"   '("Prettify"     . prettify-symbols-mode)
     "r"   '("Rainbow"      . rainbow-mode)
-    "s"   '("Spell"        . flyspell-mode)
+    "s"   '("Spellcheck"   . flyspell-mode)
     "t"   '("Theme"        . my-toggle-faces)
     "w"   '("Write good"   . writegood-mode)
     "b"   `("Tab bar"      . ,my-tb-spc-map)
@@ -321,6 +322,7 @@
   (which-key-add-keymap-based-replacements my-x-spc-map
     "D"   '("Downcase"     . evil-downcase)
     "U"   '("Upcase"       . evil-upcase)
+    "W"   '("Spell word"   . flyspell-word)
     "c"   '("Swap chars"   . transpose-chars)
     "l"   '("Swap lines"   . transpose-lines)
     "p"   '("S.paragraphs" . transpose-paragraphs)
@@ -334,7 +336,7 @@
   (which-key-add-keymap-based-replacements my-root-spc-map
     "SPC" '("M-x"          . counsel-M-x)
     "TAB" '("Select tab"   . tab-bar-select-tab-by-name)
-    "0"   '("Close window" . delete-window)
+    "0"   '("Close win"    . delete-window)
     "1"   '("Maximize"     . my-toggle-window-maximize)
     "2"   '("Below"        . split-window-below)
     "3"   '("Right"        . split-window-right)
@@ -347,9 +349,9 @@
     "e"   '("Embark"       . embark-act)
     "j"   '("Avy jump"     . evil-avy-goto-char-timer)
     "u"   '("Uni.arg."     . universal-argument)
-    "a"   `("Apps"         . ,my-a-spc-map)
-    "b"   `("Buffers"      . ,my-b-spc-map)
-    "f"   `("Files"        . ,my-f-spc-map)
+    "a"   `("App"          . ,my-a-spc-map)
+    "b"   `("Buffer"       . ,my-b-spc-map)
+    "f"   `("File"         . ,my-f-spc-map)
     "g"   `("Git"          . ,my-g-spc-map)
     "h"   `("Help"         . ,help-map)
     "l"   `("Lisp"         . ,my-l-spc-map)

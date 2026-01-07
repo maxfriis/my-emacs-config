@@ -11,7 +11,7 @@
 (when (find-font (font-spec :name "Verdana 24"))
   (set-face-font 'variable-pitch "Verdana 24"))
 ;; ----------------------------------------------------------------------------
-;; Two basic "size" faces.
+;; Two basic size faces.
 (defface shrink '((t :height .8))
   "Basic shrink face.  Size: 4/5=.8.
 This does the opposite of the `grow' face."
@@ -141,7 +141,8 @@ This does the opposite of the `shrink' face."
         'help-echo "evil-emacs-cursor-model-mode disabled, mouse-1: Enable"
         'local-map (make-mode-line-mouse-map
                     'mouse-1 #'evil-emacs-cursor-model-mode)
-        'mouse-face 'mode-line-highlight))
+        'mouse-face 'mode-line-highlight
+        'face 'bold))
       (t
        (propertize
         "|"
@@ -268,9 +269,10 @@ This does the opposite of the `shrink' face."
  ;; ----------------------------------------------------------------------------
  ;; Emacs' `isearch' rather than `evil-search'.
  search-whitespace-regexp "[^\n]*?"
- lazy-count-prefix-format "%s/%s "
- lazy-count-suffix-format nil
+ isearch-repeat-on-direction-change t
  isearch-lazy-count t
+ lazy-count-suffix-format nil
+ lazy-count-prefix-format "%s/%s "
  ;; ----------------------------------------------------------------------------
  ;; Tab bar.
  tab-bar-show                  1
@@ -389,10 +391,10 @@ The function will organize the `buffer-list' and focus note.org."
   (find-file (concat org-agenda-directory "note.org")))
 ;; ----------------------------------------------------------------------------
 ;; Split dired in new tab.
-(defun my-split-dired-tab (dir)
+(defun my-split-dired-tab (directory)
   "Split dired in new tab."
   (interactive "DDirectory: ")
-  (dired-other-tab dir)
+  (dired-other-tab directory)
   (split-window-right))
 ;; ----------------------------------------------------------------------------
 ;; Custom agenda.
@@ -523,7 +525,7 @@ and focus the window you swapped to."
    ("melpa"  . 2)
    ("nongnu" . 1)) ; The remaining archives have priority 0.
  package-selected-packages
- '(evil evil-collection evil-nerd-commenter evil-surround evil-numbers evil-org org-superstar org-appear org-present magit cape corfu nerd-icons-corfu nerd-icons nerd-icons-dired nerd-icons-ibuffer nerd-icons-completion avy vertico marginalia orderless counsel consult embark embark-consult lsp-mode rainbow-delimiters rainbow-mode recursive-narrow centered-cursor-mode golden-ratio ace-window transpose-frame mixed-pitch indent-guide keycast undo-tree flycheck writegood-mode auto-package-update backup-each-save package-lint))
+ '(evil evil-collection evil-nerd-commenter evil-surround evil-numbers evil-org org-superstar org-appear org-present magit cape corfu nerd-icons-corfu nerd-icons nerd-icons-dired nerd-icons-ibuffer nerd-icons-completion avy vertico marginalia orderless counsel consult embark embark-consult rainbow-delimiters rainbow-mode recursive-narrow centered-cursor-mode golden-ratio ace-window transpose-frame mixed-pitch indent-guide keycast undo-tree flycheck writegood-mode auto-package-update backup-each-save package-lint))
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents nil))
@@ -576,7 +578,7 @@ and focus the window you swapped to."
 (with-eval-after-load 'vertico
   (require 'marginalia)
   (marginalia-mode 1))
-;; Tidy typing directories:
+;; Tidy typing directories (rfn=read-file-name):
 (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
 (require 'orderless)
 (setq completion-styles '(orderless))
@@ -626,7 +628,6 @@ and focus the window you swapped to."
 (require 'writegood-mode)
 ;; ----------------------------------------------------------------------------
 ;; Color guides.
-(require 'lsp-mode)
 (require 'indent-guide)
 (add-hook 'prog-mode-hook #'indent-guide-mode)
 (require 'rainbow-delimiters)
@@ -663,7 +664,7 @@ and focus the window you swapped to."
  evil-undo-system 'undo-tree ; Set before loading evil!
  evil-want-keybinding nil    ; `evil-collection' need this.
  evil-want-integration t
- evil-want-C-i-jump nil)     ; I rebind jump forward to "C-O".
+ evil-want-C-i-jump nil)     ; I rebind jump forward to "C-S-o".
 (require 'evil)
 ;; ----------------------------------------------------------------------------
 ;; Cursor colors. I combine f and 0 to indicate the evil state.
@@ -674,7 +675,7 @@ and focus the window you swapped to."
  evil-visual-state-cursor   '((bar  . 4) "#0ff")
  evil-replace-state-cursor  '((hbar . 4) "#f0f")
  evil-insert-state-cursor   '((bar  . 4) "#ff0")
- evil-emacs-state-cursor    '((bar  . 4) "#fff"))
+ evil-emacs-state-cursor    '(box        "#f00"))
 ;; ----------------------------------------------------------------------------
 ;; Tags for `evil-mode-line-tag'.
 (if (display-graphic-p)
@@ -682,23 +683,23 @@ and focus the window you swapped to."
      evil-operator-state-tag "🅾"
      evil-normal-state-tag   "🅽"
      evil-motion-state-tag   "🅼"
-     evil-replace-state-tag  "🆁"
-     evil-emacs-state-tag    "🆉"
-     evil-insert-state-tag   "🅸"
      evil-visual-char-tag    "🆅"
      evil-visual-line-tag    "🅻"
-     evil-visual-block-tag   "🅱")
+     evil-visual-block-tag   "🅱"
+     evil-replace-state-tag  "🆁"
+     evil-insert-state-tag   "🅸"
+     evil-emacs-state-tag    "🆉")
   ;; else
   (setq
    evil-operator-state-tag "O"
    evil-normal-state-tag   "N"
    evil-motion-state-tag   "M"
-   evil-replace-state-tag  "R"
-   evil-emacs-state-tag    "Z"
-   evil-insert-state-tag   "I"
    evil-visual-char-tag    "V"
    evil-visual-line-tag    "L"
-   evil-visual-block-tag   "B"))
+   evil-visual-block-tag   "B"
+   evil-replace-state-tag  "R"
+   evil-insert-state-tag   "I"
+   evil-emacs-state-tag    "Z"))
 (evil-mode 1)
 ;; ============================================================================
 ;;;; Addons
@@ -729,6 +730,9 @@ and focus the window you swapped to."
 ;;;; Hooks to suspend `global-hl-line-mode'
 ;; ============================================================================
 ;; Suspend the `hl-line' so `region' can use the same background color.
+;; ----------------------------------------------------------------------------
+;; The buffer-local `hl-line-mode' don't properly respect specificity so it
+;; only override `global-hl-line-mode' when called interactively.
 (add-hook 'evil-visual-state-entry-hook
           #'(lambda () (global-hl-line-mode 0)))
 (add-hook 'evil-visual-state-exit-hook #'global-hl-line-mode)
@@ -803,11 +807,11 @@ and focus the window you swapped to."
   (save-buffer)
   (switch-to-buffer "*scratch*"))
 ;; ============================================================================
-;;;; Variables setting up org
+;;;; Variables setting up org-mode
 ;; ============================================================================
 (setq
  org-default-notes-file (concat org-directory "inbox.org")
- org-ellipsis " … " ; ▾▼⤵⮷
+ org-ellipsis " … " ; ▾▼⤵⮷ the dots are similar to `outline-mode'.
  org-todo-keywords ; I use categories and refile rather than more keywords.
  '((type     "NEXT(n!/!)" "TODO(t!/!)" "|") ; Active states.
    (type "|" "HOLD(h@/!)" "DONE(d!/!)"))  ; Inactive states.
@@ -937,6 +941,8 @@ and focus the window you swapped to."
      ;; TODOs without a timestamp.
      (todo
       "TODO" ; Sort [/] cookies on top. This is typically categories.
+      ;; I would prefer to use `org-agenda-sorting-strategy' but I have not
+      ;; figured out `org-agenda-cmp-user-defined'.
       ((org-agenda-overriding-header "No timestamp TODO or HOLD:")
        (org-agenda-skip-function
         '(org-agenda-skip-entry-if
@@ -1180,19 +1186,19 @@ and focus the window you swapped to."
  ("gs"            . transpose-chars) ; Or "<spc> x c"
  :map evil-motion-state-map
  ;; I don't need "n"/"N" for `evil-search'. I use `isearch'.
- ("m"             . backward-paragraph)        ; Below "k".
- ("n"             . forward-paragraph)         ; Below "j".
+ ("m"             . backward-paragraph) ; Below "k".
+ ("n"             . forward-paragraph)  ; Below "j".
  ("N"             . evil-search-next) ; I don't have `evil-search-previous'.
- ("s"             . isearch-forward)  ; I prefer `isearch' and "C-s" to repeat.
+ ("s"             . isearch-forward) ; I prefer `isearch' and "C-s" to repeat.
  ("S"             . isearch-forward-thing-at-point) ; This is like Vim's "*".
+ ("´"             . evil-set-marker) ; I use "m" for paragraph.
+ ("¨"             . tab-bar-new-tab)
+ ("½"             . mode-line-other-buffer)
  ("<down>"        . evil-next-visual-line)     ; up/down wrapped lines.
  ("<up>"          . evil-previous-visual-line) ; j/k respect line atoms.
- ("½"             . mode-line-other-buffer)
- ("¨"             . tab-bar-new-tab)
- ("´"             . evil-set-marker)     ; I use "m" for paragraph.
- ("C-i"           . outline-cycle)       ; "C-i" = <tab>.
  ("<backtab>"     . outline-cycle-buffer)
- ("C-S-o"         . evil-jump-forward)   ; "C-i" is used for <tab>.
+ ("C-i"           . outline-cycle) ; "C-i" = <tab>.
+ ("C-S-o"         . evil-jump-forward)
  ("gc"            . evilnc-comment-operator)
  ("æ"             . evil-scroll-down)
  ("Æ"             . evil-scroll-up)      ; "C-u" is `universal-argument'.
@@ -1204,10 +1210,10 @@ and focus the window you swapped to."
  :map evil-insert-state-map
  ("C-b"           . evil-backward-word-begin)
  ("C-B"           . evil-backward-WORD-begin)
- ("C-d"           . backward-kill-word) ; In evil this is normally bound "C-w".
- ("C-e"           . forward-word)       ; Not using `evil-emacs-cursor-model-mode'.
+ ("C-d"           . backward-kill-word) ; In evil this is bound "C-w".
+ ("C-e"           . forward-word)       ; Not `evil-emacs-cursor-model-mode'.
  ("C-p"           . yank)               ; "M-p" is in the `global-map'.
- ("C-v"           . set-mark-command)   ; "<C-SPC>" is used by leader key.
+ ("C-v"           . set-mark-command)
  ("C-w"           . evil-forward-word-begin) ; Not `evil-delete-backward-word'.
  ("C-W"           . evil-forward-WORD-begin)
  ("C-0"           . beginning-of-line)
@@ -1218,6 +1224,8 @@ and focus the window you swapped to."
  ("<right>"       . org-present-next)
  ("<up>"          . org-present-beginning)
  ("<down>"        . org-present-end)
+ :map isearch-mode-map
+ ("C-q"           . isearch-query-replace) ; Can't be "C-r" or "M-r".
  :map corfu-map
  ("C-,"           . corfu-insert-separator) ; For fuzzy completion.
  ("C-i"           . corfu-next) ; "C-i" = <tab>.
@@ -1236,7 +1244,6 @@ and focus the window you swapped to."
   (kbd "SPC") nil ; Use <SPC> as a leader key.
   (kbd "<S-left>")  #'org-agenda-earlier
   (kbd "<S-right>") #'org-agenda-later
-  "´"           #'next-buffer
   "a"           #'org-agenda-append-agenda
   "A"           #'org-agenda-archive-default
   "R"           #'org-agenda-refile
@@ -1250,10 +1257,14 @@ and focus the window you swapped to."
   "Æ"           #'org-agenda-backward-block
   "å"           #'org-agenda-capture
   "Å"           #'my-org-capture-idea)
-(evil-define-key 'normal dired-mode-map
+(evil-define-key 'normal dired-mode-map ; I like some personal customization.
   (kbd "SPC") nil
+  "c"           #'dired-do-copy    ; Swap.
+  "C"           #'dired-do-compress-to
   "h"           #'dired-up-directory
   "l"           #'dired-find-file
+  "r"           #'dired-do-rename  ; Swap.
+  "R"           #'dired-do-redisplay
   ")"           #'dired-omit-mode) ; "(" is toggle `dired-hide-details-mode'.
 (evil-define-key 'normal debugger-mode-map
   (kbd "SPC") nil
