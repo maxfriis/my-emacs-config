@@ -648,24 +648,24 @@ and focus the window you swapped to."
 (require 'rainbow-mode) ; Toggle with "<spc> t r".
 ;; ----------------------------------------------------------------------------
 ;; Thumbnails.
-(when (display-graphic-p)
-  (require 'nerd-icons)
-  (require 'nerd-icons-dired)
-  (add-hook 'dired-mode-hook #'nerd-icons-dired-mode)
-  (require 'nerd-icons-ibuffer)
-  (add-hook 'ibuffer-mode-hook #'nerd-icons-ibuffer-mode)
-  (with-eval-after-load 'corfu
-    (require 'nerd-icons-corfu)
-    (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
-  (with-eval-after-load 'marginalia
-    (require 'nerd-icons-completion)
-    (nerd-icons-completion-mode 1)
-    (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
-  (unless (find-font (font-spec :name "Symbols Nerd Font Mono"))
-    (nerd-icons-install-fonts)))
+(require 'nerd-icons)
+(when (and (not (find-font (font-spec :name "Symbols Nerd Font Mono")))
+           (display-graphic-p))
+  (nerd-icons-install-fonts t)) ; MS Windows?
+(require 'nerd-icons-dired)
+(add-hook 'dired-mode-hook #'nerd-icons-dired-mode)
+(require 'nerd-icons-ibuffer)
+(add-hook 'ibuffer-mode-hook #'nerd-icons-ibuffer-mode)
+(with-eval-after-load 'corfu
+  (require 'nerd-icons-corfu)
+  (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
+(with-eval-after-load 'marginalia
+  (require 'nerd-icons-completion)
+  (nerd-icons-completion-mode 1)
+  (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
 
 ;; ============================================================================
- ;;; Evil.el
+;;; Evil.el
 ;; ============================================================================
 (setq
  evil-undo-system 'undo-tree ; Set before loading evil!
