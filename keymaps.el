@@ -99,19 +99,14 @@
   "b"   #'tab-bar-mode
   "c"   #'tab-bar-close-tab
   "d"   #'tab-bar-duplicate-tab
+  "h"   #'tab-bar-switch-to-prev-tab
+  "l"   #'tab-bar-switch-to-next-tab
   "m"   #'tab-bar-move-tab
   "n"   #'tab-bar-new-tab
   "o"   #'tab-bar-close-other-tabs
   "p"   #'tab-bar-close-tab-by-name
   "r"   #'tab-undo
-  "s"   #'tab-bar-select-tab-by-name
-  "t"   #'tab-bar-switch-to-next-tab)
-(defvar-keymap my-tc-spc-map
-  :doc "My <spc> prefix keys."
-  "h"   #'keycast-header-line-mode
-  "l"   #'keycast-log-mode
-  "m"   #'keycast-mode-line-mode
-  "t"   #'keycast-tab-bar-mode)
+  "s"   #'tab-bar-select-tab-by-name)
 (defvar-keymap my-ti-spc-map
   :doc "My <spc> prefix keys."
   "c"   #'display-fill-column-indicator-mode
@@ -119,6 +114,12 @@
   "n"   #'whitespace-newline-mode
   "p"   #'whitespace-page-delimiters-mode
   "s"   #'whitespace-mode)
+(defvar-keymap my-tk-spc-map
+  :doc "My <spc> prefix keys."
+  "h"   #'keycast-header-line-mode
+  "l"   #'keycast-log-mode
+  "m"   #'keycast-mode-line-mode
+  "t"   #'keycast-tab-bar-mode)
 (defvar-keymap my-tl-spc-map
   :doc "My <spc> prefix keys."
   "l"   #'visual-line-mode
@@ -126,6 +127,7 @@
   "t"   #'toggle-truncate-lines)
 (defvar-keymap my-t-spc-map
   :doc "My <spc> prefix keys."
+  "a"   #'auto-save-visited-mode
   "d"   #'display-time-mode
   "e"   #'evil-emacs-cursor-model-mode
   "f"   #'mixed-pitch-mode
@@ -138,8 +140,8 @@
   "t"   #'my-toggle-faces
   "w"   #'writegood-mode
   "b"   my-tb-spc-map
-  "c"   my-tc-spc-map
   "i"   my-ti-spc-map
+  "k"   my-tk-spc-map
   "l"   my-tl-spc-map)
 (defvar-keymap my-z-spc-map
   :doc "My <spc> prefix keys."
@@ -170,7 +172,7 @@
   "6"   #'rotate-frame-clockwise
   "7"   #'transpose-frame
   "8"   #'my-split-dired-tab
-  "9"   #'tab-bar-close-tab-by-name
+  "9"   #'tab-bar-close-tab
   "e"   #'embark-act
   "j"   #'evil-avy-goto-char-timer
   "u"   #'universal-argument
@@ -281,29 +283,31 @@
     "b"   '("Toggle bar"   . tab-bar-mode)
     "c"   '("Close"        . tab-bar-close-tab)
     "d"   '("Duplicate"    . tab-bar-duplicate-tab)
+    "h"   '("Previous"     . tab-bar-switch-to-prev-tab)
+    "l"   '("Next"         . tab-bar-switch-to-next-tab)
     "m"   '("Move"         . tab-bar-move-tab)
     "n"   '("New"          . tab-bar-new-tab)
     "o"   '("Close others" . tab-bar-close-other-tabs)
     "p"   '("Close prompt" . tab-bar-close-tab-by-name)
     "r"   '("Restore"      . tab-undo)
-    "s"   '("Select"       . tab-bar-select-tab-by-name)
-    "t"   '("Next"         . tab-bar-switch-to-next-tab))
-  (which-key-add-keymap-based-replacements my-tc-spc-map
-    "h"   '("Header"       . keycast-header-line-mode)
-    "l"   '("Log frame"    . keycast-log-mode)
-    "m"   '("Mode line"    . keycast-mode-line-mode)
-    "t"   '("Tab bar"      . keycast-tab-bar-mode))
+    "s"   '("Select"       . tab-bar-select-tab-by-name))
   (which-key-add-keymap-based-replacements my-ti-spc-map
     "c"   '("Column 79"    . display-fill-column-indicator-mode)
     "i"   '("Indentation"  . indent-guide-mode)
     "n"   '("Newline"      . whitespace-newline-mode)
     "p"   '("Page"         . whitespace-page-delimiters-mode)
     "s"   '("Spaces"       . whitespace-mode))
+  (which-key-add-keymap-based-replacements my-tk-spc-map
+    "h"   '("Header"       . keycast-header-line-mode)
+    "l"   '("Log frame"    . keycast-log-mode)
+    "m"   '("Mode line"    . keycast-mode-line-mode)
+    "t"   '("Tab bar"      . keycast-tab-bar-mode))
   (which-key-add-keymap-based-replacements my-tl-spc-map
     "l"   '("Visual"       . visual-line-mode)
     "n"   '("Numbers"      . display-line-numbers-mode)
     "t"   '("Truncate"     . toggle-truncate-lines))
   (which-key-add-keymap-based-replacements my-t-spc-map
+    "a"   '("Auto save"    . auto-save-visited-mode)
     "d"   '("Date/time"    . display-time-mode)
     "e"   '("Evil cursor"  . evil-emacs-cursor-model-mode)
     "f"   '("Font pitch"   . mixed-pitch-mode)
@@ -316,8 +320,8 @@
     "t"   '("Theme"        . my-toggle-faces)
     "w"   '("Write good"   . writegood-mode)
     "b"   `("Tab bar"      . ,my-tb-spc-map)
-    "c"   `("Cast keys"    . ,my-tc-spc-map)
     "i"   `("Indicate"     . ,my-ti-spc-map)
+    "k"   `("Key cast"     . ,my-tk-spc-map)
     "l"   `("Line"         . ,my-tl-spc-map))
   (which-key-add-keymap-based-replacements my-x-spc-map
     "D"   '("Downcase"     . evil-downcase)
@@ -345,7 +349,7 @@
     "6"   '("Rotate"       . rotate-frame-clockwise)
     "7"   '("Transpose"    . transpose-frame)
     "8"   '("Dired tab"    . my-split-dired-tab)
-    "9"   '("Close tab"    . tab-bar-close-tab-by-name)
+    "9"   '("Close tab"    . tab-bar-close-tab)
     "e"   '("Embark"       . embark-act)
     "j"   '("Avy jump"     . evil-avy-goto-char-timer)
     "u"   '("Uni.arg."     . universal-argument)

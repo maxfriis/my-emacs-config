@@ -11,17 +11,7 @@
 (when (find-font (font-spec :name "Verdana 24"))
   (set-face-font 'variable-pitch "Verdana 24"))
 ;; ----------------------------------------------------------------------------
-;; Two basic size faces.
-(defface shrink '((t :height .8))
-  "Basic shrink face.  Size: 4/5=.8.
-This does the opposite of the `grow' face."
-  :group 'basic-faces)
-(defface grow '((t :height 1.25))
-  "Basic grow face.  Size: 5/4=1.25.
-This does the opposite of the `shrink' face."
-  :group 'basic-faces)
-;; ----------------------------------------------------------------------------
-;; I use files for face colors and don't (deftheme...).
+;; Files for face colors.
 (when (file-newer-than-file-p
        (locate-user-emacs-file "ansi-faces.el")
        (locate-user-emacs-file "ansi-faces.elc"))
@@ -31,10 +21,20 @@ This does the opposite of the `shrink' face."
        (locate-user-emacs-file "brown-faces.elc"))
   (byte-compile-file (locate-user-emacs-file "brown-faces.el")))
 (if (and (display-graphic-p)
-         (not (eq (user-uid) 0))) ; Ansi colors as root.
+         (/= (user-uid) 0)) ; Ansi colors as root.
     (load (locate-user-emacs-file "brown-faces.elc") nil t)
   ;; else
   (load (locate-user-emacs-file "ansi-faces.elc") nil t))
+;; ----------------------------------------------------------------------------
+;; Two basic size faces.
+(defface shrink '((t :height .8))
+  "Basic shrink face.  Size: 4/5=.8.
+This does the opposite of the `grow' face."
+  :group 'basic-faces)
+(defface grow '((t :height 1.25))
+  "Basic grow face.  Size: 5/4=1.25.
+This does the opposite of the `shrink' face."
+  :group 'basic-faces)
 ;; ----------------------------------------------------------------------------
 ;; My additional coloring.
 (font-lock-add-keywords
@@ -49,16 +49,16 @@ This does the opposite of the `shrink' face."
    ("(\\(a?\\(cos\\|sin\\|tan\\)\\)[\s\n]"   . (1 'font-lock-keyword-face))
    ("(\\(sqrt\\|expt?\\|log\\)[\s\n]"        . (1 'font-lock-keyword-face))
    ("(\\(1?[+-]\\|[*/]\\)[\s\n]"             . (1 'font-lock-keyword-face))
-   ;; Logic (green).
+   ;; Boolean logic functions (green).
    ("(\\(not\\|and\\|x?or\\)[\s\n]"    . (1 'font-lock-function-call-face))
    ("(\\([^\s]*[<>=]\\)[\s\n]"         . (1 'font-lock-function-call-face))
    ("(\\(eq\\(\\(ua\\)?l\\)?\\)[\s\n]" . (1 'font-lock-function-call-face))
    ("(\\(mem\\(ber\\|ql?\\)\\)[\s\n]"  . (1 'font-lock-function-call-face))
    ("(\\([be]o[bl]p\\))"               . (1 'font-lock-function-call-face))
    ("(\\([^\s]+-p\\)[\s\n)]"           . (1 'font-lock-function-call-face))
-   ;; Prefix for function argument and constants (blue).
-   ("\\(#'\\)"                               . (1 'font-lock-builtin-face))
+   ;; Prefix for constants and function arguments (blue).
    ("\\(float-\\(e\\|pi\\)\\)[\s\n)]"       . (1 'font-lock-constant-face))
+   ("\\(#'\\)"                               . (1 'font-lock-builtin-face))
    ;; Booleans and number/float/fraction/date/time (magenta).
    ("\\(\\([(\s]+\\(nil\\|t\\)\\)+\\)[\s\n)]" . (1 'font-lock-number-face))
    ("\\(\\(\\([(\s]\\|^\\)[0-9]*[/:-]?[0-9]*[.:-]?[0-9]+\\)+\\)[\s\n)/.:-]"
@@ -74,7 +74,7 @@ This does the opposite of the `shrink' face."
  '((:eval ; Eval and list everything.
     (list
      ;; Indicators.
-     (if (and (eq (user-uid) 0) ; I link ~/.emacs.d in /root.
+     (if (and (= (user-uid) 0) ; I link ~/.emacs.d in /root.
               (mode-line-window-selected-p))
          (propertize
           "#"
@@ -122,7 +122,7 @@ This does the opposite of the `shrink' face."
       ((and rainbow-mode
             (mode-line-window-selected-p))
        (propertize
-        "*"
+        "#"
         'help-echo "rainbow-mode enabled, mouse-1: Disable"
         'local-map (make-mode-line-mouse-map
                     'mouse-1 #'rainbow-mode)
@@ -134,6 +134,13 @@ This does the opposite of the `shrink' face."
         'help-echo "golden-ratio-mode disabled, mouse-1: Enable"
         'local-map (make-mode-line-mouse-map
                     'mouse-1 #'golden-ratio-mode)
+        'mouse-face 'mode-line-highlight))
+      ((not auto-save-visited-mode)
+       (propertize
+        "*"
+        'help-echo "Auto save disabled, mouse-1: Enable"
+        'local-map (make-mode-line-mouse-map
+                    'mouse-1 #'auto-save-visited-mode)
         'mouse-face 'mode-line-highlight))
       ((not evil-emacs-cursor-model-mode)
        (propertize
@@ -175,7 +182,7 @@ This does the opposite of the `shrink' face."
          (list
           ;; Version control.
           (if vc-mode
-              (propertize ; Override the built in `propertize'.
+              (propertize ; Replace the built in `propertize' of vc-mode.
                (replace-regexp-in-string "\\` Git" "" vc-mode)
                'help-echo "Version control, mouse-1: Magit"
                'local-map (make-mode-line-mouse-map
@@ -256,22 +263,21 @@ This does the opposite of the `shrink' face."
  dired-kill-when-opening-new-dired-buffer t
  dired-dwim-target t
  dired-recursive-copies 'always
- dired-recursive-deletes 'always ; Risky.
+ dired-recursive-deletes 'always ; Risky but I move to trash.
  dired-listing-switches "-aghov --group-directories-first"
  dired-omit-files "\\`[#\\.].*\\'"
  dired-omit-verbose  nil
  auto-revert-verbose nil
- global-auto-revert-non-file-buffers t ; Update dired when files change.
+ global-auto-revert-non-file-buffers t ; Auto update dired when files change.
  ;; ----------------------------------------------------------------------------
  ;; Ediff.
  ediff-split-window-function 'split-window-horizontally
  ediff-window-setup-function 'ediff-setup-windows-plain
  ;; ----------------------------------------------------------------------------
  ;; Emacs' `isearch' rather than `evil-search'.
- search-whitespace-regexp "[^\n]*?"
+ search-whitespace-regexp "[^\n]*?" ; Don't cross lines.
  isearch-repeat-on-direction-change t
  isearch-lazy-count t
- lazy-count-suffix-format nil
  lazy-count-prefix-format "%s/%s "
  ;; ----------------------------------------------------------------------------
  ;; Tab bar.
@@ -395,13 +401,15 @@ The function will organize the `buffer-list' and focus note.org."
   "Split dired in new tab."
   (interactive "DDirectory: ")
   (dired-other-tab directory)
-  (split-window-right))
+  (split-window-right)
+  (find-file "~/")
+  (ace-swap-window)
+  (aw-flip-window))
 ;; ----------------------------------------------------------------------------
 ;; Custom agenda.
 (defun my-org-agenda-custom ()
   "Custom agenda with NEXT items, this week's agenda and TODO/HOLD items."
   (interactive)
-  (delete-other-windows)
   (org-agenda nil "c")
   (unless (eq (char-after) ?\s) ; Stay on a NEXT item (start with a space).
     (org-agenda-goto-today)))   ; If on a heading (doesn't).
@@ -413,7 +421,7 @@ The function will organize the `buffer-list' and focus note.org."
   (org-capture nil "i")
   (org-save-all-org-buffers)
   (when (eq major-mode 'org-agenda-mode)
-    (org-agenda-redo) ; Might turn `hl-line-mode' off for some reason?!?
+    (org-agenda-redo) ; Might turn `global-hl-line-mode' off for some reason?!?
     (global-hl-line-mode 1)
     (goto-char (point-min)))) ; Jump to the newly prepended NEXT item.
 ;; ----------------------------------------------------------------------------
@@ -525,7 +533,7 @@ and focus the window you swapped to."
    ("melpa"  . 2)
    ("nongnu" . 1)) ; The remaining archives have priority 0.
  package-selected-packages
- '(evil evil-collection evil-nerd-commenter evil-surround evil-numbers evil-org org-superstar org-appear org-present magit cape corfu nerd-icons-corfu nerd-icons nerd-icons-dired nerd-icons-ibuffer nerd-icons-completion avy vertico marginalia orderless counsel consult embark embark-consult rainbow-delimiters rainbow-mode recursive-narrow centered-cursor-mode golden-ratio ace-window transpose-frame mixed-pitch indent-guide keycast undo-tree flycheck writegood-mode auto-package-update backup-each-save package-lint))
+ '(evil evil-collection evil-nerd-commenter evil-surround evil-numbers evil-org org-superstar org-appear org-present magit cape corfu nerd-icons nerd-icons-corfu nerd-icons-dired nerd-icons-ibuffer nerd-icons-completion avy vertico marginalia orderless counsel consult embark embark-consult rainbow-delimiters rainbow-mode recursive-narrow centered-cursor-mode golden-ratio ace-window transpose-frame mixed-pitch indent-guide keycast undo-tree flycheck writegood-mode auto-package-update backup-each-save package-lint))
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents nil))
@@ -653,12 +661,11 @@ and focus the window you swapped to."
     (require 'nerd-icons-completion)
     (nerd-icons-completion-mode 1)
     (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
-  ;; Hack that install nerd fonts when init.el has not yet been compiled.
-  (unless (file-exists-p (locate-user-emacs-file "init.elc"))
-    (nerd-icons-install-fonts t)))
+  (unless (find-font (font-spec :name "Symbols Nerd Font Mono"))
+    (nerd-icons-install-fonts)))
 
 ;; ============================================================================
-;;; Evil.el
+ ;;; Evil.el
 ;; ============================================================================
 (setq
  evil-undo-system 'undo-tree ; Set before loading evil!
@@ -675,7 +682,7 @@ and focus the window you swapped to."
  evil-visual-state-cursor   '((bar  . 4) "#0ff")
  evil-replace-state-cursor  '((hbar . 4) "#f0f")
  evil-insert-state-cursor   '((bar  . 4) "#ff0")
- evil-emacs-state-cursor    '(box        "#f00"))
+ evil-emacs-state-cursor    '(box        "#fff"))
 ;; ----------------------------------------------------------------------------
 ;; Tags for `evil-mode-line-tag'.
 (if (display-graphic-p)
@@ -702,7 +709,7 @@ and focus the window you swapped to."
    evil-emacs-state-tag    "Z"))
 (evil-mode 1)
 ;; ============================================================================
-;;;; Addons
+ ;;;; Addons
 ;; ============================================================================
 (require 'evil-collection)
 (evil-collection-init)
@@ -719,7 +726,7 @@ and focus the window you swapped to."
 (require 'evil-org-agenda)
 (evil-org-agenda-set-keys)
 ;; ============================================================================
-;;;; `evil-emacs-cursor-model-mode' (my sacrilege to "the curch of Vim")
+ ;;;; `evil-emacs-cursor-model-mode' (my sacrilege to "the curch of Vim")
 ;; ============================================================================
 (unless (package-installed-p 'evil-emacs-cursor-model-mode)
   (package-install-file (locate-user-emacs-file "evil-emacs-cursor-model-mode.el")))
@@ -727,7 +734,7 @@ and focus the window you swapped to."
 ;; (require 'evil-emacs-cursor-model-mode)
 (evil-emacs-cursor-model-mode 1)
 ;; ============================================================================
-;;;; Hooks to suspend `global-hl-line-mode'
+ ;;;; Hooks to suspend `global-hl-line-mode'
 ;; ============================================================================
 ;; Suspend the `hl-line' so `region' can use the same background color.
 ;; ----------------------------------------------------------------------------
@@ -1133,27 +1140,32 @@ and focus the window you swapped to."
 ;; ============================================================================
 ;;; Leader key setup
 ;; ============================================================================
+;; I use `which-key' for my leader rather than `transient'
 (unless (version< emacs-version "30.1")
   (which-key-mode 1)
   (setq
-   ;; which-key-sort-order 'which-key-prefix-then-key-order ; nil prefix works.
+   which-key-sort-order 'which-key-prefix-then-key-order ; nil prefix works.
    which-key-prefix-prefix nil
    which-key-idle-delay 3.0)
   (which-key-setup-minibuffer))
+;; ----------------------------------------------------------------------------
+;; Keymaps for my leader key setup.
 (when (file-newer-than-file-p
        (locate-user-emacs-file "keymaps.el")
        (locate-user-emacs-file "keymaps.elc"))
   (byte-compile-file (locate-user-emacs-file "keymaps.el")))
 (load (locate-user-emacs-file "keymaps.elc") nil t)
-(keymap-set evil-window-map       "d"    #'toggle-window-dedicated)
-(keymap-set evil-window-map       "g"    #'golden-ratio-mode)
-(keymap-set help-map              "c"    #'describe-char)
-(keymap-set help-map              "e"    #'embark-dwim)
-(keymap-set help-map              "E"    #'view-echo-area-messages)
-(keymap-set help-map              "F"    #'describe-face)
-(keymap-set help-map              "G"    #'Info-goto-emacs-command-node)
-(keymap-set help-map              "h"    #'describe-symbol)
-(keymap-set help-map              "o"    #'view-hello-file)
+;; ----------------------------------------------------------------------------
+;; Additions to existing keymaps.
+(keymap-set evil-window-map "d" #'toggle-window-dedicated)
+(keymap-set evil-window-map "g" #'golden-ratio-mode)
+(keymap-set help-map        "c" #'describe-char)
+(keymap-set help-map        "F" #'describe-face)
+(keymap-set help-map        "G" #'Info-goto-emacs-command-node)
+(keymap-set help-map        "h" #'describe-symbol) ; Swap with "o"
+(keymap-set help-map        "o" #'view-hello-file)
+;; ----------------------------------------------------------------------------
+;; Leader keys.
 (keymap-set evil-motion-state-map "SPC"  my-root-spc-map)
 (keymap-set global-map            "<f9>" my-root-spc-map)
 
@@ -1188,7 +1200,8 @@ and focus the window you swapped to."
  ;; I don't need "n"/"N" for `evil-search'. I use `isearch'.
  ("m"             . backward-paragraph) ; Below "k".
  ("n"             . forward-paragraph)  ; Below "j".
- ("N"             . evil-search-next) ; I don't have `evil-search-previous'.
+ ("N"             . evil-search-next)
+ ("C-N"           . evil-search-previous)
  ("s"             . isearch-forward) ; I prefer `isearch' and "C-s" to repeat.
  ("S"             . isearch-forward-thing-at-point) ; This is like Vim's "*".
  ("´"             . evil-set-marker) ; I use "m" for paragraph.
@@ -1198,7 +1211,7 @@ and focus the window you swapped to."
  ("<up>"          . evil-previous-visual-line) ; j/k respect line atoms.
  ("<backtab>"     . outline-cycle-buffer)
  ("C-i"           . outline-cycle) ; "C-i" = <tab>.
- ("C-S-o"         . evil-jump-forward)
+ ("C-O"           . evil-jump-forward)
  ("gc"            . evilnc-comment-operator)
  ("æ"             . evil-scroll-down)
  ("Æ"             . evil-scroll-up)      ; "C-u" is `universal-argument'.
@@ -1225,7 +1238,7 @@ and focus the window you swapped to."
  ("<up>"          . org-present-beginning)
  ("<down>"        . org-present-end)
  :map isearch-mode-map
- ("C-q"           . isearch-query-replace) ; Can't be "C-r" or "M-r".
+ ("C-S-s"         . isearch-query-replace) ; "C-S" does not work.
  :map corfu-map
  ("C-,"           . corfu-insert-separator) ; For fuzzy completion.
  ("C-i"           . corfu-next) ; "C-i" = <tab>.

@@ -1,4 +1,4 @@
-;;; my-faces.el --- -*- lexical-binding: t; -*-
+;;; brown-faces.el --- -*- lexical-binding: t; -*-
 
 ;; ============================================================================
 ;;; Vanilla faces
@@ -385,4 +385,4 @@
   (set-face-attribute
    'tab-line-highlight ;; mouseover
    nil :foreground "#432" :background "#210" :box '(:line-width 1 :color "#3f7" :style released-button)))
-;;; my-faces.el ends here
+;;; brown-faces.el ends here
