@@ -305,6 +305,22 @@
   (set-face-attribute
    'dired-ignored
    nil :foreground "#3f7"))
+(with-eval-after-load 'dired-subtree
+  (set-face-attribute
+   'dired-subtree-depth-1-face
+   nil :background "#432")
+  (set-face-attribute
+   'dired-subtree-depth-2-face
+   nil :background "#210")
+  (set-face-attribute
+   'dired-subtree-depth-3-face
+   nil :background "#432")
+  (set-face-attribute
+   'dired-subtree-depth-4-face
+   nil :background "#210")
+  (set-face-attribute
+   'dired-subtree-depth-5-face
+   nil :background "#432"))
 (with-eval-after-load 'ace-window
   (set-face-attribute
    'aw-leading-char-face

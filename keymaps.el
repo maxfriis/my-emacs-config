@@ -2,8 +2,10 @@
 
 (defvar-keymap my-a-spc-map
   :doc "My <spc> prefix keys."
-  "C"   #'full-calc
-  "c"   #'calc
+  "A"   #'tmr-tabulated-view
+  "a"   #'tmr
+  "C"   #'calc
+  "c"   #'full-calc
   "s"   #'eshell
   "u"   #'undo-tree-visualize)
 (defvar-keymap my-b-spc-map
@@ -20,6 +22,7 @@
   "R"   #'consult-recent-file
   "S"   #'save-some-buffers
   "a"   #'my-find-agenda-file
+  "b"   #'diff-buffer-with-file
   "d"   #'dired-jump
   "e"   #'ediff-files
   "f"   #'counsel-find-file
@@ -58,6 +61,7 @@
   "G"   #'org-goto
   "I"   #'org-clock-in
   "L"   #'org-store-link
+  "N"   #'org-num-mode
   "O"   #'org-clock-out
   "P"   #'org-present
   "R"   #'org-refile
@@ -81,6 +85,8 @@
   "s"   #'save-buffers-kill-emacs)
 (defvar-keymap my-r-spc-map
   :doc "My <spc> prefix keys."
+  "b"   #'counsel-bookmark
+  "d"   #'bookmark-delete
   "e"   #'evil-set-marker
   "j"   #'evil-goto-mark
   "l"   #'consult-register-load
@@ -145,6 +151,8 @@
   "l"   my-tl-spc-map)
 (defvar-keymap my-z-spc-map
   :doc "My <spc> prefix keys."
+  "+"   #'text-scale-increase
+  "-"   #'text-scale-decrease
   "g"   #'global-text-scale-adjust
   "l"   #'text-scale-adjust)
 (defvar-keymap my-x-spc-map
@@ -196,8 +204,10 @@
 ;; `which-key' leader key replacements.
 (unless (version< emacs-version "30.1")
   (which-key-add-keymap-based-replacements my-a-spc-map
-    "C"   '("Full calc"    . full-calc)
-    "c"   '("Calc"         . calc)
+    "A"   '("View alarms"  . tmr-tabulated-view)
+    "a"   '("Alarm"        . tmr)
+    "C"   '("Calc"         . calc)
+    "c"   '("Full calc"    . full-calc)
     "s"   '("Eshell"       . eshell)
     "u"   '("Undo tree"    . undo-tree-visualize))
   (which-key-add-keymap-based-replacements my-b-spc-map
@@ -212,6 +222,7 @@
     "R"   '("Mini recent"  . consult-recent-file)
     "S"   '("Save all"     . save-some-buffers)
     "a"   '("Agenda"       . my-find-agenda-file)
+    "b"   '("Buffer diff"  . diff-buffer-with-file)
     "d"   '("Dired"        . dired-jump)
     "e"   '("Ediff"        . ediff-files)
     "f"   '("Find"         . counsel-find-file)
@@ -246,6 +257,7 @@
     "G"   '("Goto"         . org-goto)
     "I"   '("Clock in"     . org-clock-in)
     "L"   '("Store link"   . org-store-link)
+    "N"   '("Number heads" . org-num-mode)
     "O"   '("Clock out"    . org-clock-out)
     "P"   '("Present"      . org-present)
     "R"   '("Refile"       . org-refile)
@@ -267,10 +279,12 @@
     "q"   '("Save&kill"    . my-save-all-kill-emacs-no-prompt)
     "s"   '("Prompt&kill"  . save-buffers-kill-emacs))
   (which-key-add-keymap-based-replacements my-r-spc-map
+    "b"   '("Bookmark"     . counsel-bookmark)
+    "d"   '("Del.bookmark" . bookmark-delete)
     "e"   '("Evil mark"    . evil-set-marker)
     "j"   '("Jump mark"    . evil-goto-mark)
     "l"   '("Load"         . consult-register-load)
-    "r"   '("Emacs marks"  . counsel-mark-ring)
+    "r"   '("Mark ring"    . counsel-mark-ring)
     "s"   '("Store"        . consult-register-store))
   (which-key-add-keymap-based-replacements my-s-spc-map
     "O"   '("Occur"        . occur)
@@ -309,7 +323,7 @@
   (which-key-add-keymap-based-replacements my-t-spc-map
     "a"   '("Auto save"    . auto-save-visited-mode)
     "d"   '("Date/time"    . display-time-mode)
-    "e"   '("Evil cursor"  . evil-emacs-cursor-model-mode)
+    "e"   '("Emacs cursor" . evil-emacs-cursor-model-mode)
     "f"   '("Font pitch"   . mixed-pitch-mode)
     "h"   '("Hl line"      . global-hl-line-mode)
     "m"   '("Mode line"    . mode-line-invisible-mode)
@@ -329,12 +343,14 @@
     "W"   '("Spell word"   . flyspell-word)
     "c"   '("Swap chars"   . transpose-chars)
     "l"   '("Swap lines"   . transpose-lines)
-    "p"   '("S.paragraphs" . transpose-paragraphs)
-    "s"   '("S.sentences"  . transpose-sentences)
+    "p"   '("Swap para."   . transpose-paragraphs)
+    "s"   '("Swap sent."   . transpose-sentences)
     "u"   '("Unicode"      . insert-char)
     "w"   '("Swap words"   . transpose-words)
     "x"   '("One space"    . just-one-space))
   (which-key-add-keymap-based-replacements my-z-spc-map
+    "+"   '("Increase"     . text-scale-increase)
+    "-"   '("Decrease"     . text-scale-decrease)
     "g"   '("Global"       . global-text-scale-adjust)
     "l"   '("Local"        . text-scale-adjust))
   (which-key-add-keymap-based-replacements my-root-spc-map

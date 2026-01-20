@@ -6,15 +6,14 @@ Publication of this configuration is mainly inspirational.
 You can install the whole thing but might experience an overload of oddities.
 The custom functions I use are simple and short so everything should be easy to understand.
 
-I have changed some keybindings and even modify the default evil-mode behavior with a mode I have composed.
-The mode can be toggled with =<SPC> t e= but it can be confusing and it is on by default.
+I have changed some keybindings and even modify the default evil-mode behavior with a mode.
+The `evil-emacs-cursor-model-mode' can be toggled with =<SPC> t e= and it is on by default.
 It is my configuration after all.
 
 ** Version requirement
 
-Most of the configuration is fine with Emacs version 29.1, but my which-key
-configuration requires version 30.1.  I think which-key was made native in that
-version because I know the which-key package is much older.
+Most of the configuration is fine with Emacs version 29.1, but my which-key configuration requires version 30.1.
+I think which-key was made native in that version because I know the package is much older.
 
 ** Early init
 
@@ -24,12 +23,9 @@ E.g. I don't want a white background to blink on startup since I prefer dark the
 
 * My font faces
 
-I don't use a theme package.
+I don't use theme packages.
 I simply change faces if I don't like them.
-I should probably use (deftheme...) and I will at some point.
-
-I use (set-face-attribute...) because (custom-set-faces...) is hard to change for packages I might load in the future (red text is hard to read on a red background).
-I don't like or use custom.el for anything.
+I should probably use `deftheme' and I might at some point.
 
 I restrict myself to use 8 dark theme colors.
 Examples of their use are:
@@ -50,7 +46,7 @@ Note that I don't use #73f.
 
 ** Ansi faces
 
-As root and sometimes on my laptop I use 8 ansi colors for the theme.
+As root, in terminal and sometimes on my laptop I use 8 ansi colors for the theme.
 | Color | Use            |   | Color | Use             |
 |-------+----------------+---+-------+-----------------|
 | #000  | background     |   | #fff  | default text    |
@@ -59,7 +55,7 @@ As root and sometimes on my laptop I use 8 ansi colors for the theme.
 | #0f0  | success/done   |   | #f0f  | error/todo      |
 | #00f  | link/timestamp |   | #ff0  | warning/heading |
 |-------+----------------+---+-------+-----------------|
-Operator state is automatically converted when shown on the red hl-line background.
+The red operator state is inverse when shown on the red hl-line background.
 The idea is to have something clearly indicating that I have root privileges and have a fallback theme I can use with an ansi color terminal.
 
 *** Ansi screenshot
@@ -92,30 +88,17 @@ Prot has a Youtube video on how to make your own modeline: [[https://www.youtube
 * Other vanilla stuff
 
 Here I set variables that are used by vanilla Emacs or a native package.
-I also activate a few global minor modes and add some hooks.
+I also activate add some hooks and a few global minor modes.
 
 ** Custom functions
 
 I keep these functions simple.
-Emacs usually provide what I need and I don't have to write functions.
+Emacs usually provide what I need so I don't have to write functions.
 
 * Package.el
 
-I use package.el and (require 'foo) to install and load packages.
-I used to use use-package but that seem to increase the number of garbage collections significantly (about 5 fold for me).
-It is not clear to me that gains from the control (:defer) is worth that cost.
-
-I think deferring also makes less sense combined with Emacs server/client and modern computers.
-If I was bothered by a slow startup time I would make a daemon on boot and use emacsclient.
-
-I preserve some of the structure that is also a feature of use-package.
-That means that I will set variables associated with a package right next to where I load it.
-This would typically be part of an :init or :custom section in use-package.
-Hooks (:hook or :config) and mode activations (:init?! or :config) I do right after require.
-I do keybindings (:bind or :command) at the end of the configuration in a dedicated section.
-Faces (:custom-face) are handled in a loaded file.
-
-All this should make it fairly easy to convert to use-package or straight.
+I use package.el and (require 'foo) to install and load external packages.
+I used to use use-package but that seem to increase the number of garbage collections significantly.
 
 *** Honorable mentions
 
@@ -129,7 +112,7 @@ Evil has become the foundation of my use of Emacs.
 *** Layered versus modal bindings
 
 Emacs comes with a complex but very powerful set of /layered/ keybindings (using =<ctrl>=, =<meta>=, =<shift>= or combinations of these).
-An alternative is the evil package with Vim's /modal/ keybindings combined with some layering.
+An alternative is the evil package with Vim's /modal/ keybindings.
 I prefer modal bindings and try to minimize the use of layers.
 
 *** Cursor model (my sacrilege)
@@ -139,7 +122,7 @@ When in insert state it works with the standard cursor between characters approa
 In normal state this model is changed to something no other editor I know have picked up on.
 The cursor is considered on top of characters rather than between them.
 
-I use my evil-emacs-cursor-model-mode to modify evil to use a cursor between characters in normal state.
+I use my `evil-emacs-cursor-model-mode' to modify evil to use a cursor between characters in normal state.
 This has the advantage of fewer keys being used (e.g. no need for =a=) at little to no cost in efficiency.
 
 I rebind three keys but with few exceptions I just leave the evil bindings be.
@@ -147,7 +130,6 @@ I do swap the two paste bindings =p= and =P= to avoid using the capitalized one.
 
 *** Two ways of pasting
 
-I will try to illustrate the efficiency with a case study on pasting.
 Vim's cursor on character model requires two ways of pasting.
 One is layered with =<shift>= and really counts as two keystrokes.
 You can mimic this behavior by using a "correction-motion" before paste in the cursor between characters model.
@@ -161,15 +143,15 @@ As you get used to the less complex bindings you will develop foresight to use l
 
 *** Casual use
 
-As a more casual or inexperienced user, one paste command is preferable.
-My configuration can work as an introduction to the evil modal system and keybindings.
-
-The cursor model in normal state will be a little more consistent both with it's insert state but also with other programs.
 If you dislike layers and try to minimize their use, you gain a lot from not needing capitalized bindings.
 I very much dislike holding down two keys at once just as if I were using vanilla Emacs (take that, Vim out of the box lovers).
 
+As a more casual or inexperienced user, one paste command is preferable.
+My configuration can work as an introduction to the evil modal system and keybindings.
+The cursor model in normal state will be a little more consistent both with it's insert state but also with other programs.
+
 In my configuration the between characters behavior is isolated in evil-emacs-cursor-model-mode.el, which I have modified compared to [[https://www.dr-qubit.org/Evil_cursor_model.html][the author's original version]].
-Standard evil behavior is easy to achieve by not loading the mode or simply toggling the mode off.
+Standard evil behavior is easy to achieve by toggling the mode off.
 
 You can find the mode on github at [[https://github.com/maxfriis/evil-emacs-cursor-model-mode][evil-emacs-cursor-model-mode]].
 
@@ -185,25 +167,23 @@ I restrict myself to the 4 todo-states *TODO*, *DONE*, *NEXT* and *HOLD*.
 The default TODO and DONE states are self explanatory.
 NEXT is an unblocked task that can be done in less than 5 minutes.
 This might be a new tasks pending a schedule and refile to organize the task into the agenda.
+
 HOLD is an inactive state that can be translated to "pending third party action".
 A clarifying note is added to this state when it's changed to HOLD.
 I also use this state for canceled tasks which I archive.
 
 Besides the states I use refile and an unrestricted number of categories.
-When I have a project I introduce a new category with a cookie.
+When I have a project I introduce a new category with a =[/]= cookie.
 
 I configure my custom agenda to have 4 sections:
 
 1. I have a potentially empty section without a headline where I display my NEXT items.
    When I capture ideas they will go in my inbox as a NEXT item.
-   NEXT items are unblocked tasks that take less than 5 minutes.
-   Organizing an item into my agenda is such a task.
 2. After this I display this week's agenda with active todo-state items that have an active timestamp.
-   Items from the first section can potentially be repeated here if they are timestamped.
 3. Not all TODO items have or even should have a timestamp.
    I display items with a cookie at the top and these will typically be projects containing subtasks.
    Then I display other unscheduled items.
-   At the bottom I display items on HOLD which I also like to keep an eye on.
+   At the bottom I display items on HOLD which I also keep track off.
 4. The final section like the first is usually empty.
    This is where I can append what the agenda menu offers including a few custom options.
 The main two capture templates is a simple idea capture and a category capture that I can refile to.
@@ -216,17 +196,18 @@ Prot has a video about creating a leader key: [[https://www.youtube.com/watch?v=
 Inspired by Spacemacs I use =<SPC>= as my leader key and part of the structure in my leader keybindings are also inspired by this project.
 I do this with maps defined in keymaps.el.
 
+I could do this in a more sophisticated way with `transient' but I like to keep it simple with `which-key'.
+
 *** Other keybindings
 
 I like to have my keybindings in a section rather than distributed out among my packages.
 I find it more useful to spot collisions by gathering these bindings in one place.
-Use-package might be able to defer stuff based on :bind but I don't use use-package.
 
-A few evil bindings specific to the change in cursor model are rebound inside evil-emacs-cursor-model-mode.el.
+A few evil bindings specific to the change in cursor model are rebound inside `evil-emacs-cursor-model-mode'.
 Besides that I choose to use Emacs' isearch and I have it bound to =s=.
-evil-substitute can be mimicked with =cl=.
-This comes natural to me since =c= is the most common way I enter insert state.
-I often press =c= even before I have fully decided what motion I need to use.
+`evil-substitute' can be mimicked with =cl=.
+I often press =c= before I have fully decided what motion I need to use.
+I bind `evil-set-marker' to =´= so I can use both =n= and =m= (under =j= and =k=) for paragraph motions.
 
 * Youtube videos
 

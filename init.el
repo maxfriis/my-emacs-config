@@ -1,17 +1,18 @@
 ;;; init.el --- Emacs configuration -*- lexical-binding: t; -*-
 
 ;; ============================================================================
-;;; Fonts and faces (my themes)
+;;; Fonts and faces
 ;; ============================================================================
-(if (find-font (font-spec :name "Ubuntu Mono 19"))
-    (set-face-font 'default "Ubuntu Mono 19")
-  ;; else
-  (message "The default font is set to %s" (font-get-system-font)))
-;; The variable width Ubuntu font doesn't look good with Ubuntu Mono imo.
-(when (find-font (font-spec :name "Verdana 24"))
-  (set-face-font 'variable-pitch "Verdana 24"))
+(when (display-graphic-p)
+  (if (find-font (font-spec :name "Ubuntu Mono 19"))
+      (set-face-font 'default "Ubuntu Mono 19")
+    ;; else
+    (message "The font is set to %s" (font-get-system-font)))
+  ;; The variable width Ubuntu font doesn't look good with Ubuntu Mono imo.
+  (when (find-font (font-spec :name "Verdana 19"))
+    (set-face-font 'variable-pitch "Verdana 19")))
 ;; ----------------------------------------------------------------------------
-;; Files for face colors.
+;; Face colors.
 (when (file-newer-than-file-p
        (locate-user-emacs-file "ansi-faces.el")
        (locate-user-emacs-file "ansi-faces.elc"))
@@ -20,23 +21,13 @@
        (locate-user-emacs-file "brown-faces.el")
        (locate-user-emacs-file "brown-faces.elc"))
   (byte-compile-file (locate-user-emacs-file "brown-faces.el")))
-(if (and (display-graphic-p)
-         (/= (user-uid) 0)) ; Ansi colors as root.
+(if (and (/= (user-uid) 0)    ; Ansi colors as root
+         (display-graphic-p)) ; or in terminal.
     (load (locate-user-emacs-file "brown-faces.elc") nil t)
   ;; else
   (load (locate-user-emacs-file "ansi-faces.elc") nil t))
 ;; ----------------------------------------------------------------------------
-;; Two basic size faces.
-(defface shrink '((t :height .8))
-  "Basic shrink face.  Size: 4/5=.8.
-This does the opposite of the `grow' face."
-  :group 'basic-faces)
-(defface grow '((t :height 1.25))
-  "Basic grow face.  Size: 5/4=1.25.
-This does the opposite of the `shrink' face."
-  :group 'basic-faces)
-;; ----------------------------------------------------------------------------
-;; My additional coloring.
+;; Additional coloring.
 (font-lock-add-keywords
  'emacs-lisp-mode
  '(;; Functions closely related to strings (cyan).
@@ -63,6 +54,16 @@ This does the opposite of the `shrink' face."
    ("\\(\\([(\s]+\\(nil\\|t\\)\\)+\\)[\s\n)]" . (1 'font-lock-number-face))
    ("\\(\\(\\([(\s]\\|^\\)[0-9]*[/:-]?[0-9]*[.:-]?[0-9]+\\)+\\)[\s\n)/.:-]"
     . (1 'font-lock-number-face))))
+;; ----------------------------------------------------------------------------
+;; Two basic size faces.
+(defface shrink '((t :height .8))
+  "Basic shrink face.  Size: 4/5=.8.
+This does the opposite of the `grow' face."
+  :group 'basic-faces)
+(defface grow '((t :height 1.25))
+  "Basic grow face.  Size: 5/4=1.25.
+This does the opposite of the `shrink' face."
+  :group 'basic-faces)
 
 ;; ============================================================================
 ;;; Mode line
@@ -97,12 +98,6 @@ This does the opposite of the `shrink' face."
         'face 'shrink))
      mode-line-modified
      (cond
-      ((window-dedicated-p)
-       (propertize
-        "!"
-        'help-echo "Window dedicated to buffer"
-        'mouse-face 'mode-line-highlight
-        'face 'bold))
       ((buffer-narrowed-p)
        (propertize
         "="
@@ -110,6 +105,12 @@ This does the opposite of the `shrink' face."
         'local-map (make-mode-line-mouse-map
                     'mouse-1 #'mode-line-widen)
         'mouse-face 'mode-line-highlight))
+      ((window-dedicated-p)
+       (propertize
+        "!"
+        'help-echo "Window dedicated to buffer"
+        'mouse-face 'mode-line-highlight
+        'face 'bold))
       ;; Local minor modes.
       ((and (not centered-cursor-mode)
             (mode-line-window-selected-p))
@@ -234,6 +235,7 @@ This does the opposite of the `shrink' face."
         (abbreviate-file-name (buffer-file-name))
       ;; else
       "%b")))
+ frame-background-mode 'dark ; Terminal can't detect.
  tab-width 4
  warning-minimum-level :error
  visible-bell t
@@ -274,8 +276,8 @@ This does the opposite of the `shrink' face."
  ediff-split-window-function 'split-window-horizontally
  ediff-window-setup-function 'ediff-setup-windows-plain
  ;; ----------------------------------------------------------------------------
- ;; Emacs' `isearch' rather than `evil-search'.
- search-whitespace-regexp "[^\n]*?" ; Don't cross lines.
+ ;; Emacs' `isearch'.
+ search-whitespace-regexp "[^\n]*?"
  isearch-repeat-on-direction-change t
  isearch-lazy-count t
  lazy-count-prefix-format "%s/%s "
@@ -295,7 +297,7 @@ This does the opposite of the `shrink' face."
    tab-bar-format-tabs
    tab-bar-separator)
  ;; ----------------------------------------------------------------------------
- ;; Display.
+ ;; Time/display.
  world-clock-list ; For `world-clock'.
  '(("UTC" "UTC")
    ("Europe/Copenhagen" "Copenhagen")
@@ -309,6 +311,12 @@ This does the opposite of the `shrink' face."
    ("America/New_York" "New York")
    ("America/Nuuk" "Nuuk"))
  world-clock-time-format "[%F %a %02H:%M] %Z"
+ tmr-mode-line-separator "|"
+ tmr-mode-line-prefix (propertize "⏲"
+                                  'help-echo "Tmr alarm, mouse-1: View timers"
+                                  'local-map (make-mode-line-mouse-map
+                                              'mouse-1 #'tmr-tabulated-view)
+                                  'mouse-face 'mode-line-highlight)
  display-time-format "[%F %a %02H:%M]" ; org timestamp.
  display-line-numbers-type 'relative
  ;; Focus popups. The default is to not focus them.
@@ -356,13 +364,28 @@ This does the opposite of the `shrink' face."
 (global-display-line-numbers-mode 1)
 
 ;; ============================================================================
-;;; Custom functions and variables
+;;; Custom stuff
 ;; ============================================================================
-;; Misc variables.
-(defvar org-agenda-directory nil ; Will be set in the org section.
-  "Default `org-agenda' directory.
-\nI include this directory in the list `org-agenda-files'.
-All org files in the directory will then be in the agenda.")
+;; Toggle my faces (themes).
+(defun my-toggle-faces ()
+  "Toggle my two default faces.
+\nThe faces are loaded from brown-faces.elc and ansi-faces.elc respectively."
+  (interactive)
+  (if (equal (face-background 'default) "#000")
+      (load (locate-user-emacs-file "brown-faces.elc") nil t)
+    ;; else
+    (load (locate-user-emacs-file "ansi-faces.elc") nil t))
+  (message "%s background faces" (face-background 'default)))
+;; ----------------------------------------------------------------------------
+;; Dired in tab.
+(defun my-split-dired-tab (directory)
+  "Split dired in new tab."
+  (interactive "DDirectory: ")
+  (dired-other-tab directory)
+  (split-window-right)
+  (find-file "~/")
+  (ace-swap-window)
+  (aw-flip-window))
 ;; ----------------------------------------------------------------------------
 ;; Open init files.
 (defun my-find-init-file ()
@@ -396,16 +419,6 @@ The function will organize the `buffer-list' and focus note.org."
   (find-file (concat org-agenda-directory "date.org"))
   (find-file (concat org-agenda-directory "note.org")))
 ;; ----------------------------------------------------------------------------
-;; Split dired in new tab.
-(defun my-split-dired-tab (directory)
-  "Split dired in new tab."
-  (interactive "DDirectory: ")
-  (dired-other-tab directory)
-  (split-window-right)
-  (find-file "~/")
-  (ace-swap-window)
-  (aw-flip-window))
-;; ----------------------------------------------------------------------------
 ;; Custom agenda.
 (defun my-org-agenda-custom ()
   "Custom agenda with NEXT items, this week's agenda and TODO/HOLD items."
@@ -424,17 +437,6 @@ The function will organize the `buffer-list' and focus note.org."
     (org-agenda-redo) ; Might turn `global-hl-line-mode' off for some reason?!?
     (global-hl-line-mode 1)
     (goto-char (point-min)))) ; Jump to the newly prepended NEXT item.
-;; ----------------------------------------------------------------------------
-;; Toggle my faces (themes).
-(defun my-toggle-faces ()
-  "Toggle my two default faces.
-\nThe faces are loaded from my-faces.elc and my-ansi-faces.elc respectively."
-  (interactive)
-  (if (equal (face-background 'default) "#000")
-      (load (locate-user-emacs-file "brown-faces.elc") nil t)
-    ;; else
-    (load (locate-user-emacs-file "ansi-faces.elc") nil t))
-  (message "%s background faces" (face-background 'default)))
 ;; ----------------------------------------------------------------------------
 ;; Toggle maximized window.
 (defvar my-window-configuration nil
@@ -462,18 +464,19 @@ window 2, Messages in window 3 and window 1's `next-buffer' in window 4."
   (when (eq major-mode 'org-agenda-mode) ; Would affect `org-agenda-list'.
     (org-agenda-quit)
     (ibuffer))
-  (split-window-right)
+  (split-window-right) ; 4th window.
   (other-window 1)
-  (next-buffer)                   ; 4th window.
-  (when (eq major-mode 'dired-mode)
+  (next-buffer)
+  (while (memq major-mode '(dired-mode
+                            org-agenda-mode
+                            messages-buffer-mode))
     (next-buffer))
-  (when (eq major-mode 'org-agenda-mode)
-    (switch-to-buffer "*scratch*"))
-  (split-window-below)
-  (switch-to-buffer "*Messages*") ; 3rd window.
-  (split-window-below)
-  (org-agenda-list)               ; 2nd window.
+  (split-window-below) ; 3rd window.
+  (switch-to-buffer "*Messages*")
+  (split-window-below) ; 2nd window.
+  (org-agenda-list)
   (set-window-dedicated-p nil t)
+  (set-window-dedicated-p (next-window) t) ; 3rd.
   (other-window -1)
   (message "Four window setup"))
 ;; ----------------------------------------------------------------------------
@@ -533,7 +536,7 @@ and focus the window you swapped to."
    ("melpa"  . 2)
    ("nongnu" . 1)) ; The remaining archives have priority 0.
  package-selected-packages
- '(evil evil-collection evil-nerd-commenter evil-surround evil-numbers evil-org org-superstar org-appear org-present magit cape corfu nerd-icons nerd-icons-corfu nerd-icons-dired nerd-icons-ibuffer nerd-icons-completion avy vertico marginalia orderless counsel consult embark embark-consult rainbow-delimiters rainbow-mode recursive-narrow centered-cursor-mode golden-ratio ace-window transpose-frame mixed-pitch indent-guide keycast undo-tree flycheck writegood-mode auto-package-update backup-each-save package-lint))
+ '(evil-collection evil-nerd-commenter evil-surround evil-numbers evil-org org-superstar org-appear org-present magit dired-subtree cape corfu nerd-icons-corfu nerd-icons-dired nerd-icons-ibuffer nerd-icons-completion avy vertico marginalia orderless embark-consult counsel tmr rainbow-delimiters rainbow-mode recursive-narrow centered-cursor-mode golden-ratio ace-window transpose-frame mixed-pitch indent-guide casual-suite keycast undo-tree flycheck writegood-mode auto-package-update backup-each-save package-lint))
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents nil))
@@ -550,6 +553,7 @@ and focus the window you swapped to."
 (require 'backup-each-save)
 (setq backup-each-save-mirror-location "~/.backup-emacs-saved")
 (add-hook 'after-save-hook #'backup-each-save)
+(require 'dired-subtree)
 ;; ----------------------------------------------------------------------------
 ;; Magit.
 (require 'magit)
@@ -589,7 +593,7 @@ and focus the window you swapped to."
 ;; Tidy typing directories (rfn=read-file-name):
 (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
 (require 'orderless)
-(setq completion-styles '(orderless))
+(setq completion-styles '(orderless basic))
 (require 'embark)
 ;; ----------------------------------------------------------------------------
 ;; Completion.
@@ -610,9 +614,6 @@ and focus the window you swapped to."
 (add-hook 'completion-at-point-functions #'cape-history)
 ;; ----------------------------------------------------------------------------
 ;; Windows.
-(require 'transpose-frame)
-(require 'ace-window)
-(ace-window-display-mode 1)
 (require 'golden-ratio)
 (setq
  golden-ratio-exclude-buffer-regexp
@@ -622,6 +623,10 @@ and focus the window you swapped to."
 (require 'centered-cursor-mode)
 (add-to-list 'ccm-ignored-commands 'mwheel-scroll)
 (global-centered-cursor-mode 1) ; Local toggle with `Scroll_Lock'.
+(require 'transpose-frame)
+(require 'ace-window)
+(ace-window-display-mode 1)
+(tmr-mode-line-mode 1)
 ;; ============================================================================
 ;;;; Guides
 ;; ============================================================================
@@ -648,21 +653,21 @@ and focus the window you swapped to."
 (require 'rainbow-mode) ; Toggle with "<spc> t r".
 ;; ----------------------------------------------------------------------------
 ;; Thumbnails.
-(require 'nerd-icons)
-(when (and (not (find-font (font-spec :name "Symbols Nerd Font Mono")))
-           (display-graphic-p))
-  (nerd-icons-install-fonts t)) ; MS Windows?
-(require 'nerd-icons-dired)
-(add-hook 'dired-mode-hook #'nerd-icons-dired-mode)
-(require 'nerd-icons-ibuffer)
-(add-hook 'ibuffer-mode-hook #'nerd-icons-ibuffer-mode)
-(with-eval-after-load 'corfu
-  (require 'nerd-icons-corfu)
-  (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
-(with-eval-after-load 'marginalia
-  (require 'nerd-icons-completion)
-  (nerd-icons-completion-mode 1)
-  (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
+(when (display-graphic-p)
+  (require 'nerd-icons)
+  (unless (find-font (font-spec :name "Symbols Nerd Font Mono"))
+    (nerd-icons-install-fonts t)) ; MS Windows?
+  (require 'nerd-icons-dired)
+  (add-hook 'dired-mode-hook #'nerd-icons-dired-mode)
+  (require 'nerd-icons-ibuffer)
+  (add-hook 'ibuffer-mode-hook #'nerd-icons-ibuffer-mode)
+  (with-eval-after-load 'corfu
+    (require 'nerd-icons-corfu)
+    (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
+  (with-eval-after-load 'marginalia
+    (require 'nerd-icons-completion)
+    (nerd-icons-completion-mode 1)
+    (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup)))
 
 ;; ============================================================================
 ;;; Evil.el
@@ -682,7 +687,7 @@ and focus the window you swapped to."
  evil-visual-state-cursor   '((bar  . 4) "#0ff")
  evil-replace-state-cursor  '((hbar . 4) "#f0f")
  evil-insert-state-cursor   '((bar  . 4) "#ff0")
- evil-emacs-state-cursor    '(box        "#fff"))
+ evil-emacs-state-cursor    '(box        "#f00"))
 ;; ----------------------------------------------------------------------------
 ;; Tags for `evil-mode-line-tag'.
 (if (display-graphic-p)
@@ -709,7 +714,7 @@ and focus the window you swapped to."
    evil-emacs-state-tag    "Z"))
 (evil-mode 1)
 ;; ============================================================================
- ;;;; Addons
+;;;; Addons
 ;; ============================================================================
 (require 'evil-collection)
 (evil-collection-init)
@@ -726,20 +731,20 @@ and focus the window you swapped to."
 (require 'evil-org-agenda)
 (evil-org-agenda-set-keys)
 ;; ============================================================================
- ;;;; `evil-emacs-cursor-model-mode' (my sacrilege to "the curch of Vim")
+;;;; `evil-emacs-cursor-model-mode' (my sacrilege to "the curch of Vim")
 ;; ============================================================================
 (unless (package-installed-p 'evil-emacs-cursor-model-mode)
   (package-install-file (locate-user-emacs-file "evil-emacs-cursor-model-mode.el")))
-(load (locate-user-emacs-file "evil-emacs-cursor-model-mode.el") nil t) ; for testing.
+(load (locate-user-emacs-file "evil-emacs-cursor-model-mode") nil t) ; for testing.
 ;; (require 'evil-emacs-cursor-model-mode)
 (evil-emacs-cursor-model-mode 1)
 ;; ============================================================================
- ;;;; Hooks to suspend `global-hl-line-mode'
+;;;; Hooks to suspend `global-hl-line-mode'
 ;; ============================================================================
 ;; Suspend the `hl-line' so `region' can use the same background color.
 ;; ----------------------------------------------------------------------------
 ;; The buffer-local `hl-line-mode' don't properly respect specificity so it
-;; only override `global-hl-line-mode' when called interactively.
+;; only override `global-hl-line-mode' when called interactively?
 (add-hook 'evil-visual-state-entry-hook
           #'(lambda () (global-hl-line-mode 0)))
 (add-hook 'evil-visual-state-exit-hook #'global-hl-line-mode)
@@ -774,8 +779,12 @@ and focus the window you swapped to."
 ;; ============================================================================
 ;; Create `org-agenda' directories.
 (setq
- org-directory "~/org/" ; I prefer a trailing slash on directory names.
- org-agenda-directory (concat org-directory "agenda/"))
+ org-directory "~/org/") ; Trailing slash.
+(defvar org-agenda-directory (concat org-directory "agenda/")
+  "Default `org-agenda' directory.
+\nI include this directory in the list `org-agenda-files'.
+All org files in the directory will then be in the agenda.")
+;; ----------------------------------------------------------------------------
 (unless (file-exists-p org-directory)
   (make-directory org-directory))
 (unless (file-exists-p org-agenda-directory)
@@ -818,7 +827,7 @@ and focus the window you swapped to."
 ;; ============================================================================
 (setq
  org-default-notes-file (concat org-directory "inbox.org")
- org-ellipsis " … " ; ▾▼⤵⮷ the dots are similar to `outline-mode'.
+ org-ellipsis " … "
  org-todo-keywords ; I use categories and refile rather than more keywords.
  '((type     "NEXT(n!/!)" "TODO(t!/!)" "|") ; Active states.
    (type "|" "HOLD(h@/!)" "DONE(d!/!)"))  ; Inactive states.
@@ -866,7 +875,7 @@ and focus the window you swapped to."
  org-latex-title-command nil
  org-export-with-smart-quotes t
  org-export-backends
- '(ascii latex beamer texinfo html odt md org)
+ '(ascii latex beamer html odt md)
  org-file-apps
  '(("\\.docx\\'"    . default)
    ("\\.mm\\'"      . default)
@@ -934,7 +943,7 @@ and focus the window you swapped to."
  org-time-stamp-rounding-minutes
  '(15 15))
 ;; ----------------------------------------------------------------------------
-;; Custom agenda commands.
+;;;;; Custom agenda commands.
 (setq
  org-agenda-custom-commands
  '(("c" "Custom agenda setup"
@@ -1010,6 +1019,7 @@ and focus the window you swapped to."
       ":LOGBOOK:\n"
       "- State \"TODO\" from \"Capture\" %U\n"
       ":END:\n")
+    :before-finalize (org-id-get-create)
     :immediate-finish t
     :prepend t)
    ("i" "Idea" entry
@@ -1055,7 +1065,7 @@ and focus the window you swapped to."
       "%x")
     :immediate-finish t)))
 ;; ----------------------------------------------------------------------------
-;; Logbook.
+;;;;; Logbook.
 (setq
  org-log-into-drawer 'logbook
  org-log-done        'time
@@ -1138,7 +1148,7 @@ and focus the window you swapped to."
   (add-hook 'org-log-buffer-setup-hook #'evil-insert-state))
 
 ;; ============================================================================
-;;; Leader key setup
+;;; Leader key
 ;; ============================================================================
 ;; I use `which-key' for my leader rather than `transient'
 (unless (version< emacs-version "30.1")
@@ -1156,18 +1166,32 @@ and focus the window you swapped to."
   (byte-compile-file (locate-user-emacs-file "keymaps.el")))
 (load (locate-user-emacs-file "keymaps.elc") nil t)
 ;; ----------------------------------------------------------------------------
-;; Additions to existing keymaps.
-(keymap-set evil-window-map "d" #'toggle-window-dedicated)
-(keymap-set evil-window-map "g" #'golden-ratio-mode)
-(keymap-set help-map        "c" #'describe-char)
-(keymap-set help-map        "F" #'describe-face)
-(keymap-set help-map        "G" #'Info-goto-emacs-command-node)
-(keymap-set help-map        "h" #'describe-symbol) ; Swap with "o"
-(keymap-set help-map        "o" #'view-hello-file)
-;; ----------------------------------------------------------------------------
 ;; Leader keys.
 (keymap-set evil-motion-state-map "SPC"  my-root-spc-map)
 (keymap-set global-map            "<f9>" my-root-spc-map)
+;; ----------------------------------------------------------------------------
+;; Additions to existing keymaps.
+(keymap-set evil-window-map  "d" #'toggle-window-dedicated)
+(keymap-set evil-window-map  "g" #'golden-ratio-mode)
+(keymap-set help-map         "B" #'embark-bindings)
+(keymap-set help-map         "c" #'describe-char)
+(keymap-set help-map         "F" #'describe-face)
+(keymap-set help-map         "G" #'Info-goto-emacs-command-node)
+(keymap-set help-map         "h" #'describe-symbol) ; Swap with "o"
+(keymap-set help-map         "o" #'view-hello-file)
+;; ----------------------------------------------------------------------------
+;; `transient' menus from `casual-suite'.
+(with-eval-after-load 'calc
+  (keymap-set calc-mode-map "<f8>" #'casual-calc-tmenu)
+  (keymap-set calc-alg-map  "<f8>" #'casual-calc-tmenu))
+(with-eval-after-load 'dired
+  (keymap-set dired-mode-map "<f8>" #'casual-dired-tmenu))
+(with-eval-after-load 'ibuffer
+  (keymap-set ibuffer-mode-map "<f8>" #'casual-ibuffer-tmenu))
+(with-eval-after-load 'isearch
+  (keymap-set isearch-mode-map "<f8>" #'casual-isearch-tmenu))
+(with-eval-after-load 'org-agenda
+  (keymap-set org-agenda-mode-map "<f8>" #'casual-agenda-tmenu))
 
 ;; ============================================================================
 ;;; Keybindings
@@ -1198,40 +1222,42 @@ and focus the window you swapped to."
  ("gs"            . transpose-chars) ; Or "<spc> x c"
  :map evil-motion-state-map
  ;; I don't need "n"/"N" for `evil-search'. I use `isearch'.
- ("m"             . backward-paragraph) ; Below "k".
+ ("m"             . backward-paragraph) ; Below "k". "´" is `evil-set-marker'.
  ("n"             . forward-paragraph)  ; Below "j".
  ("N"             . evil-search-next)
- ("C-N"           . evil-search-previous)
+ ("C-S-n"         . evil-search-previous)
  ("s"             . isearch-forward) ; I prefer `isearch' and "C-s" to repeat.
  ("S"             . isearch-forward-thing-at-point) ; This is like Vim's "*".
- ("´"             . evil-set-marker) ; I use "m" for paragraph.
+ ("´"             . evil-set-marker) ; "m" is `backward-paragraph'.
+ ("'"             . evil-goto-mark)  ; Swap with "`" (better with my keyboard).
+ ("`"             . evil-goto-mark-line)
  ("¨"             . tab-bar-new-tab)
  ("½"             . mode-line-other-buffer)
  ("<down>"        . evil-next-visual-line)     ; up/down wrapped lines.
  ("<up>"          . evil-previous-visual-line) ; j/k respect line atoms.
  ("<backtab>"     . outline-cycle-buffer)
  ("C-i"           . outline-cycle) ; "C-i" = <tab>.
- ("C-O"           . evil-jump-forward)
+ ("C-S-o"         . evil-jump-forward)
  ("gc"            . evilnc-comment-operator)
  ("æ"             . evil-scroll-down)
  ("Æ"             . evil-scroll-up)      ; "C-u" is `universal-argument'.
- ("ø"             . end-of-line)         ; "$" use the equivalent evil command.
- ("Ø"             . back-to-indentation) ; "^" use the equivalent evil command.
+ ("ø"             . end-of-line)         ; "$" use the evil command.
+ ("Ø"             . back-to-indentation) ; "^" use the evil command.
  ("å"             . my-org-agenda-custom)
  ("Å"             . my-org-capture-idea)
  ("C-å"           . org-cycle-agenda-files)
  :map evil-insert-state-map
  ("C-b"           . evil-backward-word-begin)
- ("C-B"           . evil-backward-WORD-begin)
+ ("C-S-b"         . evil-backward-WORD-begin)
  ("C-d"           . backward-kill-word) ; In evil this is bound "C-w".
  ("C-e"           . forward-word)       ; Not `evil-emacs-cursor-model-mode'.
  ("C-p"           . yank)               ; "M-p" is in the `global-map'.
  ("C-v"           . set-mark-command)
  ("C-w"           . evil-forward-word-begin) ; Not `evil-delete-backward-word'.
- ("C-W"           . evil-forward-WORD-begin)
+ ("C-S-w"         . evil-forward-WORD-begin)
  ("C-0"           . beginning-of-line)
  ("C-ø"           . end-of-line)
- ("C-Ø"           . back-to-indentation)
+ ("C-S-ø"         . back-to-indentation)
  :map org-present-mode-keymap
  ("<left>"        . org-present-prev)
  ("<right>"       . org-present-next)
@@ -1293,4 +1319,5 @@ and focus the window you swapped to."
 ;;; Startup
 ;; ============================================================================
 (my-org-agenda-custom)
+
 ;;; init.el ends here

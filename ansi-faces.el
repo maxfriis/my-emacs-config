@@ -324,6 +324,22 @@
   (set-face-attribute
    'dired-ignored
    nil :foreground "#0ff"))
+(with-eval-after-load 'dired-subtree
+  (set-face-attribute
+   'dired-subtree-depth-1-face
+   nil :background "#f00")
+  (set-face-attribute
+   'dired-subtree-depth-2-face
+   nil :background "#000")
+  (set-face-attribute
+   'dired-subtree-depth-3-face
+   nil :background "#f00")
+  (set-face-attribute
+   'dired-subtree-depth-4-face
+   nil :background "#000")
+  (set-face-attribute
+   'dired-subtree-depth-5-face
+   nil :background "#f00"))
 (with-eval-after-load 'marginalia
   (set-face-attribute
    'marginalia-documentation
