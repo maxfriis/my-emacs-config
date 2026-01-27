@@ -32,7 +32,7 @@
 ;;;; font-lock.
 (set-face-attribute
  'font-lock-comment-face
- nil :foreground "#0ff")
+ nil :foreground "#0ff" :slant 'italic)
 (set-face-attribute
  'font-lock-string-face
  nil :foreground "#0ff")
@@ -161,17 +161,17 @@
    'org-tag
    nil :foreground "#0ff" :weight 'normal)
   (set-face-attribute
+   'org-code
+   nil :foreground "#00f")
+  (set-face-attribute
+   'org-verbatim
+   nil :foreground "#00f" :box '(:line-width 1 :color "#0ff" :style released-button))
+  (set-face-attribute
    'org-table
    nil :foreground "#0ff" :height .8)
   (set-face-attribute
    'org-formula
    nil :foreground "#0ff" :height .8)
-  (set-face-attribute
-   'org-code
-   nil :foreground "#0ff" :height .8)
-  (set-face-attribute
-   'org-verbatim
-   nil :foreground "#00f" :box '(:line-width 1 :color "#0ff" :style released-button) :height .8)
   (set-face-attribute
    'org-block
    nil :foreground "#fff")
@@ -183,6 +183,9 @@
    nil :foreground "#00f")
   (set-face-attribute
    'org-drawer
+   nil :foreground "#00f" :height .8)
+  (set-face-attribute
+   'org-priority
    nil :foreground "#00f" :height .8)
   (set-face-attribute
    'org-footnote
@@ -201,7 +204,7 @@
    nil :foreground "#f00" :height .8) ; the dots marking the deapt
   (set-face-attribute
    'org-superstar-header-bullet
-   nil :foreground "#0ff" :height .8) ; the header bullet face
+   nil :foreground "#0ff" :slant 'normal :height .8) ; the header bullet face
   (set-face-attribute
    'org-superstar-item
    nil :foreground "#ff0" :height .8)) ; the item bullet face
@@ -296,7 +299,7 @@
 ;; ============================================================================
 (set-face-attribute ; matching parenthesis get cursor colors
  'show-paren-match
- nil :foreground "#fff" :background "#f00" :weight 'bold)
+ nil :foreground "#fff" :background "#f00" :weight 'bold) ; :slant 'italic
 (with-eval-after-load 'keycast
   (set-face-attribute
    'keycast-key

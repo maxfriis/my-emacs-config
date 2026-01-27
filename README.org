@@ -169,8 +169,8 @@ NEXT is an unblocked task that can be done in less than 5 minutes.
 This might be a new tasks pending a schedule and refile to organize the task into the agenda.
 
 HOLD is an inactive state that can be translated to "pending third party action".
-A clarifying note is added to this state when it's changed to HOLD.
-I also use this state for canceled tasks which I archive.
+A clarifying note is added to a task when it's state it's changed to HOLD.
+I also use this state for canceled tasks.
 
 Besides the states I use refile and an unrestricted number of categories.
 When I have a project I introduce a new category with a =[/]= cookie.
@@ -181,13 +181,12 @@ I configure my custom agenda to have 4 sections:
    When I capture ideas they will go in my inbox as a NEXT item.
 2. After this I display this week's agenda with active todo-state items that have an active timestamp.
 3. Not all TODO items have or even should have a timestamp.
-   I display items with a cookie at the top and these will typically be projects containing subtasks.
-   Then I display other unscheduled items.
+   I display items with a =[/]= cookie at the top and these will typically be projects containing subtasks.
+   Then I display other unscheduled active items.
    At the bottom I display items on HOLD which I also keep track off.
 4. The final section like the first is usually empty.
    This is where I can append what the agenda menu offers including a few custom options.
 The main two capture templates is a simple idea capture and a category capture that I can refile to.
-That is all I need for my agenda.
 
 ** Leader key setup
 
@@ -204,10 +203,11 @@ I like to have my keybindings in a section rather than distributed out among my 
 I find it more useful to spot collisions by gathering these bindings in one place.
 
 A few evil bindings specific to the change in cursor model are rebound inside `evil-emacs-cursor-model-mode'.
-Besides that I choose to use Emacs' isearch and I have it bound to =s=.
-`evil-substitute' can be mimicked with =cl=.
-I often press =c= before I have fully decided what motion I need to use.
-I bind `evil-set-marker' to =´= so I can use both =n= and =m= (under =j= and =k=) for paragraph motions.
+
+Besides that I use Emacs' `isearch-forward' and I have it bound to =s=.
+Having a special binding for `evil-substitute' which can be mimicked with =cl= would confuse me.
+I often press =c= before I have fully considered what motion I need to use.
+Last I bind `evil-set-marker' to =´= so I can use =n= and =m= (under =j= and =k=) for paragraph motions.
 
 * Youtube videos
 
@@ -216,7 +216,8 @@ I have made a few Youtube videos roughly on this configuration:
 + [[https://www.youtube.com/watch?v=L9aGgAt6Hd8][A tour of my Emacs init files]]
 + [[https://www.youtube.com/watch?v=5ziOMpT4EwE][My Emacs org-agenda and capture setup]]
 + [[https://www.youtube.com/watch?v=M3dbr2NrnQ0][The 8 colors I use in Emacs]]
-Note that I have modified my init files after I made the videos.
++ [[https://www.youtube.com/watch?v=0xaGgaaUMcw][Emacs' cursor model in evil-mode's normal state]]
+Note that some of the videos are old and I have modified my init files after I made them.
 My configuration is constantly evolving.
 
 * Clone

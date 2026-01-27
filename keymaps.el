@@ -6,8 +6,10 @@
   "a"   #'tmr
   "C"   #'calc
   "c"   #'full-calc
+  "i"   #'erc-tls
   "s"   #'eshell
-  "u"   #'undo-tree-visualize)
+  "u"   #'undo-tree-visualize
+  "w"   #'world-clock)
 (defvar-keymap my-b-spc-map
   :doc "My <spc> prefix keys."
   "b"   #'consult-buffer
@@ -26,6 +28,7 @@
   "d"   #'dired-jump
   "e"   #'ediff-files
   "f"   #'counsel-find-file
+  "g"   #'consult-ripgrep
   "i"   #'my-find-init-file
   "n"   #'my-find-note-file
   "p"   #'find-file-at-point
@@ -87,8 +90,6 @@
   :doc "My <spc> prefix keys."
   "b"   #'counsel-bookmark
   "d"   #'bookmark-delete
-  "e"   #'evil-set-marker
-  "j"   #'evil-goto-mark
   "l"   #'consult-register-load
   "r"   #'counsel-mark-ring
   "s"   #'consult-register-store)
@@ -208,8 +209,10 @@
     "a"   '("Alarm"        . tmr)
     "C"   '("Calc"         . calc)
     "c"   '("Full calc"    . full-calc)
+    "i"   '("irc chat"     . erc-tls)
     "s"   '("Eshell"       . eshell)
-    "u"   '("Undo tree"    . undo-tree-visualize))
+    "u"   '("Undo tree"    . undo-tree-visualize)
+    "w"   '("World clock"  . world-clock))
   (which-key-add-keymap-based-replacements my-b-spc-map
     "b"   '("Mini menu"    . consult-buffer)
     "d"   '("Delete"       . kill-current-buffer)
@@ -226,6 +229,7 @@
     "d"   '("Dired"        . dired-jump)
     "e"   '("Ediff"        . ediff-files)
     "f"   '("Find"         . counsel-find-file)
+    "g"   '("Grep"         . consult-ripgrep)
     "i"   '("Init"         . my-find-init-file)
     "n"   '("Notes"        . my-find-note-file)
     "p"   '("At point"     . find-file-at-point)
@@ -281,8 +285,6 @@
   (which-key-add-keymap-based-replacements my-r-spc-map
     "b"   '("Bookmark"     . counsel-bookmark)
     "d"   '("Del.bookmark" . bookmark-delete)
-    "e"   '("Evil mark"    . evil-set-marker)
-    "j"   '("Jump mark"    . evil-goto-mark)
     "l"   '("Load"         . consult-register-load)
     "r"   '("Mark ring"    . counsel-mark-ring)
     "s"   '("Store"        . consult-register-store))
