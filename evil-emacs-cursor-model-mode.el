@@ -6,6 +6,8 @@
 ;; Creative Commons Attribution-ShareAlike 4.0 International License
 ;; [[https://creativecommons.org/licenses/by-sa/4.0/]]
 
+;; ----------------------------------------------------------------------------
+;; Thanks.
 ;; A special thanks to Toby Cubitt who coded the motions in the cursor model.
 ;; Peter Friis Jensen made it a mode and swapped some keybindings.
 
@@ -29,6 +31,10 @@
 ;; 1.15.0 is the current but fairly old release version of evil.
 ;;
 ;; Work on `evil-visual-block' which still use `evil-mode's cursor model.
+;;
+;; Make error `message' into `user-error' in
+;; `evil-emacs-cursor-model-repeat-find-char'.
+;; I don't know how yet.
 
 ;; ============================================================================
 ;;; Code:
@@ -43,6 +49,13 @@
   "For toggling the variable with `evil-emacs-cursor-model-mode'.")
 (defvar evil-emacs-cursor-model-highlight-closing-paren-at-point-states-init evil-highlight-closing-paren-at-point-states
   "For toggling the variable with `evil-emacs-cursor-model-mode'.")
+;; ----------------------------------------------------------------------------
+;; Customization. Not yet implemented.
+(defvar evil-emacs-cursor-model-incremented-repeat-find-char-to nil
+  "Toggle Vim's oddity when repeating a `evil-find-char-to' character search.
+\n`evil-find-char' does the same as `evil-repeat-find-char' with the same prefix.
+`evil-find-char-to' need an incremented prefix to replicate what
+`evil-repeat-find-char' does.  Vim's \"2t?\" keybinding is repeated with \"1;\"")
 
 ;; ============================================================================
 ;;; The minor mode
@@ -152,94 +165,68 @@ Maybe fewer layers are better for your Emacs pinky?"
 ;; ============================================================================
 ;;; Evil commands implementing Emacs' cursor model
 ;; ============================================================================
-(evil-define-motion evil-emacs-cursor-model-find-before-char (count char)
-  "Move point immediately before the next COUNT'th occurrence of CHAR.
-Movement is restricted to the current line unless `evil-cross-lines' is non-nil."
-  :type inclusive
-  (interactive "<c><C>")
-  (unless count (setq count 1))
-  (cond
-   ((> count 0)
-    (if (= (char-after) char)
-        (evil-find-char (1- count) char)
-      (evil-find-char count char)))
-   ((< count 0)
-    (evil-find-char-to-backward (- count) char)))
-  (setq evil-last-find (list #'evil-find-char-to char (> count 0))))
-
 (evil-define-motion evil-emacs-cursor-model-find-after-char (count char)
   "Move point immediately after the next COUNT'th occurrence of CHAR.
 Movement is restricted to the current line unless `evil-cross-lines' is non-nil."
   :type inclusive
   (interactive "<c><C>")
   (unless count (setq count 1))
-  (cond
-   ((> count 0)
-    (if (= (char-after) char)
-        (evil-find-char (1- count) char)
-      (evil-find-char count char))
-    (forward-char))
-   ((< count 0)
-    (evil-find-char-backward (- count) char)))
+  (if (and (= char (char-after))
+           (> count 0))
+      (evil-find-char (1- count) char)
+    (evil-find-char count char))
+  (when (> count 0) (forward-char))
   (setq evil-last-find (list #'evil-find-char char (> count 0))))
 
+(evil-define-motion evil-emacs-cursor-model-find-before-char (count char)
+  "Move point immediately before the next COUNT'th occurrence of CHAR.
+Movement is restricted to the current line unless `evil-cross-lines' is non-nil."
+  :type inclusive
+  (interactive "<c><C>")
+  (unless count (setq count 1))
+  (if (and (= char (char-after))
+           (> count 0))
+      (evil-find-char (1- count) char)
+    (evil-find-char count char))
+  (setq evil-last-find (list #'evil-find-char-to char (> count 0))))
+
 (evil-define-motion evil-emacs-cursor-model-repeat-find-char (count)
-  "Repeat the last find/to COUNT times."
+  "Repeat the last find COUNT times."
   :type inclusive
   (interactive "<c>")
   (unless count (setq count 1))
-  (let ((char (car (cdr evil-last-find)))
-        (forward (car (cdr (cdr evil-last-find)))))
-    (cond
-     ((eq (car evil-last-find) 'evil-find-char)
-      (if (and forward
-               (= char (char-after)))
-          (when (> count 1)
-            (evil-repeat-find-char (1- count)))
-        (evil-repeat-find-char count))
-      (when forward (forward-char))
-      (setq evil-last-find (list #'evil-find-char char forward)))
-     ((eq (car evil-last-find) 'evil-find-char-to)
-      (if (and forward
-               (= char (char-after)))
-          (when (> count 1)
-            (evil-repeat-find-char (1- count))
-            (forward-char))
-        (unless (and (not forward)
-                     (= char (char-before))
-                     (= count 1))
-          (evil-repeat-find-char count)
-          (when forward (forward-char))))
-      (setq evil-last-find (list #'evil-find-char-to char forward))))))
+  (let ((find (eq (car evil-last-find) #'evil-find-char))
+        (char (nth 1 evil-last-find))
+        (fwd  (nth 2 evil-last-find))) ; Lower case "t"/"f".
+    (unless char (message "No previous search"))
+    (unless fwd (setq count (- count) fwd (not fwd)))
+    (when (< count 0) (setq fwd (not fwd))) ; fwd is now forward.
+    (unless find
+      (cond
+       ((and (= count 1) (eq char (char-after)))
+        (setq count (1+ count)))
+       ((and (= count -1) (eq char (char-before)))
+        (setq count (1- count))))) ; Vim does this on "repeat find to".
+    (if (search-forward
+         (char-to-string char)
+         (cond (evil-cross-lines nil)
+               ((and evil-respect-visual-line-mode
+                     visual-line-mode)
+                (save-excursion
+                  (if fwd (end-of-visual-line) (beginning-of-visual-line))
+                  (point)))
+               (fwd (line-end-position))
+               (t (line-beginning-position)))
+         t count)
+        (unless (or find (= count 0))
+          (if (> count 0) (backward-char) (forward-char)))
+      (message "Can't find `%c'" char))))
 
 (evil-define-motion evil-emacs-cursor-model-repeat-find-char-reverse (count)
-  "Repeat the last find/to COUNT times in the opposite direction."
+  "Repeat the last find COUNT times in the opposite direction."
   :type inclusive
   (interactive "<c>")
-  (unless count (setq count 1))
-  (let ((char (car (cdr evil-last-find)))
-        (forward (car (cdr (cdr evil-last-find)))))
-    (cond
-     ((eq (car evil-last-find) 'evil-find-char)
-      (if (and (not forward)
-               (= char (char-after)))
-          (when (> count 1)
-            (evil-repeat-find-char-reverse (1- count)))
-        (evil-repeat-find-char-reverse count))
-      (unless forward (forward-char))
-      (setq evil-last-find (list #'evil-find-char char forward)))
-     ((eq (car evil-last-find) 'evil-find-char-to)
-      (if (and (not forward)
-               (= char (char-after)))
-          (when (> count 1)
-            (evil-repeat-find-char-reverse (1- count))
-            (forward-char))
-        (unless (and forward
-                     (= char (char-before))
-                     (= count 1))
-          (evil-repeat-find-char-reverse count)
-          (unless forward (forward-char))))
-      (setq evil-last-find (list #'evil-find-char-to char forward))))))
+  (evil-emacs-cursor-model-repeat-find-char (- (or count 1))))
 
 (defun evil-emacs-cursor-model-forward-after-end (thing &optional count)
   "Move forward to end of THING.

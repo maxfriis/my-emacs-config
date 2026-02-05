@@ -178,7 +178,7 @@
   "3"   #'split-window-right
   "4"   #'my-4-windows
   "5"   #'my-ace-swap-window
-  "6"   #'rotate-frame-clockwise
+  "6"   #'rotate-frame-anticlockwise
   "7"   #'transpose-frame
   "8"   #'my-split-dired-tab
   "9"   #'tab-bar-close-tab
@@ -364,7 +364,7 @@
     "3"   '("Right"        . split-window-right)
     "4"   '("Four"         . my-4-windows)
     "5"   '("Swap"         . my-ace-swap-window)
-    "6"   '("Rotate"       . rotate-frame-clockwise)
+    "6"   '("Rotate"       . rotate-frame-anticlockwise)
     "7"   '("Transpose"    . transpose-frame)
     "8"   '("Dired tab"    . my-split-dired-tab)
     "9"   '("Close tab"    . tab-bar-close-tab)

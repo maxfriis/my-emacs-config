@@ -21,6 +21,10 @@
        (locate-user-emacs-file "brown-faces.el")
        (locate-user-emacs-file "brown-faces.elc"))
   (byte-compile-file (locate-user-emacs-file "brown-faces.el")))
+(when (file-newer-than-file-p
+       (locate-user-emacs-file "white-faces.el")
+       (locate-user-emacs-file "white-faces.elc"))
+  (byte-compile-file (locate-user-emacs-file "white-faces.el")))
 (if (and (/= (user-uid) 0)    ; Ansi colors as root
          (display-graphic-p)) ; or in terminal.
     (load (locate-user-emacs-file "brown-faces.elc") nil t)
@@ -182,23 +186,23 @@ This does the opposite of the `shrink' face."
      ;; Active vs. inactive window.
      (if (mode-line-window-selected-p)
          (list
-          " "
           ;; Version control.
-          (when vc-mode
-            (propertize ; Replace the built in `propertize' of vc-mode.
-             (replace-regexp-in-string "\\` Git" "" vc-mode)
-             'help-echo "Version control, mouse-1: Magit"
-             'local-map (make-mode-line-mouse-map
-                         'mouse-1 #'magit)
-             'mouse-face 'mode-line-highlight))
+          (if vc-mode
+              (propertize ; Replace the built in `propertize' of vc-mode.
+               (replace-regexp-in-string "\\` Git" "" vc-mode)
+               'help-echo "Version control, mouse-1: Magit"
+               'local-map (make-mode-line-mouse-map
+                           'mouse-1 #'magit)
+               'mouse-face 'mode-line-highlight)
+            "")
           " "
           ;; Display `global-mode-string' used by e.g. `display-time-mode'.
           mode-line-misc-info
           ;; Gap for alignment.
           (propertize
            " "
-           'display '((space
-                       :align-to (- (+ right right-fringe right-margin) 7)))
+           'display `((space :align-to (- (+ right right-fringe right-margin)
+                                          ,(if (display-graphic-p) 7 9))))
            'face    'mode-line-inactive)
           ;; Horizontal position.
           (propertize
@@ -216,8 +220,8 @@ This does the opposite of the `shrink' face."
        (list
         (propertize
          " "
-         'display '((space
-                     :align-to (- (+ right right-fringe right-margin) 4))))
+         'display `((space :align-to (- (+ right right-fringe right-margin)
+                                        ,(if (display-graphic-p) 4 5)))))
         '(-3 "%o")))))))
 
 ;; ============================================================================
@@ -264,6 +268,7 @@ This does the opposite of the `shrink' face."
  ;; Dired.
  dired-kill-when-opening-new-dired-buffer t
  dired-dwim-target t
+ dired-isearch-filenames t
  dired-recursive-copies 'always
  dired-recursive-deletes 'always ; Risky but I move to trash.
  dired-listing-switches "-aghov --group-directories-first"
@@ -729,8 +734,8 @@ and focus the window you swapped to."
 ;; ============================================================================
 (unless (package-installed-p 'evil-emacs-cursor-model-mode)
   (package-install-file (locate-user-emacs-file "evil-emacs-cursor-model-mode.el")))
-(require 'evil-emacs-cursor-model-mode)
-;; (load (locate-user-emacs-file "evil-emacs-cursor-model-mode") nil t) ; Testing.
+;; (require 'evil-emacs-cursor-model-mode)
+(load (locate-user-emacs-file "evil-emacs-cursor-model-mode") nil t) ; Testing.
 (evil-emacs-cursor-model-mode 1)
 ;; ============================================================================
 ;;;; Hooks to suspend `global-hl-line-mode'
@@ -1079,7 +1084,7 @@ All org files in the directory will then be in the agenda.")
 (require 'org-superstar)
 (setq
  org-superstar-headline-bullets-list
- '(?⓪ ?① ?② ?③ ?ⓧ) ; ④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳Ⓧ
+ '(?⓪ ?① ?② ?③ ?ⓧ) ; ④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳Ⓧ ; Italics change size.
  org-superstar-cycle-headline-bullets nil)
 (add-hook 'org-mode-hook #'org-superstar-mode)
 ;; ----------------------------------------------------------------------------
@@ -1240,15 +1245,11 @@ All org files in the directory will then be in the agenda.")
   "Å"           #'my-org-capture-idea
   "æ"           #'org-agenda-forward-block
   "å"           #'org-agenda-capture)
-(evil-define-key 'normal dired-mode-map ; I like some personal customization.
+(evil-define-key 'normal dired-mode-map
   (kbd "SPC") nil
   ")"           #'dired-omit-mode ; "(" is toggle `dired-hide-details-mode'.
-  "C"           #'dired-do-compress-to ; Swap "c" and "C".
-  "R"           #'dired-do-redisplay   ; Swap "r" and "R".
-  "c"           #'dired-do-copy
   "h"           #'dired-up-directory
-  "l"           #'dired-find-file
-  "r"           #'dired-do-rename)
+  "l"           #'dired-find-file)
 (evil-define-key 'normal tmr-tabulated-mode-map
   "+"           #'tmr
   "*"           #'tmr-with-details
