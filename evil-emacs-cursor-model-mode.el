@@ -11,6 +11,8 @@
 ;; A special thanks to Toby Cubitt who coded the motions in the cursor model.
 ;; Peter Friis Jensen made it a mode and swapped some keybindings.
 
+;; ----------------------------------------------------------------------------
+;; Package meta data.
 ;; Author: Toby Cubitt
 ;; Maintainer: Peter Friis Jensen <maxfriis@gmail.com>
 ;; URL: https://github.com/maxfriis/evil-emacs-cursor-model-mode
@@ -27,14 +29,14 @@
 ;; ============================================================================
 ;;; TODO:
 ;; ============================================================================
-;; Does erlier release versions of evil work?
+;; Does erlier release versions of evil work?  Probably.
 ;; 1.15.0 is the current but fairly old release version of evil.
 ;;
 ;; Work on `evil-visual-block' which still use `evil-mode's cursor model.
 ;;
-;; Make error `message' into `user-error' in
-;; `evil-emacs-cursor-model-repeat-find-char'.
-;; I don't know how yet.
+;; Fix `user-error' in `evil-emacs-cursor-model-repeat-find-char'.
+;; Don't know how to make the signal come from the function when inside `let'.
+;; For now the function `if' reports the `user-error'.
 
 ;; ============================================================================
 ;;; Code:
@@ -49,13 +51,6 @@
   "For toggling the variable with `evil-emacs-cursor-model-mode'.")
 (defvar evil-emacs-cursor-model-highlight-closing-paren-at-point-states-init evil-highlight-closing-paren-at-point-states
   "For toggling the variable with `evil-emacs-cursor-model-mode'.")
-;; ----------------------------------------------------------------------------
-;; Customization. Not yet implemented.
-(defvar evil-emacs-cursor-model-incremented-repeat-find-char-to nil
-  "Toggle Vim's oddity when repeating a `evil-find-char-to' character search.
-\n`evil-find-char' does the same as `evil-repeat-find-char' with the same prefix.
-`evil-find-char-to' need an incremented prefix to replicate what
-`evil-repeat-find-char' does.  Vim's \"2t?\" keybinding is repeated with \"1;\"")
 
 ;; ============================================================================
 ;;; The minor mode
@@ -90,7 +85,7 @@ Maybe fewer layers are better for your Emacs pinky?"
       "O"  #'evil-org-open-below))
    (t ; else
     ;; ----------------------------------------------------------------------------
-    ;; Back to `evil-mode' defaults when `evil-emacs-cursor-model-mode' is disabled.
+    ;; Back to user init defaults when `evil-emacs-cursor-model-mode' is disabled.
     (setq
      evil-move-cursor-back evil-emacs-cursor-model-move-cursor-back-init
      evil-move-beyond-eol evil-emacs-cursor-model-move-beyond-eol-init
@@ -172,11 +167,11 @@ Movement is restricted to the current line unless `evil-cross-lines' is non-nil.
   (interactive "<c><C>")
   (unless count (setq count 1))
   (if (and (= char (char-after))
-           (> count 0))
+           (plusp count))
       (evil-find-char (1- count) char)
     (evil-find-char count char))
-  (when (> count 0) (forward-char))
-  (setq evil-last-find (list #'evil-find-char char (> count 0))))
+  (when (plusp count) (forward-char))
+  (setq evil-last-find (list #'evil-find-char char (plusp count))))
 
 (evil-define-motion evil-emacs-cursor-model-find-before-char (count char)
   "Move point immediately before the next COUNT'th occurrence of CHAR.
@@ -185,42 +180,38 @@ Movement is restricted to the current line unless `evil-cross-lines' is non-nil.
   (interactive "<c><C>")
   (unless count (setq count 1))
   (if (and (= char (char-after))
-           (> count 0))
+           (plusp count))
       (evil-find-char (1- count) char)
     (evil-find-char count char))
-  (setq evil-last-find (list #'evil-find-char-to char (> count 0))))
+  (setq evil-last-find (list #'evil-find-char-to char (plusp count))))
 
 (evil-define-motion evil-emacs-cursor-model-repeat-find-char (count)
   "Repeat the last find COUNT times."
   :type inclusive
   (interactive "<c>")
   (unless count (setq count 1))
+  (unless (nth 2 evil-last-find) (setq count (- count))) ; Backwards search.
   (let ((find (eq (car evil-last-find) #'evil-find-char))
-        (char (nth 1 evil-last-find))
-        (fwd  (nth 2 evil-last-find))) ; Lower case "t"/"f".
-    (unless char (message "No previous search"))
-    (unless fwd (setq count (- count) fwd (not fwd)))
-    (when (< count 0) (setq fwd (not fwd))) ; fwd is now forward.
+        (char (nth 1 evil-last-find)))
+    (unless char (user-error "No previous search"))
     (unless find
-      (cond
-       ((and (= count 1) (eq char (char-after)))
-        (setq count (1+ count)))
-       ((and (= count -1) (eq char (char-before)))
-        (setq count (1- count))))) ; Vim does this on "repeat find to".
+      (cond ; Vim does this when find is nil.
+       ((and (= count  1) (= char (char-after)))  (setq count (1+ count)))
+       ((and (= count -1) (= char (char-before))) (setq count (1- count)))))
     (if (search-forward
          (char-to-string char)
          (cond (evil-cross-lines nil)
                ((and evil-respect-visual-line-mode
                      visual-line-mode)
                 (save-excursion
-                  (if fwd (end-of-visual-line) (beginning-of-visual-line))
+                  (if (plusp count) (end-of-visual-line) (beginning-of-visual-line))
                   (point)))
-               (fwd (line-end-position))
+               ((plusp count) (line-end-position))
                (t (line-beginning-position)))
          t count)
-        (unless (or find (= count 0))
-          (if (> count 0) (backward-char) (forward-char)))
-      (message "Can't find `%c'" char))))
+        (unless (or find (zerop count))
+          (if (plusp count) (backward-char) (forward-char)))
+      (user-error "Can't find `%c'" char))))
 
 (evil-define-motion evil-emacs-cursor-model-repeat-find-char-reverse (count)
   "Repeat the last find COUNT times in the opposite direction."
@@ -231,7 +222,7 @@ Movement is restricted to the current line unless `evil-cross-lines' is non-nil.
 (defun evil-emacs-cursor-model-forward-after-end (thing &optional count)
   "Move forward to end of THING.
 The motion is repeated COUNT times."
-  (setq count (or count 1))
+  (unless count (setq count 1))
   (cond
    ((> count 0)
     (forward-thing thing count))
@@ -242,7 +233,7 @@ The motion is repeated COUNT times."
       (when bnd
         (cond
          ((< (point) (cdr bnd)) (goto-char (car bnd)))
-         ((= (point) (cdr bnd)) (cl-incf count))))
+         ((= (point) (cdr bnd)) (setq count (1+ count)))))
       (condition-case nil
           (when (zerop (setq rest (forward-thing thing count)))
             (end-of-thing thing))

@@ -22,14 +22,15 @@
        (locate-user-emacs-file "brown-faces.elc"))
   (byte-compile-file (locate-user-emacs-file "brown-faces.el")))
 (when (file-newer-than-file-p
-       (locate-user-emacs-file "white-faces.el")
-       (locate-user-emacs-file "white-faces.elc"))
-  (byte-compile-file (locate-user-emacs-file "white-faces.el")))
-(if (and (/= (user-uid) 0)    ; Ansi colors as root
-         (display-graphic-p)) ; or in terminal.
-    (load (locate-user-emacs-file "brown-faces.elc") nil t)
-  ;; else
+       (locate-user-emacs-file "light-faces.el")
+       (locate-user-emacs-file "light-faces.elc"))
+  (byte-compile-file (locate-user-emacs-file "light-faces.el")))
+(cond
+ ((= (user-uid) 0)
   (load (locate-user-emacs-file "ansi-faces.elc") nil t))
+ ((display-graphic-p)
+  (load (locate-user-emacs-file "brown-faces.elc") nil t))
+ (t (load (locate-user-emacs-file "light-faces.elc") nil t)))
 ;; ----------------------------------------------------------------------------
 ;; Additional coloring.
 (font-lock-add-keywords
@@ -96,8 +97,7 @@ This does the opposite of the `shrink' face."
        (propertize
         "🅴"
         'help-echo "evil-mode disabled, mouse-1: Enable"
-        'local-map (make-mode-line-mouse-map
-                    'mouse-1 #'evil-mode)
+        'local-map (make-mode-line-mouse-map 'mouse-1 #'evil-mode)
         'mouse-face 'mode-line-highlight
         'face 'shrink))
      (unless (display-graphic-p) " ")
@@ -107,8 +107,7 @@ This does the opposite of the `shrink' face."
        (propertize
         "="
         'help-echo "Narrowed, mouse-1: Widen"
-        'local-map (make-mode-line-mouse-map
-                    'mouse-1 #'mode-line-widen)
+        'local-map (make-mode-line-mouse-map 'mouse-1 #'mode-line-widen)
         'mouse-face 'mode-line-highlight))
       ((window-dedicated-p)
        (propertize
@@ -122,38 +121,33 @@ This does the opposite of the `shrink' face."
        (propertize
         "÷"
         'help-echo "centered-cursor-mode disabled, mouse-1: Enable"
-        'local-map (make-mode-line-mouse-map
-                    'mouse-1 #'centered-cursor-mode)
+        'local-map (make-mode-line-mouse-map 'mouse-1 #'centered-cursor-mode)
         'mouse-face 'mode-line-highlight))
       ((and rainbow-mode
             (mode-line-window-selected-p))
        (propertize
         "#"
         'help-echo "rainbow-mode enabled, mouse-1: Disable"
-        'local-map (make-mode-line-mouse-map
-                    'mouse-1 #'rainbow-mode)
+        'local-map (make-mode-line-mouse-map 'mouse-1 #'rainbow-mode)
         'mouse-face 'mode-line-highlight))
       ;; Global minor modes.
       ((not golden-ratio-mode)
        (propertize
         "+"
         'help-echo "golden-ratio-mode disabled, mouse-1: Enable"
-        'local-map (make-mode-line-mouse-map
-                    'mouse-1 #'golden-ratio-mode)
+        'local-map (make-mode-line-mouse-map 'mouse-1 #'golden-ratio-mode)
         'mouse-face 'mode-line-highlight))
       ((not auto-save-visited-mode)
        (propertize
         "*"
         'help-echo "Auto save disabled, mouse-1: Enable"
-        'local-map (make-mode-line-mouse-map
-                    'mouse-1 #'auto-save-visited-mode)
+        'local-map (make-mode-line-mouse-map 'mouse-1 #'auto-save-visited-mode)
         'mouse-face 'mode-line-highlight))
       ((not evil-emacs-cursor-model-mode)
        (propertize
         "?"
         'help-echo "evil-emacs-cursor-model-mode disabled, mouse-1: Enable"
-        'local-map (make-mode-line-mouse-map
-                    'mouse-1 #'evil-emacs-cursor-model-mode)
+        'local-map (make-mode-line-mouse-map 'mouse-1 #'evil-emacs-cursor-model-mode)
         'mouse-face 'mode-line-highlight
         'face 'bold))
       (t
@@ -186,15 +180,14 @@ This does the opposite of the `shrink' face."
      ;; Active vs. inactive window.
      (if (mode-line-window-selected-p)
          (list
+          ""
           ;; Version control.
-          (if vc-mode
-              (propertize ; Replace the built in `propertize' of vc-mode.
-               (replace-regexp-in-string "\\` Git" "" vc-mode)
-               'help-echo "Version control, mouse-1: Magit"
-               'local-map (make-mode-line-mouse-map
-                           'mouse-1 #'magit)
-               'mouse-face 'mode-line-highlight)
-            "")
+          (when vc-mode
+            (propertize ; Replace the built in `propertize' of vc-mode.
+             (replace-regexp-in-string "\\` Git" "" vc-mode)
+             'help-echo "Version control, mouse-1: Magit"
+             'local-map (make-mode-line-mouse-map 'mouse-1 #'magit)
+             'mouse-face 'mode-line-highlight))
           " "
           ;; Display `global-mode-string' used by e.g. `display-time-mode'.
           mode-line-misc-info
@@ -376,14 +369,16 @@ This does the opposite of the `shrink' face."
 ;;; Custom stuff
 ;; ============================================================================
 ;; Toggle my faces.
-(defun my-toggle-faces ()
-  "Toggle my two default faces.
-\nThe faces are loaded from brown-faces.elc and ansi-faces.elc respectively."
-  (interactive)
-  (if (equal (face-background 'default) "#000")
-      (load (locate-user-emacs-file "brown-faces.elc") nil t)
-    ;; else
+(defun my-toggle-faces (&optional prefix)
+  "Faces cycle between brown, ansi and light faces respectively.
+Any non-nil PREFIX will load the brown faces."
+  (interactive "P")
+  (cond
+   ((or prefix (string-equal (face-background 'default) "#cba"))
+    (load (locate-user-emacs-file "brown-faces.elc") nil t))
+   ((string-equal (face-background 'default) "#210")
     (load (locate-user-emacs-file "ansi-faces.elc") nil t))
+   (t (load (locate-user-emacs-file "light-faces.elc") nil t)))
   (message "%s background faces" (face-background 'default)))
 ;; ----------------------------------------------------------------------------
 ;; Dired in new tab.
@@ -548,7 +543,7 @@ and focus the window you swapped to."
    ("melpa"  . 2)
    ("nongnu" . 1)) ; The remaining archives have priority 0.
  package-selected-packages
- '(evil-collection evil-nerd-commenter evil-surround evil-numbers evil-org org-superstar org-appear org-present magit dired-subtree cape corfu nerd-icons-corfu nerd-icons-dired nerd-icons-ibuffer nerd-icons-completion avy vertico marginalia orderless embark-consult counsel tmr rainbow-delimiters rainbow-mode recursive-narrow centered-cursor-mode golden-ratio ace-window transpose-frame mixed-pitch indent-guide casual-suite keycast undo-tree flycheck writegood-mode auto-package-update backup-each-save package-lint))
+ '(evil-collection evil-nerd-commenter evil-surround evil-numbers evil-org org-superstar org-appear org-present magit dired-subtree cape corfu nerd-icons-corfu nerd-icons-dired nerd-icons-ibuffer nerd-icons-completion avy vertico marginalia orderless embark-consult counsel tmr rainbow-delimiters rainbow-mode recursive-narrow centered-cursor-mode golden-ratio ace-window transpose-frame mixed-pitch indent-guide casual-suite keycast undo-tree flycheck writegood-mode auto-package-update backup-each-save package-lint helpful))
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents nil))
@@ -643,6 +638,11 @@ and focus the window you swapped to."
 ;; ============================================================================
 (require 'consult)
 (require 'counsel)
+(require 'helpful)
+(keymap-set global-map "<remap> <describe-key>"      #'helpful-key)
+(keymap-set global-map "<remap> <describe-function>" #'helpful-function)
+(keymap-set global-map "<remap> <describe-symbol>"   #'helpful-symbol)
+(keymap-set global-map "<remap> <describe-variable>" #'helpful-variable)
 (require 'keycast)
 (keycast-tab-bar-mode 1)
 ;; ----------------------------------------------------------------------------
@@ -695,7 +695,7 @@ and focus the window you swapped to."
  evil-operator-state-cursor '(box        "#f00")
  evil-normal-state-cursor   '(box        "#0f0")
  evil-motion-state-cursor   '(box        "#00f")
- evil-visual-state-cursor   '((bar  . 4) "#0ff")
+ evil-visual-state-cursor   '(hollow     "#0ff")
  evil-replace-state-cursor  '((hbar . 4) "#f0f")
  evil-insert-state-cursor   '((bar  . 4) "#ff0")
  evil-emacs-state-cursor    '(box        "#f00"))
@@ -1306,7 +1306,7 @@ All org files in the directory will then be in the agenda.")
 (keymap-set help-map        "h" #'describe-symbol) ; Swap "h" and "o".
 (keymap-set help-map        "o" #'view-hello-file)
 ;; ----------------------------------------------------------------------------
-;; <f8> menus. Mainly `transient' from `casual-suite'.
+;; <f8> contextual menus. Mainly `transient' from `casual-suite'.
 (with-eval-after-load 'calc
   (keymap-set calc-mode-map          "<f8>" #'casual-calc-tmenu)
   (keymap-set calc-alg-map           "<f8>" #'casual-calc-tmenu))

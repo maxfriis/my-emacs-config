@@ -20,14 +20,14 @@
  'default
  nil :foreground "#dcb" :background "#210")
 (set-face-attribute
- 'success
- nil :foreground "#7f3")
+ 'error
+ nil :foreground "#f37" :underline t)
 (set-face-attribute
  'warning
  nil :foreground "#f73")
 (set-face-attribute
- 'error
- nil :foreground "#f37" :underline t)
+ 'success
+ nil :foreground "#7f3")
 ;; ----------------------------------------------------------------------------
 ;;;; font-lock.
 (set-face-attribute
