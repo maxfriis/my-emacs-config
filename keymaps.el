@@ -135,6 +135,7 @@
 (defvar-keymap my-t-spc-map
   :doc "My <spc> prefix keys."
   "a"   #'auto-save-visited-mode
+  "c"   #'colorful-mode
   "d"   #'display-time-mode
   "e"   #'evil-emacs-cursor-model-mode
   "f"   #'mixed-pitch-mode
@@ -142,7 +143,6 @@
   "m"   #'mode-line-invisible-mode
   "o"   #'outline-minor-mode
   "p"   #'prettify-symbols-mode
-  "r"   #'rainbow-mode
   "s"   #'flyspell-mode
   "t"   #'my-toggle-faces
   "w"   #'writegood-mode
@@ -324,6 +324,7 @@
     "t"   '("Truncate"     . toggle-truncate-lines))
   (which-key-add-keymap-based-replacements my-t-spc-map
     "a"   '("Auto save"    . auto-save-visited-mode)
+    "c"   '("colorful"     . colorful-mode)
     "d"   '("Date/time"    . display-time-mode)
     "e"   '("Emacs cursor" . evil-emacs-cursor-model-mode)
     "f"   '("Font pitch"   . mixed-pitch-mode)
@@ -331,7 +332,6 @@
     "m"   '("Mode line"    . mode-line-invisible-mode)
     "o"   '("Outline"      . outline-minor-mode)
     "p"   '("Prettify"     . prettify-symbols-mode)
-    "r"   '("Rainbow"      . rainbow-mode)
     "s"   '("Spellcheck"   . flyspell-mode)
     "t"   '("Theme"        . my-toggle-faces)
     "w"   '("Write good"   . writegood-mode)

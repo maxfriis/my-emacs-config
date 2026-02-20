@@ -5,14 +5,14 @@
 ;; ============================================================================
 ;; Creative Commons Attribution-ShareAlike 4.0 International License
 ;; [[https://creativecommons.org/licenses/by-sa/4.0/]]
-
 ;; ----------------------------------------------------------------------------
 ;; Thanks.
-;; A special thanks to Toby Cubitt who coded the motions in the cursor model.
+;; Thanks to Toby Cubitt who coded most of the motions in the cursor model.
 ;; Peter Friis Jensen made it a mode and swapped some keybindings.
 
-;; ----------------------------------------------------------------------------
-;; Package meta data.
+;; ============================================================================
+;;; Package meta data:
+;; ============================================================================
 ;; Author: Toby Cubitt
 ;; Maintainer: Peter Friis Jensen <maxfriis@gmail.com>
 ;; URL: https://github.com/maxfriis/evil-emacs-cursor-model-mode
@@ -42,15 +42,15 @@
 ;;; Code:
 ;; ============================================================================
 (require 'evil)
-
 ;; ----------------------------------------------------------------------------
 ;; Remember init defaults.
 (defvar evil-emacs-cursor-model-move-cursor-back-init evil-move-cursor-back
-  "For toggling the variable with `evil-emacs-cursor-model-mode'.")
+  "For toggling `evil-move-cursor-back' with `evil-emacs-cursor-model-mode'.")
 (defvar evil-emacs-cursor-model-move-beyond-eol-init evil-move-beyond-eol
-  "For toggling the variable with `evil-emacs-cursor-model-mode'.")
+  "For toggling `evil-move-beyond-eol' with `evil-emacs-cursor-model-mode'.")
 (defvar evil-emacs-cursor-model-highlight-closing-paren-at-point-states-init evil-highlight-closing-paren-at-point-states
-  "For toggling the variable with `evil-emacs-cursor-model-mode'.")
+  "For toggling `evil-highlight-closing-paren-at-point-states' with
+`evil-emacs-cursor-model-mode'.")
 
 ;; ============================================================================
 ;;; The minor mode
@@ -61,7 +61,7 @@
 The idea is to avoid the <shift> layer when dealing with the current line.
 Layers can then be replaced with a motion with equivalent efficiency.
 \nEmbrace the mindset of Emacs' cursor model and motions among line nuggets.
-Maybe fewer layers are better for your Emacs pinky?"
+Maybe fewer layers are better if you have an Emacs pinky?"
   :lighter nil
   :global t
   :require 'evil-emacs-cursor-model-mode
@@ -99,18 +99,24 @@ Maybe fewer layers are better for your Emacs pinky?"
       "O"  #'evil-org-open-above))))
 
 ;; ============================================================================
-;;; Remappings that implement Emacs' cursor model
+;;; Remappings
 ;; ============================================================================
 (defvar evil-emacs-cursor-model-mode-map (make-sparse-keymap)
   "Keymap for `evil-emacs-cursor-model-mode'.")
 ;; ----------------------------------------------------------------------------
 ;; Motions.
 (keymap-set evil-emacs-cursor-model-mode-map
+            "<remap> <evil-find-char>"
+            #'evil-emacs-cursor-model-find-after-char)
+(keymap-set evil-emacs-cursor-model-mode-map
+            "<remap> <evil-find-char-backward>"
+            #'evil-emacs-cursor-model-find-before-char-backward)
+(keymap-set evil-emacs-cursor-model-mode-map
             "<remap> <evil-find-char-to>"
             #'evil-emacs-cursor-model-find-before-char)
 (keymap-set evil-emacs-cursor-model-mode-map
-            "<remap> <evil-find-char>"
-            #'evil-emacs-cursor-model-find-after-char)
+            "<remap> <evil-find-char-to-backward>"
+            #'evil-emacs-cursor-model-find-after-char-backward)
 (keymap-set evil-emacs-cursor-model-mode-map
             "<remap> <evil-repeat-find-char>"
             #'evil-emacs-cursor-model-repeat-find-char)
@@ -158,53 +164,64 @@ Maybe fewer layers are better for your Emacs pinky?"
                    evil-emacs-cursor-model-mode-map) t)
 
 ;; ============================================================================
-;;; Evil commands implementing Emacs' cursor model
+;;; Evil commands implementing the cursor model
 ;; ============================================================================
 (evil-define-motion evil-emacs-cursor-model-find-after-char (count char)
   "Move point immediately after the next COUNT'th occurrence of CHAR.
 Movement is restricted to the current line unless `evil-cross-lines' is non-nil."
   :type inclusive
   (interactive "<c><C>")
-  (unless count (setq count 1))
-  (if (and (= char (char-after))
-           (plusp count))
+  (setq count (or count 1))
+  (if (and (plusp count) (= char (char-after)))
       (evil-find-char (1- count) char)
     (evil-find-char count char))
-  (when (plusp count) (forward-char))
-  (setq evil-last-find (list #'evil-find-char char (plusp count))))
+  (when (plusp count) (forward-char)))
 
 (evil-define-motion evil-emacs-cursor-model-find-before-char (count char)
   "Move point immediately before the next COUNT'th occurrence of CHAR.
 Movement is restricted to the current line unless `evil-cross-lines' is non-nil."
   :type inclusive
   (interactive "<c><C>")
-  (unless count (setq count 1))
-  (if (and (= char (char-after))
-           (plusp count))
+  (setq count (or count 1))
+  (if (and (plusp count) (= char (char-after)))
       (evil-find-char (1- count) char)
     (evil-find-char count char))
+  (when (minusp count) (forward-char))
   (setq evil-last-find (list #'evil-find-char-to char (plusp count))))
+
+(evil-define-motion evil-emacs-cursor-model-find-after-char-backward (count char)
+  "Move after the previous COUNT'th occurrence of CHAR."
+  :type inclusive
+  (interactive "<c><C>")
+  (evil-emacs-cursor-model-find-before-char (- (or count 1)) char))
+
+(evil-define-motion evil-emacs-cursor-model-find-before-char-backward (count char)
+  "Move before the previous COUNT'th occurrence of CHAR."
+  :type inclusive
+  (interactive "<c><C>")
+  (evil-emacs-cursor-model-find-after-char (- (or count 1)) char))
 
 (evil-define-motion evil-emacs-cursor-model-repeat-find-char (count)
   "Repeat the last find COUNT times."
   :type inclusive
   (interactive "<c>")
-  (unless count (setq count 1))
-  (unless (nth 2 evil-last-find) (setq count (- count))) ; Backwards search.
-  (let ((find (eq (car evil-last-find) #'evil-find-char))
-        (char (nth 1 evil-last-find)))
-    (unless char (user-error "No previous search"))
-    (unless find
-      (cond ; Vim does this when find is nil.
-       ((and (= count  1) (= char (char-after)))  (setq count (1+ count)))
-       ((and (= count -1) (= char (char-before))) (setq count (1- count)))))
+  (setq count (or count 1))
+  (unless (nth 2 evil-last-find) (setq count (- count)))
+  (let ((char (nth 1 evil-last-find))
+        (find (eq (car evil-last-find) #'evil-find-char))
+        case-fold-search)
+    (unless char (user-error "No previous char search"))
+    (unless find ; Vim does this.
+      (cond ((and (= count  1) (= char (char-after)))  (incf count))
+            ((and (= count -1) (= char (char-before))) (decf count))))
     (if (search-forward
          (char-to-string char)
          (cond (evil-cross-lines nil)
-               ((and evil-respect-visual-line-mode
-                     visual-line-mode)
+               ((and evil-respect-visual-line-mode visual-line-mode)
                 (save-excursion
-                  (if (plusp count) (end-of-visual-line) (beginning-of-visual-line))
+                  (if (plusp count)
+                      (end-of-visual-line)
+                    (beginning-of-visual-line))
                   (point)))
                ((plusp count) (line-end-position))
                (t (line-beginning-position)))
@@ -222,23 +239,20 @@ Movement is restricted to the current line unless `evil-cross-lines' is non-nil.
 (defun evil-emacs-cursor-model-forward-after-end (thing &optional count)
   "Move forward to end of THING.
 The motion is repeated COUNT times."
-  (unless count (setq count 1))
-  (cond
-   ((> count 0)
-    (forward-thing thing count))
-   (t
+  (setq count (or count 1))
+  (if (plusp count)
+      (forward-thing thing count)
     (unless (bobp) (backward-char))
     (let ((bnd (bounds-of-thing-at-point thing))
           rest)
       (when bnd
-        (cond
-         ((< (point) (cdr bnd)) (goto-char (car bnd)))
-         ((= (point) (cdr bnd)) (setq count (1+ count)))))
+        (cond ((< (point) (cdr bnd)) (goto-char (car bnd)))
+              ((= (point) (cdr bnd)) (incf count))))
       (condition-case nil
           (when (zerop (setq rest (forward-thing thing count)))
             (end-of-thing thing))
         (error))
-      rest))))
+      rest)))
 
 (defun evil-emacs-cursor-model-backward-after-end (thing &optional count)
   "Move backward to end of THING.
@@ -284,26 +298,21 @@ If the end position is at the beginning of a line, then:
   :expand (lambda (beg end) (evil-range beg end))
   :contract (lambda (beg end) (evil-range beg end))
   :normalize (lambda (beg end)
-               (cond
-                ((progn
-                   (goto-char end)
-                   (and (/= beg end) (bolp)))
+               (if (progn
+                     (goto-char end)
+                     (or (= beg end) (not (bolp))))
+                   (evil-range beg end)
                  (setq end (max beg (1- end)))
-                 (cond
-                  ((progn
-                     (goto-char beg)
-                     (looking-back "^[\f\s\t\v]*" (line-beginning-position)))
-                   (evil-expand beg end 'line))
-                  (t
+                 (if (progn
+                       (goto-char beg)
+                       (looking-back "^[\f\s\t\v]*" (line-beginning-position)))
+                     (evil-expand beg end 'line)
                    (unless evil-cross-lines
                      (setq end (max beg (1- end))))
                    (evil-expand beg end 'inclusive))))
-                (t
-                 (evil-range beg end))))
   :string (lambda (beg end)
             (let ((width (- end beg)))
-              (format "%s character%s" width
-                      (if (= width 1) "" "s")))))
+              (format "%s character%s" width (if (= width 1) "" "s")))))
 
 ;; ----------------------------------------------------------------------------
 ;;;; Make "e" search offset put point after last character.
@@ -330,7 +339,7 @@ or somewhere after the cursor and jump to the corresponding one."
   :jump t
   :type inclusive
   (let ((pos (point)))
-    (unless (or (bolp) (bobp)) (backward-char))
+    (unless (bolp) (backward-char))
     (condition-case nil
         (evil-jump-item count)
       (user-error (goto-char pos)))
