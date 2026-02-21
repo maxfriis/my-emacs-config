@@ -22,13 +22,12 @@
        (locate-user-emacs-file "themes/8color-brown-theme.elc"))
   (byte-compile-file (locate-user-emacs-file "themes/8color-brown-theme.el")))
 (when (file-newer-than-file-p
-       (locate-user-emacs-file "themes/8color-light-theme.el")
-       (locate-user-emacs-file "themes/8color-light-theme.elc"))
-  (byte-compile-file (locate-user-emacs-file "themes/8color-light-theme.el")))
+       (locate-user-emacs-file "themes/8color-beige-theme.el")
+       (locate-user-emacs-file "themes/8color-beige-theme.elc"))
+  (byte-compile-file (locate-user-emacs-file "themes/8color-beige-theme.el")))
 (add-to-list 'custom-theme-load-path (locate-user-emacs-file "themes/"))
 (if (and (/= (user-uid) 0) (display-graphic-p))
     (load-theme '8color-brown t)
-  ;; else
   (load-theme '8color-ansi t))
 ;; ----------------------------------------------------------------------------
 ;; Additional coloring.
@@ -86,13 +85,11 @@ This does the opposite of the `shrink' face."
           'help-echo "Root access"
           'mouse-face 'mode-line-highlight
           'face 'warning) ; Emphasize.
-       ;; else
        " ")
      (if evil-mode
          (propertize
           evil-mode-line-tag
           'face 'shrink)
-       ;; else
        (propertize
         "🅴"
         'help-echo "evil-mode disabled, mouse-1: Enable"
@@ -123,7 +120,7 @@ This does the opposite of the `shrink' face."
       ;; Minor modes.
       ((not evil-emacs-cursor-model-mode)
        (propertize
-        "!"
+        "×"
         'help-echo "evil-emacs-cursor-model-mode disabled, mouse-1: Enable"
         'local-map (make-mode-line-mouse-map 'mouse-1 #'evil-emacs-cursor-model-mode)
         'mouse-face 'mode-line-highlight
@@ -193,7 +190,7 @@ This does the opposite of the `shrink' face."
           (propertize
            " "
            'display `((space :align-to (- (+ right right-fringe right-margin)
-                                          ,(if (display-graphic-p) 8 9))))
+                                          ,(if (display-graphic-p) 7 9))))
            'face    'mode-line-inactive)
           ;; Horizontal position.
           (propertize
@@ -203,11 +200,9 @@ This does the opposite of the `shrink' face."
           ;; Vertical position.
           (if display-line-numbers-mode
               '(-3 "%o")
-            ;; else
             (propertize
              "%3l"
              'help-echo "Line number")))
-       ;; else
        (list
         (propertize
          " "
@@ -228,7 +223,6 @@ This does the opposite of the `shrink' face."
  '((:eval
     (if (buffer-file-name)
         (abbreviate-file-name (buffer-file-name))
-      ;; else
       "%b")))
  frame-background-mode 'dark
  tab-width 4
@@ -343,7 +337,6 @@ This does the opposite of the `shrink' face."
                 (if (or (outline-invisible-p (pos-bol))
                         (outline-invisible-p (pos-eol)))
                     (setq display-line-numbers 'visual)     ; Folded lines.
-                  ;; else
                   (setq display-line-numbers 'relative))))) ; Wrapped lines.
 (add-hook 'emacs-startup-hook
           #'(lambda ()
@@ -367,16 +360,16 @@ This does the opposite of the `shrink' face."
 ;;; Custom stuff
 ;; ============================================================================
 ;; Toggle my faces.
-(defun my-toggle-faces (prefix)
+(defun my-toggle-themes (prefix)
   "Cycle between brown, ansi and light faces respectively.
 \nAny non-nil PREFIX will load the brown faces."
   (interactive "P")
   (cond
-   ((or prefix (string-equal (face-background 'default) "#edc"))
+   ((or (string-equal (face-background 'default) "#edc") prefix)
     (load-theme '8color-brown t))
    ((string-equal (face-background 'default) "#210")
     (load-theme '8color-ansi t))
-   (t (load-theme '8color-light t)))
+   (t (load-theme '8color-beige t)))
   (message "%s background faces" (face-background 'default)))
 ;; ----------------------------------------------------------------------------
 ;; Dired in new tab.
@@ -452,7 +445,6 @@ The function will organize the `buffer-list' and focus note.org."
       (when my-window-configuration
         (set-window-configuration my-window-configuration)
         (message "Window configuration restored"))
-    ;; else
     (setq my-window-configuration (current-window-configuration))
     (delete-other-windows)
     (message "Window maximized")))
@@ -471,10 +463,8 @@ window 2, Messages in window 3 and window 1's `previous-buffer' in window 4."
   (split-window-right) ; 4th window.
   (other-window 1)
   (next-buffer)
-  (while (memq major-mode '(dired-mode
-                            org-agenda-mode
-                            messages-buffer-mode))
-    (next-buffer))
+  (while (memq major-mode '(dired-mode org-agenda-mode messages-buffer-mode))
+    (next-buffer)) ; `while' will loop finitely due to *scratch*.
   (split-window-below) ; 3rd window.
   (switch-to-buffer "*Messages*")
   (split-window-below) ; 2nd window.
@@ -539,7 +529,7 @@ and focus the window you swapped to."
    ("melpa"  . 2)
    ("nongnu" . 1)) ; The remaining archives have priority 0.
  package-selected-packages
- '(evil-collection evil-nerd-commenter evil-surround evil-numbers evil-org org-superstar org-appear org-present magit dired-subtree cape corfu nerd-icons-corfu nerd-icons-dired nerd-icons-ibuffer nerd-icons-completion avy vertico marginalia orderless embark-consult counsel tmr rainbow-delimiters colorful-mode recursive-narrow centered-cursor-mode golden-ratio ace-window transpose-frame mixed-pitch indent-guide casual-suite keycast undo-tree flycheck writegood-mode auto-package-update backup-each-save package-lint helpful))
+ '(evil-collection evil-nerd-commenter evil-surround evil-numbers evil-org org-superstar org-appear org-present auctex magit dired-subtree cape corfu nerd-icons-corfu nerd-icons-dired nerd-icons-ibuffer nerd-icons-completion avy vertico marginalia orderless embark-consult counsel tmr rainbow-delimiters colorful-mode recursive-narrow centered-cursor-mode olivetti golden-ratio ace-window transpose-frame mixed-pitch indent-guide casual-suite keycast undo-tree flycheck writegood-mode auto-package-update backup-each-save package-lint helpful))
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents nil))
@@ -693,9 +683,9 @@ and focus the window you swapped to."
  evil-operator-state-cursor '(box        "#f00")
  evil-normal-state-cursor   '(box        "#0f0")
  evil-motion-state-cursor   '(box        "#00f")
- evil-visual-state-cursor   '((bar  . 4) "#0ff")
- evil-replace-state-cursor  '((hbar . 4) "#f0f")
  evil-insert-state-cursor   '((bar  . 4) "#ff0")
+ evil-replace-state-cursor  '((hbar . 4) "#f0f")
+ evil-visual-state-cursor   '((bar  . 4) "#0ff")
  evil-emacs-state-cursor    '(box        "#f00"))
 ;; ----------------------------------------------------------------------------
 ;; Tags for `evil-mode-line-tag'.
@@ -838,9 +828,9 @@ All org files in the directory will then be in the agenda.")
  '(("*" bold)
    ("/" italic)
    ("_" underline)
-   ("+" '(shadow shrink))
    ("=" org-verbatim)
-   ("~" org-code))
+   ("~" org-code)
+   ("+" '(shadow shrink)))
  org-tags-column -75 ; Right aligned.
  org-tag-alist
  '(("pc"       . ?c) ; c for computer.
@@ -1097,6 +1087,7 @@ All org files in the directory will then be in the agenda.")
 (add-hook 'org-mode-hook #'org-appear-mode)
 ;; ----------------------------------------------------------------------------
 ;; Present.
+(setq olivetti-body-width .75)
 (require 'org-present)
 (setq-local
  org-blank-before-new-entry
@@ -1104,6 +1095,26 @@ All org files in the directory will then be in the agenda.")
    (plain-list-item . nil)))
 (with-eval-after-load 'evil
   (evil-collection-org-present-setup))
+(add-hook 'org-present-mode-hook
+          #'(lambda ()
+              (if org-present-mode
+                  (progn (set-face-font 'default "Ubuntu Mono")
+                         (org-present-read-only)
+                         (org-present-big)
+                         (org-display-inline-images t)
+                         (display-line-numbers-mode 0)
+                         (tab-line-mode 0)
+                         (tab-bar-mode 0)
+                         (setq header-line-format
+                               (propertize " " 'face '(:height 5.0)))
+                         (olivetti-mode 1))
+                (set-face-font 'default "Liberation Mono")
+                (org-present-read-write)
+                (org-present-quit)
+                (display-line-numbers-mode 1)
+                (tab-bar-mode 1)
+                (setq header-line-format nil)
+                (olivetti-mode 0))))
 ;; ----------------------------------------------------------------------------
 ;; A pictogram is often better than a word.
 (add-hook 'org-mode-hook
@@ -1206,10 +1217,8 @@ All org files in the directory will then be in the agenda.")
  ("C-S-ø"         . back-to-indentation)
  ("C-ø"           . end-of-line)
  :map org-present-mode-keymap
- ("<left>"        . org-present-prev)
- ("<right>"       . org-present-next)
- ("<up>"          . org-present-beginning)
- ("<down>"        . org-present-end)
+ ("<f6>"          . org-present-prev)
+ ("<f7>"          . org-present-next)
  :map isearch-mode-map
  ("C-S-s"         . isearch-query-replace) ; "C-S" does not work.
  :map corfu-map

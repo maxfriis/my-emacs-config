@@ -1,6 +1,4 @@
 #+title: My Emacs configuration
-#+startup: showall hideblocks
-#+options: toc:nil
 
 Publication of this configuration is mainly inspirational.
 You can install the whole thing but might experience an overload of oddities.
@@ -221,6 +219,9 @@ Note that some of the videos are old and I have modified my init files after I m
 My configuration is constantly evolving.
 
 * Clone
+:LOGBOOK:
+- State "DONE" from           [2026-02-20 Fri 09:00]
+:END:
 
 If you have an /empty/ or deleted ~/.emacs.d directory and have git installed you can clone this configuration with:
 #+begin_src bash

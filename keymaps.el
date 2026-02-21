@@ -59,14 +59,14 @@
   :doc "My <spc> prefix keys."
   "."   #'org-time-stamp
   "A"   #'org-archive-subtree-default
-  "E"   #'org-latex-export-to-pdf
+  "E"   #'org-export-dispatch
   "F"   #'org-agenda-file-to-front
   "G"   #'org-goto
   "I"   #'org-clock-in
   "L"   #'org-store-link
   "N"   #'org-num-mode
   "O"   #'org-clock-out
-  "P"   #'org-present
+  "P"   #'org-set-property
   "R"   #'org-refile
   "S"   #'org-sort
   "T"   #'orgtbl-mode
@@ -74,12 +74,12 @@
   "b"   #'org-insert-structure-template
   "c"   #'org-capture
   "d"   #'org-deadline
-  "e"   #'org-export-dispatch
+  "e"   #'org-latex-export-to-pdf
   "g"   #'counsel-org-goto-all
   "l"   #'org-insert-link
   "n"   #'org-add-note
   "o"   #'org-open-at-point
-  "p"   #'org-set-property
+  "p"   #'org-present
   "s"   #'org-schedule
   "t"   #'evil-org-org-insert-todo-heading-respect-content-below)
 (defvar-keymap my-q-spc-map
@@ -141,10 +141,10 @@
   "f"   #'mixed-pitch-mode
   "h"   #'global-hl-line-mode
   "m"   #'mode-line-invisible-mode
-  "o"   #'outline-minor-mode
+  "o"   #'olivetti-mode
   "p"   #'prettify-symbols-mode
   "s"   #'flyspell-mode
-  "t"   #'my-toggle-faces
+  "t"   #'my-toggle-themes
   "w"   #'writegood-mode
   "b"   my-tb-spc-map
   "i"   my-ti-spc-map
@@ -159,6 +159,7 @@
 (defvar-keymap my-x-spc-map
   :doc "My <spc> prefix keys."
   "D"   #'evil-downcase
+  "S"   #'sort-lines
   "U"   #'evil-upcase
   "W"   #'flyspell-word
   "c"   #'transpose-chars
@@ -256,14 +257,14 @@
   (which-key-add-keymap-based-replacements my-o-spc-map
     "."   '("Timestamp"    . org-time-stamp)
     "A"   '("Archive"      . org-archive-subtree-default)
-    "E"   '("Latex pdf"    . org-latex-export-to-pdf)
+    "E"   '("Export"       . org-export-dispatch)
     "F"   '("Agenda file"  . org-agenda-file-to-front)
     "G"   '("Goto"         . org-goto)
     "I"   '("Clock in"     . org-clock-in)
     "L"   '("Store link"   . org-store-link)
     "N"   '("Number heads" . org-num-mode)
     "O"   '("Clock out"    . org-clock-out)
-    "P"   '("Present"      . org-present)
+    "P"   '("Property"     . org-set-property)
     "R"   '("Refile"       . org-refile)
     "S"   '("Sort"         . org-sort)
     "T"   '("Tables"       . orgtbl-mode)
@@ -271,12 +272,12 @@
     "b"   '("Block"        . org-insert-structure-template)
     "c"   '("Capture"      . org-capture)
     "d"   '("Deadline"     . org-deadline)
-    "e"   '("Export"       . org-export-dispatch)
+    "e"   '("Latex pdf"    . org-latex-export-to-pdf)
     "g"   '("Goto head"    . counsel-org-goto-all)
     "l"   '("Ins. link"    . org-insert-link)
     "n"   '("Add note"     . org-add-note)
     "o"   '("Open link"    . org-open-at-point)
-    "p"   '("Property"     . org-set-property)
+    "p"   '("Present"      . org-present)
     "s"   '("Schedule"     . org-schedule)
     "t"   '("New todo"     . evil-org-org-insert-todo-heading-respect-content-below))
   (which-key-add-keymap-based-replacements my-q-spc-map
@@ -330,10 +331,10 @@
     "f"   '("Font pitch"   . mixed-pitch-mode)
     "h"   '("Hl line"      . global-hl-line-mode)
     "m"   '("Mode line"    . mode-line-invisible-mode)
-    "o"   '("Outline"      . outline-minor-mode)
+    "o"   '("Olivetti"     . olivetti-mode)
     "p"   '("Prettify"     . prettify-symbols-mode)
     "s"   '("Spellcheck"   . flyspell-mode)
-    "t"   '("Theme"        . my-toggle-faces)
+    "t"   '("Theme"        . my-toggle-themes)
     "w"   '("Write good"   . writegood-mode)
     "b"   `("Tab bar"      . ,my-tb-spc-map)
     "i"   `("Indicate"     . ,my-ti-spc-map)
@@ -341,6 +342,7 @@
     "l"   `("Line"         . ,my-tl-spc-map))
   (which-key-add-keymap-based-replacements my-x-spc-map
     "D"   '("Downcase"     . evil-downcase)
+    "S"   '("Sort lines"   . sort-lines)
     "U"   '("Upcase"       . evil-upcase)
     "W"   '("Spell word"   . flyspell-word)
     "c"   '("Swap chars"   . transpose-chars)
