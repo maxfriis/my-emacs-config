@@ -1,4 +1,4 @@
-;;; 8color-light-theme.el --- -*- lexical-binding: t; -*-
+;;; 8color-beige-theme.el --- -*- lexical-binding: t; -*-
 
 ;; ============================================================================
 ;;; Vanilla faces
@@ -9,23 +9,23 @@
 ;; |------+-----------------+------+-----------------|
 ;; | #987 | shadow/hl-line  | #00f | comment/tag     |
 ;; | #090 | success/done    | #f00 | error/todo      |
-;; | #b0b | link/timestamp  | #940 | warning/heading |
+;; | #b0b | link/timestamp  | #840 | warning/heading |
 ;; |------+-----------------+------+-----------------|
 ;; The colors are based on f, b, 7 and 0 adjusting grays to brownish.
 ;; Unspecified faces are handled by the light part of the vanilla theme.
 ;; ----------------------------------------------------------------------------
-(deftheme 8color-light)
+(deftheme 8color-beige)
 
 (let ((class '((class color) (min-colors 89))))
   (custom-theme-set-faces
-   '8color-light
+   '8color-beige
 ;;;; Special faces.
    `(default
      ((,class (:foreground "#210" :background "#edc"))))
    `(error
      ((,class (:foreground "#f00" :underline t))))
    `(warning
-     ((,class (:foreground "#940"))))
+     ((,class (:foreground "#840"))))
    `(success
      ((,class (:foreground "#090"))))
    ;; ----------------------------------------------------------------------------
@@ -45,7 +45,7 @@
    `(font-lock-variable-name-face
      ((,class (:foreground "#090"))))
    `(font-lock-keyword-face
-     ((,class (:foreground "#940"))))
+     ((,class (:foreground "#840"))))
    `(font-lock-number-face
      ((,class (:foreground "#f00"))))
    `(font-lock-warning-face
@@ -85,23 +85,23 @@
 ;;; Org
    ;; ============================================================================
    `(org-document-title
-     ((,class (:foreground "#940" :weight bold :height 1.25))))
+     ((,class (:foreground "#840" :weight bold :height 1.25))))
    `(org-level-1
-     ((,class (:foreground "#940" :weight bold :height 1.25))))
+     ((,class (:foreground "#840" :weight bold :height 1.25))))
    `(org-level-2
-     ((,class (:foreground "#940" :weight bold :height 1.25))))
+     ((,class (:foreground "#840" :weight bold :height 1.25))))
    `(org-level-3
-     ((,class (:foreground "#940" :weight bold :height 1.25))))
+     ((,class (:foreground "#840" :weight bold :height 1.25))))
    `(org-level-4
-     ((,class (:foreground "#940" :weight bold :height 1.25))))
+     ((,class (:foreground "#840" :weight bold :height 1.25))))
    `(org-level-5
-     ((,class (:foreground "#940" :weight bold :height 1.25))))
+     ((,class (:foreground "#840" :weight bold :height 1.25))))
    `(org-level-6
-     ((,class (:foreground "#940" :weight bold :height 1.25))))
+     ((,class (:foreground "#840" :weight bold :height 1.25))))
    `(org-level-7
-     ((,class (:foreground "#940" :weight bold :height 1.25))))
+     ((,class (:foreground "#840" :weight bold :height 1.25))))
    `(org-level-8
-     ((,class (:foreground "#940" :weight bold :height 1.25))))
+     ((,class (:foreground "#840" :weight bold :height 1.25))))
    `(org-todo
      ((,class (:foreground "#f00" :height .8))))
    `(org-done
@@ -149,14 +149,14 @@
    `(org-superstar-header-bullet
      ((,class (:foreground "#00f" :slant normal :height .8))))
    `(org-superstar-item
-     ((,class (:foreground "#940" :height .8))))
+     ((,class (:foreground "#840" :height .8))))
    ;; ============================================================================
 ;;;; Agenda
    ;; ============================================================================
    `(header-line
-     ((,class (:foreground "#940" :background "#edc" :weight bold :height 1.25))))
+     ((,class (:foreground "#840" :background "#edc" :weight bold :height 1.25))))
    `(org-agenda-structure
-     ((,class (:foreground "#940" :background "#edc" :box nil :weight bold :height 1.25))))
+     ((,class (:foreground "#840" :background "#edc" :box nil :weight bold :height 1.25))))
    `(org-column
      ((,class (:background "#edc"))))
    `(org-warning
@@ -176,35 +176,35 @@
    `(org-agenda-date-weekend
      ((,class (:foreground "#b0f" :background "#edc" :box nil :weight normal :underline nil))))
    `(org-agenda-date-today
-     ((,class (:foreground "#940" :background "#edc" :box nil :weight normal :slant normal :inverse-video nil))))
+     ((,class (:foreground "#840" :background "#edc" :box nil :weight normal :slant normal :inverse-video nil))))
    `(org-upcoming-distant-deadline
      ((,class (:foreground "#090"))))
    `(org-upcoming-deadline
      ((,class (:foreground "#090"))))
    `(org-imminent-deadline
-     ((,class (:foreground "#940" :weight normal))))
+     ((,class (:foreground "#840" :weight normal))))
    `(org-scheduled
      ((,class (:foreground "#090"))))
    `(org-scheduled-today
      ((,class (:foreground "#090"))))
    `(org-scheduled-previously
-     ((,class (:foreground "#940"))))
+     ((,class (:foreground "#840"))))
    ;; ----------------------------------------------------------------------------
 ;;;; Habit.
    `(org-habit-alert-face
-     ((,class (:foreground "#f00" :background "#940" :weight bold))))
+     ((,class (:foreground "#f00" :background "#840" :weight bold))))
    `(org-habit-alert-future-face
-     ((,class (:background "#940"))))
+     ((,class (:background "#840"))))
    `(org-habit-overdue-face
-     ((,class (:foreground "#940" :background "#f00" :weight bold))))
+     ((,class (:foreground "#840" :background "#f00" :weight bold))))
    `(org-habit-overdue-future-face
      ((,class (:background "#987"))))
    `(org-habit-ready-face
-     ((,class (:foreground "#940" :background "#090" :weight bold))))
+     ((,class (:foreground "#840" :background "#090" :weight bold))))
    `(org-habit-ready-future-face
      ((,class (:background "#090"))))
    `(org-habit-clear-face
-     ((,class (:foreground "#940" :background "#987" :weight bold))))
+     ((,class (:foreground "#840" :background "#987" :weight bold))))
    `(org-habit-clear-future-face
      ((,class (:background "#987"))))
 
@@ -220,7 +220,7 @@
    `(corfu-current
      ((,class (:foreground "#edc" :background "#987"))))
    `(aw-leading-char-face
-     ((,class (:foreground "#940" :height 1.0))))
+     ((,class (:foreground "#840" :height 1.0))))
    `(ivy-current-match ; `counsel use this face.
      ((,class (:foreground "#090" :background "#987"))))
    `(indent-guide-face
@@ -244,7 +244,7 @@
    `(corfu-current
      ((,class (:foreground "#edc" :background "#987"))))
    `(flyspell-duplicate
-     ((,class (:underline (:style wave :color "#940")))))
+     ((,class (:underline (:style wave :color "#840")))))
    `(flyspell-incorrect
      ((,class (:underline (:style wave :color "#f00")))))
    `(rainbow-delimiters-base-error-face
@@ -254,7 +254,7 @@
    `(rainbow-delimiters-depth-2-face
      ((,class (:foreground "#b0f"))))
    `(rainbow-delimiters-depth-3-face
-     ((,class (:foreground "#940"))))
+     ((,class (:foreground "#840"))))
    `(tab-bar
      ((,class (:foreground "#987" :background "#edc" :weight bold :box nil :height .8 :inherit default))))
    `(tab-bar-tab
@@ -278,8 +278,8 @@
      ((,class (:foreground "#987" :background "#edc" :box (:line-width 1 :color "#00f" :style released-button)))))))
 
 (custom-theme-set-variables
- '8color-light
+ '8color-beige
  '(ansi-color-names-vector ["#000" "#f00" "#0f0" "#ff0" "#00f" "#f0f" "#0ff" "#fff"]))
 
-(provide-theme '8color-light)
-;;; 8color-light-theme.el ends here
+(provide-theme '8color-beige)
+;;; 8color-beige-theme.el ends here

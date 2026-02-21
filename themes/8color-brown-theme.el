@@ -229,7 +229,7 @@
      ((,class (:background "#432"))))
    `(aw-leading-char-face
      ((,class (:foreground "#f73" :height 1.0))))
-   `(ivy-current-match
+   `(ivy-current-match ; `counsel use this face.
      ((,class (:foreground "#7f3" :background "#432"))))
    `(indent-guide-face
      ((,class (:foreground "#432"))))
