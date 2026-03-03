@@ -3,7 +3,7 @@
 ;; ============================================================================
 ;;; Vanilla faces
 ;; ============================================================================
-;; 8 colors: #??? combining f and 0.
+;; 8 #??? color theme combining f and 0.
 ;; |------+-----------------+------+-----------------|
 ;; | #000 | background      | #fff | default text    |
 ;; |------+-----------------+------+-----------------|
@@ -13,7 +13,13 @@
 ;; |------+-----------------+------+-----------------|
 ;; These colors will display in an 8 or 16 color ansi terminal.
 ;; Unspecified faces are handled by the dark vanilla theme.
-(deftheme 8color-ansi)
+(deftheme 8color-ansi
+  "8 #??? color theme combining f and 0.
+
+| #000 | background      | #fff | default text    |
+| #f00 | shadow/hl-line  | #0ff | comment/tag     |
+| #0f0 | success/done    | #f0f | error/todo      |
+| #00f | link/timestamp  | #ff0 | warning/heading |")
 (let ((class '((class color) (min-colors 89))))
   (custom-theme-set-faces
    '8color-ansi
@@ -149,8 +155,9 @@
      ((,class (:foreground "#0ff" :slant normal :height .8))))
    `(org-superstar-item
      ((,class (:foreground "#ff0" :height .8))))
+
    ;; ============================================================================
-;;;; Agenda
+;;; Agenda
    ;; ============================================================================
    `(header-line
      ((,class (:foreground "#ff0" :background "#000" :weight bold :height 1.25))))
@@ -220,7 +227,7 @@
      ((,class (:foreground "#000" :background "#f00"))))
    `(aw-leading-char-face
      ((,class (:foreground "#ff0" :height 1.0))))
-   `(ivy-current-match ; `counsel use this face.
+   `(ivy-current-match ; `counsel' use this face.
      ((,class (:foreground "#0f0" :background "#f00"))))
    `(indent-guide-face
      ((,class (:foreground "#f00"))))

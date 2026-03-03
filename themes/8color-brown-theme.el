@@ -3,18 +3,20 @@
 ;; ============================================================================
 ;;; Vanilla faces
 ;; ============================================================================
-;; 8 colors: #??? combining f(15), 7 and 3 plus some dusty brownish colors.
-;; |------+-----------------+------+-----------------|
-;; | #210 | background      | #dcb | default text    |
-;; |------+-----------------+------+-----------------|
-;; | #f37 | error/todo      | #f73 | warning/heading |
-;; | #7f3 | success/done    | #3f7 | comment/tag     |
-;; | #37f | link/timestamp  | #432 | shadow/hl-line  |
-;; |------+-----------------+------+-----------------|
 ;; Dark, warm, systematic, simple and aesthetically pleasing.  No #73f.
 ;; Unspecified faces are handled by the dark part of the vanilla theme.
 ;; ----------------------------------------------------------------------------
-(deftheme 8color-brown)
+;;;###theme-autoload
+(deftheme 8color-brown
+  "8 #??? colors: combining f(15), 7 and 3 plus some dusty brownish colors.
+
+| #210 | background      | #dcb | default text    |
+| #f37 | error/todo      | #f73 | warning/heading |
+| #7f3 | success/done    | #3f7 | comment/tag     |
+| #37f | link/timestamp  | #432 | shadow/hl-line  |"
+  :background-mode 'dark
+  :kind 'color-scheme
+  :family '8color)
 
 (let ((class '((class color) (min-colors 89))))
   (custom-theme-set-faces
@@ -150,8 +152,9 @@
      ((,class (:foreground "#3f7" :slant normal :height .8))))
    `(org-superstar-item
      ((,class (:foreground "#f73" :height .8))))
+
    ;; ============================================================================
-;;;; Agenda
+;;; Agenda
    ;; ============================================================================
    `(header-line
      ((,class (:foreground "#f73" :background "#210" :weight bold :height 1.25))))
@@ -229,7 +232,7 @@
      ((,class (:background "#432"))))
    `(aw-leading-char-face
      ((,class (:foreground "#f73" :height 1.0))))
-   `(ivy-current-match ; `counsel use this face.
+   `(ivy-current-match ; `counsel' use this face.
      ((,class (:foreground "#7f3" :background "#432"))))
    `(indent-guide-face
      ((,class (:foreground "#432"))))

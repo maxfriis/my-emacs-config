@@ -150,8 +150,9 @@
      ((,class (:foreground "#00f" :slant normal :height .8))))
    `(org-superstar-item
      ((,class (:foreground "#840" :height .8))))
+
    ;; ============================================================================
-;;;; Agenda
+;;; Agenda
    ;; ============================================================================
    `(header-line
      ((,class (:foreground "#840" :background "#edc" :weight bold :height 1.25))))
@@ -221,7 +222,7 @@
      ((,class (:foreground "#edc" :background "#987"))))
    `(aw-leading-char-face
      ((,class (:foreground "#840" :height 1.0))))
-   `(ivy-current-match ; `counsel use this face.
+   `(ivy-current-match ; `counsel' use this face.
      ((,class (:foreground "#090" :background "#987"))))
    `(indent-guide-face
      ((,class (:foreground "#987"))))
