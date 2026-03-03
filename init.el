@@ -14,13 +14,13 @@
 ;; ----------------------------------------------------------------------------
 ;; Themes.
 (when (file-newer-than-file-p
-       (locate-user-emacs-file "themes/8color-ansi-theme.el")
-       (locate-user-emacs-file "themes/8color-ansi-theme.elc"))
-  (byte-compile-file (locate-user-emacs-file "themes/8color-ansi-theme.el")))
-(when (file-newer-than-file-p
        (locate-user-emacs-file "themes/8color-brown-theme.el")
        (locate-user-emacs-file "themes/8color-brown-theme.elc"))
   (byte-compile-file (locate-user-emacs-file "themes/8color-brown-theme.el")))
+(when (file-newer-than-file-p
+       (locate-user-emacs-file "themes/8color-ansi-theme.el")
+       (locate-user-emacs-file "themes/8color-ansi-theme.elc"))
+  (byte-compile-file (locate-user-emacs-file "themes/8color-ansi-theme.el")))
 (when (file-newer-than-file-p
        (locate-user-emacs-file "themes/8color-beige-theme.el")
        (locate-user-emacs-file "themes/8color-beige-theme.elc"))
@@ -107,24 +107,21 @@ This does the opposite of the `shrink' face."
         'mouse-face 'mode-line-highlight))
       ((window-dedicated-p)
        (propertize
-        "/"
+        "\\"
         'help-echo "Window dedicated to buffer"
-        'mouse-face 'mode-line-highlight
-        'face 'bold))
+        'mouse-face 'mode-line-highlight 'face 'bold))
       ((not (mode-line-window-selected-p))
        (propertize
-        "|"
+        "/"
         'help-echo "Inactive window"
-        'mouse-face 'mode-line-highlight
-        'face 'bold))
+        'mouse-face 'mode-line-highlight 'face 'bold))
       ;; Minor modes.
       ((not evil-emacs-cursor-model-mode)
        (propertize
-        "×"
+        "-"
         'help-echo "evil-emacs-cursor-model-mode disabled, mouse-1: Enable"
         'local-map (make-mode-line-mouse-map 'mouse-1 #'evil-emacs-cursor-model-mode)
-        'mouse-face 'mode-line-highlight
-        'face 'bold))
+        'mouse-face 'mode-line-highlight))
       ((not auto-save-visited-mode)
        (propertize
         "*"
@@ -145,11 +142,10 @@ This does the opposite of the `shrink' face."
         'mouse-face 'mode-line-highlight))
       (t
        (propertize
-        "\\"
+        "|"
         'help-echo "The default minor modes are active, mouse-1: Cycle themes"
-        'local-map (make-mode-line-mouse-map 'mouse-1 #'my-toggle-faces)
-        'mouse-face 'mode-line-highlight
-        'face 'bold)))
+        'local-map (make-mode-line-mouse-map 'mouse-1 #'my-toggle-themes)
+        'mouse-face 'mode-line-highlight 'face 'bold)))
      " "
      ;; Buffer name.
      mode-line-buffer-identification
@@ -174,41 +170,39 @@ This does the opposite of the `shrink' face."
       'mouse-face 'mode-line-highlight)
      ;; Active vs. inactive window.
      (if (mode-line-window-selected-p)
-         (list
-          ""
-          ;; Version control.
-          (when vc-mode
-            (propertize ; Replace the built in `propertize' of vc-mode.
-             (replace-regexp-in-string "\\` Git" "" vc-mode)
-             'help-echo "Version control, mouse-1: Magit"
-             'local-map (make-mode-line-mouse-map 'mouse-1 #'magit)
-             'mouse-face 'mode-line-highlight))
-          " "
-          ;; Display `global-mode-string' used by e.g. `display-time-mode'.
-          mode-line-misc-info
-          ;; Gap for alignment.
-          (propertize
+         `("" ; Avoid potential nil as first element in list.
+           ;; Version control.
+           ,(when vc-mode
+              (propertize ; Replace the built in `propertize' of vc-mode.
+               (replace-regexp-in-string "\\` Git" "" vc-mode)
+               'help-echo "Version control, mouse-1: Magit"
+               'local-map (make-mode-line-mouse-map 'mouse-1 #'magit)
+               'mouse-face 'mode-line-highlight))
+           " "
+           ;; Display `global-mode-string' used by e.g. `display-time-mode'.
+           ,mode-line-misc-info
+           ;; Gap for alignment.
+           ,(propertize
+             " "
+             'display `((space :align-to (- (+ right right-fringe right-margin)
+                                            ,(if (display-graphic-p) 7 9))))
+             'face 'mode-line-inactive)
+           ;; Horizontal position.
+           ,(propertize
+             "%3c"
+             'help-echo "Column number")
+           " "
+           ;; Vertical position.
+           ,(if display-line-numbers-mode
+                '(-3 "%o")
+              (propertize
+               "%3l"
+               'help-echo "Line number")))
+       `(,(propertize
            " "
            'display `((space :align-to (- (+ right right-fringe right-margin)
-                                          ,(if (display-graphic-p) 7 9))))
-           'face    'mode-line-inactive)
-          ;; Horizontal position.
-          (propertize
-           "%3c"
-           'help-echo "Column number")
-          " "
-          ;; Vertical position.
-          (if display-line-numbers-mode
-              '(-3 "%o")
-            (propertize
-             "%3l"
-             'help-echo "Line number")))
-       (list
-        (propertize
-         " "
-         'display `((space :align-to (- (+ right right-fringe right-margin)
-                                        ,(if (display-graphic-p) 4 5)))))
-        '(-3 "%o")))))))
+                                          ,(if (display-graphic-p) 4 5)))))
+         (-3 "%o")))))))
 
 ;; ============================================================================
 ;;; Vanilla stuff
@@ -255,7 +249,7 @@ This does the opposite of the `shrink' face."
  dired-dwim-target t
  dired-isearch-filenames t
  dired-recursive-copies 'always
- dired-recursive-deletes 'always ; Risky but I move to trash.
+ dired-recursive-deletes 'always ; I move deletes to trash.
  dired-listing-switches "-aghov --group-directories-first"
  dired-omit-files "\\`[#\\.].*\\'"
  dired-omit-verbose  nil
@@ -431,7 +425,7 @@ The function will organize the `buffer-list' and focus note.org."
   (org-capture nil "i")
   (org-save-all-org-buffers)
   (when (eq major-mode 'org-agenda-mode)
-    (org-agenda-redo) ; Might turn `global-hl-line-mode' off for some reason?
+    (org-agenda-redo-all) ; Might turn `global-hl-line-mode' off for some reason?
     (global-hl-line-mode 1)
     (goto-char (point-min)))) ; Jump to the new NEXT item.
 ;; ----------------------------------------------------------------------------
@@ -527,9 +521,9 @@ and focus the window you swapped to."
  package-archive-priorities
  '(("elpa"   . 3)  ; Prefer older versions from elpa.
    ("melpa"  . 2)
-   ("nongnu" . 1)) ; The remaining archives have priority 0.
+   ("nongnu" . 1)) ; Other archives have priority 0.
  package-selected-packages
- '(evil-collection evil-nerd-commenter evil-surround evil-numbers evil-org org-superstar org-appear org-present auctex magit dired-subtree cape corfu nerd-icons-corfu nerd-icons-dired nerd-icons-ibuffer nerd-icons-completion avy vertico marginalia orderless embark-consult counsel tmr rainbow-delimiters colorful-mode recursive-narrow centered-cursor-mode olivetti golden-ratio ace-window transpose-frame mixed-pitch indent-guide casual-suite keycast undo-tree flycheck writegood-mode auto-package-update backup-each-save package-lint helpful))
+ '(evil-collection evil-nerd-commenter evil-surround evil-numbers evil-org org-superstar evil-emacs-cursor-model-mode org-appear org-present auctex magit dired-subtree cape corfu nerd-icons-corfu nerd-icons-dired nerd-icons-ibuffer nerd-icons-completion avy vertico marginalia orderless embark-consult counsel tmr rainbow-delimiters colorful-mode recursive-narrow centered-cursor-mode olivetti golden-ratio ace-window transpose-frame mixed-pitch indent-guide casual-suite keycast undo-tree flycheck writegood-mode auto-package-update backup-each-save package-lint helpful))
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents nil))
@@ -585,7 +579,10 @@ and focus the window you swapped to."
 ;; Tidy typing directories (rfn=read-file-name):
 (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
 (require 'orderless)
-(setq completion-styles '(basic substring orderless))
+(setq
+ completion-category-overrides
+ '((file (styles . (basic substring))))
+ completion-styles '(orderless))
 (require 'embark)
 ;; ----------------------------------------------------------------------------
 ;; Completion.
@@ -717,13 +714,9 @@ and focus the window you swapped to."
 (add-hook 'org-mode-hook #'evil-org-mode)
 (require 'evil-org-agenda)
 (evil-org-agenda-set-keys)
-;; ============================================================================
-;;;; `evil-emacs-cursor-model-mode' (my sacrilege to "the curch of Vim")
-;; ============================================================================
-(unless (package-installed-p 'evil-emacs-cursor-model-mode)
-  (package-install-file (locate-user-emacs-file "evil-emacs-cursor-model-mode.el")))
-;; (require 'evil-emacs-cursor-model-mode)
-(load (locate-user-emacs-file "evil-emacs-cursor-model-mode") nil t) ; Testing.
+;; ----------------------------------------------------------------------------
+;; `evil-emacs-cursor-model-mode' (my sacrilege to "the curch of Vim")
+(require 'evil-emacs-cursor-model-mode)
 (evil-emacs-cursor-model-mode 1)
 ;; ============================================================================
 ;;;; Hooks to suspend `global-hl-line-mode'
@@ -890,17 +883,17 @@ All org files in the directory will then be in the agenda.")
 ;; System to organize tasks and suppress out of date information.
 (setq
  org-agenda-window-setup 'current-window
+ org-agenda-files `(,org-agenda-directory ; All org files in the directory.
+                    ,(concat org-directory "inbox.org"))
+ org-archive-location (concat org-directory "archive.org::* Archive")
  org-reverse-note-order t ; Prepend refiles.
  org-refile-targets
  `((,(concat org-agenda-directory "agenda.org") :maxlevel . 1)
    (,(concat org-agenda-directory "plan.org")   :maxlevel . 1))
- org-archive-location (concat org-directory "archive.org::* Archive")
- org-agenda-files (list org-agenda-directory ; All org files in the directory.
-                        (concat org-directory "inbox.org"))
  calendar-week-start-day 1
+ org-agenda-span 'day ; For `org-agenda-list'.
  org-agenda-format-date " [%F %a] "
  org-agenda-block-separator ?﹋ ; ﹌⎺̅‾﹉
- org-agenda-span 'day ; For `org-agenda-list'.
  org-agenda-time-leading-zero t
  org-agenda-time-grid nil
  org-agenda-prefix-format
@@ -942,7 +935,7 @@ All org files in the directory will then be in the agenda.")
      (todo
       "TODO" ; Sort [/] cookies on top. This is typically categories.
       ;; I would prefer to use `org-agenda-sorting-strategy' but I have not
-      ;; figured out `org-agenda-cmp-user-defined'.
+      ;; figured out `org-agenda-cmp-user-defined'. This works though.
       ((org-agenda-overriding-header "No timestamp TODO or HOLD:")
        (org-agenda-skip-function
         '(org-agenda-skip-entry-if
@@ -1210,7 +1203,7 @@ All org files in the directory will then be in the agenda.")
  ("C-b"           . evil-backward-word-begin)
  ("C-d"           . backward-kill-word) ; In evil this is bound "C-w".
  ("C-e"           . forward-word) ; Not from `evil-emacs-cursor-model-mode'.
- ("C-p"           . yank)               ; "M-p" is in the `global-map'.
+ ("C-p"           . yank) ; "M-p" is in the `global-map'.
  ("C-v"           . set-mark-command)
  ("C-S-w"         . evil-forward-WORD-begin)
  ("C-w"           . evil-forward-word-begin) ; Not `evil-delete-backward-word'.
@@ -1260,16 +1253,16 @@ All org files in the directory will then be in the agenda.")
 (evil-define-key 'normal tmr-tabulated-mode-map
   "+"           #'tmr
   "*"           #'tmr-with-details
-  "R"           #'tmr-remove-finished
   "T"           #'tmr-with-details
   "a"           #'tmr-toggle-acknowledge
   "c"           #'tmr-clone
-  "e"           #'tmr-edit-description
-  "k"           #'tmr-cancel
+  "d"           #'tmr-cancel
+  "i"           #'tmr-edit-description
   "l"           #'tmr-tabulated-view
-  "r"           #'tmr-remove
+  "r"           #'tmr-remove-finished
   "s"           #'tmr-reschedule
-  "t"           #'tmr)
+  "t"           #'tmr
+  "x"           #'tmr-remove)
 (evil-define-key 'normal debugger-mode-map
   (kbd "SPC") nil
   (kbd "<escape>") #'quit-window)

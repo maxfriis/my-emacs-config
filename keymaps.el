@@ -162,6 +162,7 @@
   "S"   #'sort-lines
   "U"   #'evil-upcase
   "W"   #'flyspell-word
+  "b"   #'mark-whole-buffer
   "c"   #'transpose-chars
   "l"   #'transpose-lines
   "p"   #'transpose-paragraphs
@@ -345,6 +346,7 @@
     "S"   '("Sort lines"   . sort-lines)
     "U"   '("Upcase"       . evil-upcase)
     "W"   '("Spell word"   . flyspell-word)
+    "b"   '("Mark buffer"  . mark-whole-buffer)
     "c"   '("Swap chars"   . transpose-chars)
     "l"   '("Swap lines"   . transpose-lines)
     "p"   '("Swap para."   . transpose-paragraphs)
