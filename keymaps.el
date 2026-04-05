@@ -373,7 +373,7 @@
     "8"   '("Dired tab"    . my-split-dired-tab)
     "9"   '("Close tab"    . tab-bar-close-tab)
     "e"   '("Embark"       . embark-act)
-    "j"   '("Avy jump"     . evil-avy-goto-char-timer)
+    "j"   '("Jump"         . evil-avy-goto-char-timer)
     "u"   '("Uni.arg."     . universal-argument)
     "a"   `("App"          . ,my-a-spc-map)
     "b"   `("Buffer"       . ,my-b-spc-map)

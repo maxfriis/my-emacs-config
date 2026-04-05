@@ -4,19 +4,13 @@
 ;;; Faces
 ;; ============================================================================
 (when (display-graphic-p)
-  (cond ((find-font (font-spec :name "Liberation Mono 16"))
-         (set-face-font 'default "Liberation Mono 16"))
-        ((find-font (font-spec :name "Ubuntu Mono 18"))
-         (set-face-font 'default "Ubuntu Mono 18"))
-        (t (message "The font is set to %s" (font-get-system-font))))
-  (when (find-font (font-spec :name "Verdana 24"))
-    (set-face-font 'variable-pitch "Verdana 24")))
+  (if (find-font (font-spec :name "Liberation Mono 16"))
+      (set-face-font 'default "Liberation Mono 16")
+    (message "The font is set to %s" (font-get-system-font)))
+  (when (find-font (font-spec :name "Verdana 32"))
+    (set-face-font 'variable-pitch "Verdana 32")))
 ;; ----------------------------------------------------------------------------
 ;; Themes.
-(when (file-newer-than-file-p
-       (locate-user-emacs-file "themes/8color-brown-theme.el")
-       (locate-user-emacs-file "themes/8color-brown-theme.elc"))
-  (byte-compile-file (locate-user-emacs-file "themes/8color-brown-theme.el")))
 (when (file-newer-than-file-p
        (locate-user-emacs-file "themes/8color-ansi-theme.el")
        (locate-user-emacs-file "themes/8color-ansi-theme.elc"))
@@ -25,6 +19,10 @@
        (locate-user-emacs-file "themes/8color-beige-theme.el")
        (locate-user-emacs-file "themes/8color-beige-theme.elc"))
   (byte-compile-file (locate-user-emacs-file "themes/8color-beige-theme.el")))
+(when (file-newer-than-file-p
+       (locate-user-emacs-file "themes/8color-brown-theme.el")
+       (locate-user-emacs-file "themes/8color-brown-theme.elc"))
+  (byte-compile-file (locate-user-emacs-file "themes/8color-brown-theme.el")))
 (add-to-list 'custom-theme-load-path (locate-user-emacs-file "themes/"))
 (if (and (/= (user-uid) 0) (display-graphic-p))
     (load-theme '8color-brown t)
@@ -76,133 +74,130 @@ This does the opposite of the `shrink' face."
  ;; ----------------------------------------------------------------------------
  ;; `ace-window-display-mode' start the mode line with a window number.
  '((:eval ; Eval and list everything.
-    (list
-     ;; Indicators.
-     (if (and (= (user-uid) 0) ; I link ~/.emacs.d in /root.
-              (mode-line-window-selected-p))
+    `(;; Indicators.
+      ,(if (and (= (user-uid) 0) ; I link ~/.emacs.d in /root.
+                (mode-line-window-selected-p))
+           (propertize
+            "#"
+            'help-echo "Root access"
+            'mouse-face 'mode-line-highlight 'face 'warning) ; Emphasize.
+         " ")
+      ,(if evil-mode
+           (propertize
+            evil-mode-line-tag
+            'face 'shrink)
          (propertize
-          "#"
-          'help-echo "Root access"
-          'mouse-face 'mode-line-highlight
-          'face 'warning) ; Emphasize.
-       " ")
-     (if evil-mode
+          "🅴"
+          'help-echo "evil-mode disabled, mouse-1: Enable"
+          'local-map (make-mode-line-mouse-map 'mouse-1 #'evil-mode)
+          'mouse-face 'mode-line-highlight 'face 'shrink))
+      ,(unless (display-graphic-p) " ")
+      mode-line-modified
+      ,(cond
+        ((buffer-narrowed-p)
          (propertize
-          evil-mode-line-tag
-          'face 'shrink)
-       (propertize
-        "🅴"
-        'help-echo "evil-mode disabled, mouse-1: Enable"
-        'local-map (make-mode-line-mouse-map 'mouse-1 #'evil-mode)
-        'mouse-face 'mode-line-highlight
-        'face 'shrink))
-     (unless (display-graphic-p) " ")
-     mode-line-modified
-     (cond
-      ((buffer-narrowed-p)
-       (propertize
-        "="
-        'help-echo "Narrowed, mouse-1: Widen"
-        'local-map (make-mode-line-mouse-map 'mouse-1 #'mode-line-widen)
-        'mouse-face 'mode-line-highlight))
-      ((window-dedicated-p)
-       (propertize
-        "\\"
-        'help-echo "Window dedicated to buffer"
-        'mouse-face 'mode-line-highlight 'face 'bold))
-      ((not (mode-line-window-selected-p))
-       (propertize
-        "/"
-        'help-echo "Inactive window"
-        'mouse-face 'mode-line-highlight 'face 'bold))
-      ;; Minor modes.
-      ((not evil-emacs-cursor-model-mode)
-       (propertize
-        "-"
-        'help-echo "evil-emacs-cursor-model-mode disabled, mouse-1: Enable"
-        'local-map (make-mode-line-mouse-map 'mouse-1 #'evil-emacs-cursor-model-mode)
-        'mouse-face 'mode-line-highlight))
-      ((not auto-save-visited-mode)
-       (propertize
-        "*"
-        'help-echo "Auto save disabled, mouse-1: Enable"
-        'local-map (make-mode-line-mouse-map 'mouse-1 #'auto-save-visited-mode)
-        'mouse-face 'mode-line-highlight))
-      ((not centered-cursor-mode)
-       (propertize
-        "÷"
-        'help-echo "centered-cursor-mode disabled, mouse-1: Enable"
-        'local-map (make-mode-line-mouse-map 'mouse-1 #'centered-cursor-mode)
-        'mouse-face 'mode-line-highlight))
-      ((not golden-ratio-mode)
-       (propertize
-        "+"
-        'help-echo "golden-ratio-mode disabled, mouse-1: Enable"
-        'local-map (make-mode-line-mouse-map 'mouse-1 #'golden-ratio-mode)
-        'mouse-face 'mode-line-highlight))
-      (t
-       (propertize
-        "|"
-        'help-echo "The default minor modes are active, mouse-1: Cycle themes"
-        'local-map (make-mode-line-mouse-map 'mouse-1 #'my-toggle-themes)
-        'mouse-face 'mode-line-highlight 'face 'bold)))
-     " "
-     ;; Buffer name.
-     mode-line-buffer-identification
-     " "
-     ;; Major mode with less redundant information. I don't use `mode-name'.
-     (propertize
-      (concat
-       "("
-       (string-replace
-        "-" " "
-        (replace-regexp-in-string
-         "\\`emacs-" "e"
-         (replace-regexp-in-string
-          "\\`org-" ""
+          "="
+          'help-echo "Narrowed, mouse-1: Widen"
+          'local-map (make-mode-line-mouse-map 'mouse-1 #'mode-line-widen)
+          'mouse-face 'mode-line-highlight))
+        ((window-dedicated-p)
+         (propertize
+          "\\"
+          'help-echo "Window dedicated to buffer"
+          'mouse-face 'mode-line-highlight 'face 'bold))
+        ((not (mode-line-window-selected-p))
+         (propertize
+          "/"
+          'help-echo "Inactive window"
+          'mouse-face 'mode-line-highlight 'face 'bold))
+        ;; Minor modes.
+        ((not evil-emacs-cursor-model-mode)
+         (propertize
+          "-"
+          'help-echo "evil-emacs-cursor-model-mode disabled, mouse-1: Enable"
+          'local-map (make-mode-line-mouse-map 'mouse-1 #'evil-emacs-cursor-model-mode)
+          'mouse-face 'mode-line-highlight))
+        ((not auto-save-visited-mode)
+         (propertize
+          "*"
+          'help-echo "Auto save disabled, mouse-1: Enable"
+          'local-map (make-mode-line-mouse-map 'mouse-1 #'auto-save-visited-mode)
+          'mouse-face 'mode-line-highlight))
+        ((not centered-cursor-mode)
+         (propertize
+          "÷"
+          'help-echo "centered-cursor-mode disabled, mouse-1: Enable"
+          'local-map (make-mode-line-mouse-map 'mouse-1 #'centered-cursor-mode)
+          'mouse-face 'mode-line-highlight))
+        ((not golden-ratio-mode)
+         (propertize
+          "+"
+          'help-echo "golden-ratio-mode disabled, mouse-1: Enable"
+          'local-map (make-mode-line-mouse-map 'mouse-1 #'golden-ratio-mode)
+          'mouse-face 'mode-line-highlight))
+        (t
+         (propertize
+          "|"
+          'help-echo "The default minor modes are active, mouse-1: Cycle themes"
+          'local-map (make-mode-line-mouse-map 'mouse-1 #'my-toggle-themes)
+          'mouse-face 'mode-line-highlight 'face 'bold)))
+      " "
+      ;; Buffer name.
+      mode-line-buffer-identification
+      " "
+      ;; Major mode with less redundant information. I don't use `mode-name'.
+      ,(propertize
+        (concat
+         "("
+         (string-replace
+          "-" " "
           (replace-regexp-in-string
-           "-buffer\\'" ""
+           "\\`emacs-" "e"
            (replace-regexp-in-string
-            "-mode\\'" ""
-            (downcase (symbol-name major-mode)))))))
-       ")")
-      'help-echo (symbol-name major-mode) ; Full name on mouse hover.
-      'mouse-face 'mode-line-highlight)
-     ;; Active vs. inactive window.
-     (if (mode-line-window-selected-p)
-         `("" ; Avoid potential nil as first element in list.
-           ;; Version control.
-           ,(when vc-mode
-              (propertize ; Replace the built in `propertize' of vc-mode.
-               (replace-regexp-in-string "\\` Git" "" vc-mode)
-               'help-echo "Version control, mouse-1: Magit"
-               'local-map (make-mode-line-mouse-map 'mouse-1 #'magit)
-               'mouse-face 'mode-line-highlight))
-           " "
-           ;; Display `global-mode-string' used by e.g. `display-time-mode'.
-           ,mode-line-misc-info
-           ;; Gap for alignment.
-           ,(propertize
+            "\\`org-" ""
+            (replace-regexp-in-string
+             "-buffer\\'" ""
+             (replace-regexp-in-string
+              "-mode\\'" ""
+              (downcase (symbol-name major-mode)))))))
+         ")")
+        'help-echo (symbol-name major-mode) ; Full name on mouse hover.
+        'mouse-face 'mode-line-highlight)
+      ;; Active vs. inactive window.
+      ,(if (mode-line-window-selected-p)
+           `("" ; Avoid potential nil as first element.
+             ;; Version control.
+             ,(when vc-mode
+                (propertize ; Replace the built in `propertize' of vc-mode.
+                 (replace-regexp-in-string "\\` Git" "" vc-mode)
+                 'help-echo "Version control, mouse-1: Magit"
+                 'local-map (make-mode-line-mouse-map 'mouse-1 #'magit)
+                 'mouse-face 'mode-line-highlight))
+             " "
+             ;; Display `global-mode-string' used by e.g. `display-time-mode'.
+             mode-line-misc-info
+             ;; Gap for alignment.
+             ,(propertize
+               " "
+               'display `((space :align-to (- (+ right right-fringe right-margin)
+                                              ,(if (display-graphic-p) 7 9))))
+               'face 'mode-line-inactive)
+             ;; Horizontal position.
+             ,(propertize
+               "%3c"
+               'help-echo "Column number")
+             " "
+             ;; Vertical position.
+             ,(if display-line-numbers-mode
+                  '(-3 "%o")
+                (propertize
+                 "%3l"
+                 'help-echo "Line number")))
+         `(,(propertize
              " "
              'display `((space :align-to (- (+ right right-fringe right-margin)
-                                            ,(if (display-graphic-p) 7 9))))
-             'face 'mode-line-inactive)
-           ;; Horizontal position.
-           ,(propertize
-             "%3c"
-             'help-echo "Column number")
-           " "
-           ;; Vertical position.
-           ,(if display-line-numbers-mode
-                '(-3 "%o")
-              (propertize
-               "%3l"
-               'help-echo "Line number")))
-       `(,(propertize
-           " "
-           'display `((space :align-to (- (+ right right-fringe right-margin)
-                                          ,(if (display-graphic-p) 4 5)))))
-         (-3 "%o")))))))
+                                            ,(if (display-graphic-p) 4 5)))))
+           (-3 "%o")))))))
 
 ;; ============================================================================
 ;;; Vanilla stuff
@@ -289,7 +284,7 @@ This does the opposite of the `shrink' face."
    tab-bar-format-tabs
    tab-bar-separator)
  ;; ----------------------------------------------------------------------------
- ;; Time/display.
+ ;; Time.
  tmr-mode-line-prefix "⏲"
  tmr-mode-line-separator "|"
  world-clock-list
@@ -305,6 +300,8 @@ This does the opposite of the `shrink' face."
    ("America/New_York" "New York")
    ("America/Nuuk" "Nuuk"))
  world-clock-time-format "[%F %a %02H:%M] %Z"
+ ;; ----------------------------------------------------------------------------
+ ;; Display.
  display-time-format "[%F %a %02H:%M]"
  display-line-numbers-type 'relative
  ;; Focus popups. The default is to not focus them.
@@ -354,16 +351,22 @@ This does the opposite of the `shrink' face."
 ;;; Custom stuff
 ;; ============================================================================
 ;; Toggle my faces.
-(defun my-toggle-themes (prefix)
+(defun my-toggle-themes (&optional arg)
   "Cycle between brown, ansi and light faces respectively.
-\nAny non-nil PREFIX will load the brown faces."
+\nAny non-nil ARG will load the brown faces."
   (interactive "P")
-  (cond
-   ((or (string-equal (face-background 'default) "#edc") prefix)
-    (load-theme '8color-brown t))
-   ((string-equal (face-background 'default) "#210")
-    (load-theme '8color-ansi t))
-   (t (load-theme '8color-beige t)))
+  (unless arg (setq arg 0)) ; if nil.
+  (cond ((not (numberp arg)) ; `universal-argument'.
+         (counsel-load-theme))
+        ((= arg 3)
+         (load-theme '8color-beige t))
+        ((= arg 2)
+         (load-theme '8color-ansi t))
+        ((or (= arg 1) (string-equal (face-background 'default) "#fed"))
+         (load-theme '8color-brown t))
+        ((string-equal (face-background 'default) "#000")
+         (load-theme '8color-beige t))
+        (t (load-theme '8color-ansi t)))
   (message "%s background faces" (face-background 'default)))
 ;; ----------------------------------------------------------------------------
 ;; Dired in new tab.
@@ -386,11 +389,12 @@ This does the opposite of the `shrink' face."
 ;; ----------------------------------------------------------------------------
 ;; Open theme files.
 (defun my-find-my-faces-file ()
-  "Open my theme file brown-faces.el.
-\nThe `previous-buffer' will be ansi-faces.el."
+  "Open my theme file 8color-ansi-theme.el.
+\nThe `previous-buffer' will be 8color-brown-theme.el."
   (interactive)
-  (find-file (locate-user-emacs-file "themes/8color-ansi-theme.el"))
-  (find-file (locate-user-emacs-file "themes/8color-brown-theme.el")))
+  (find-file (locate-user-emacs-file "themes/8color-beige-theme.el"))
+  (find-file (locate-user-emacs-file "themes/8color-brown-theme.el"))
+  (find-file (locate-user-emacs-file "themes/8color-ansi-theme.el")))
 ;; ----------------------------------------------------------------------------
 ;; Open agenda and plan file.
 (defun my-find-agenda-file ()
@@ -415,8 +419,8 @@ The function will organize the `buffer-list' and focus note.org."
   "Custom agenda with NEXT items, this week's agenda and TODO/HOLD items."
   (interactive)
   (org-agenda nil "c")
-  (unless (eq (char-after) ?\s) ; Stay on a NEXT item (start with a space).
-    (org-agenda-goto-today)))   ; If on a heading     (doesn't).
+  (unless (eq (char-after) ?\s) ; Stay on a NEXT item that start with a space.
+    (org-agenda-goto-today)))   ; If on a heading that don't.
 ;; ----------------------------------------------------------------------------
 ;; Capture idea.
 (defun my-org-capture-idea ()
@@ -523,7 +527,7 @@ and focus the window you swapped to."
    ("melpa"  . 2)
    ("nongnu" . 1)) ; Other archives have priority 0.
  package-selected-packages
- '(evil-collection evil-nerd-commenter evil-surround evil-numbers evil-org org-superstar evil-emacs-cursor-model-mode org-appear org-present auctex magit dired-subtree cape corfu nerd-icons-corfu nerd-icons-dired nerd-icons-ibuffer nerd-icons-completion avy vertico marginalia orderless embark-consult counsel tmr rainbow-delimiters colorful-mode recursive-narrow centered-cursor-mode olivetti golden-ratio ace-window transpose-frame mixed-pitch indent-guide casual-suite keycast undo-tree flycheck writegood-mode auto-package-update backup-each-save package-lint helpful))
+ '(evil-collection evil-nerd-commenter evil-surround evil-numbers evil-org org-superstar evil-emacs-cursor-model-mode org-appear org-present auctex magit dired-subtree cape corfu nerd-icons-corfu nerd-icons-dired nerd-icons-ibuffer nerd-icons-completion avy vertico marginalia orderless embark-consult counsel tmr rainbow-delimiters colorful-mode recursive-narrow expand-region centered-cursor-mode olivetti golden-ratio ace-window transpose-frame mixed-pitch indent-guide casual-suite keycast undo-tree flycheck writegood-mode auto-package-update backup-each-save package-lint helpful))
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents nil))
@@ -558,7 +562,7 @@ and focus the window you swapped to."
 ;;;; Buffers, completion and windows
 ;; ============================================================================
 (require 'avy)
-(setq avy-timeout-seconds 1)
+(setq avy-timeout-seconds 1.5)
 (require 'recursive-narrow)
 (put 'narrow-to-region 'disabled nil) ; Disable a warning somehow?
 (require 'mixed-pitch)
@@ -695,7 +699,7 @@ and focus the window you swapped to."
  evil-visual-block-tag   "🅱"
  evil-replace-state-tag  "🆁"
  evil-insert-state-tag   "🅸"
- evil-emacs-state-tag    "🆉")
+ evil-emacs-state-tag    "🆉") ; Reserve "🅴" for disabled `evil-mode'.
 (evil-mode 1)
 ;; ============================================================================
 ;;;; Addons
@@ -715,8 +719,12 @@ and focus the window you swapped to."
 (require 'evil-org-agenda)
 (evil-org-agenda-set-keys)
 ;; ----------------------------------------------------------------------------
-;; `evil-emacs-cursor-model-mode' (my sacrilege to "the curch of Vim")
-(require 'evil-emacs-cursor-model-mode)
+;; `evil-emacs-cursor-model-mode'.
+(if (file-exists-p (locate-user-emacs-file
+                    "evil-emacs-cursor-model/evil-emacs-cursor-model-mode.el"))
+    (load (locate-user-emacs-file
+           "evil-emacs-cursor-model/evil-emacs-cursor-model-mode.el") nil t)
+  (require 'evil-emacs-cursor-model-mode))
 (evil-emacs-cursor-model-mode 1)
 ;; ============================================================================
 ;;;; Hooks to suspend `global-hl-line-mode'
@@ -758,8 +766,7 @@ and focus the window you swapped to."
 ;;; Org.el
 ;; ============================================================================
 ;; Create `org-agenda' directories.
-(setq
- org-directory "~/org/") ; Trailing slash.
+(setq org-directory "~/org/") ; Trailing slash.
 (defvar org-agenda-directory (concat org-directory "agenda/")
   "Default `org-agenda' directory.
 \nI include this directory in the list `org-agenda-files'.
@@ -827,7 +834,7 @@ All org files in the directory will then be in the agenda.")
  org-tags-column -75 ; Right aligned.
  org-tag-alist
  '(("pc"       . ?c) ; c for computer.
-   ("family"   . ?f)
+   ("friend"   . ?f)
    ("game"     . ?g)
    ("@home"    . ?h)
    (:newline)
@@ -918,7 +925,7 @@ All org files in the directory will then be in the agenda.")
  org-clock-in-switch-to-state "NEXT"
  org-clock-out-when-done t
  org-time-stamp-rounding-minutes
- '(15 15))
+ '(15 5))
 ;; ----------------------------------------------------------------------------
 ;;;;; Custom agenda commands.
 (setq
@@ -1006,7 +1013,7 @@ All org files in the directory will then be in the agenda.")
       ":LOGBOOK:\n"
       "- State \"NEXT\" from \"Capture\" %U\n"
       ":END:\n"
-      "%i")
+      "%i\n")
     :immediate-finish t
     :prepend t)
    ("e" "Event" entry
@@ -1017,7 +1024,7 @@ All org files in the directory will then be in the agenda.")
       ":LOGBOOK:\n"
       "- State \"TODO\" from \"Capture\" %U\n"
       ":END:\n"
-      "%?%i"))
+      "%?%i\n"))
    ("t" "Task" entry
     (file+olp ,(concat org-agenda-directory "agenda.org") "Task")
     ,(concat
@@ -1025,12 +1032,12 @@ All org files in the directory will then be in the agenda.")
       ":LOGBOOK:\n"
       "- State \"TODO\" from \"Capture\" %U\n"
       ":END:\n"
-      "%?%i"))
+      "%?%i\n"))
    ("n" "Note" entry
     (file+datetree ,(concat org-agenda-directory "note.org"))
     ,(concat
       "* %U\n"
-      "%?%i")
+      "%?%i\n")
     :tree-type month)
    ("x" "Clipboard" entry
     (file+olp+datetree ,(concat org-directory "archive.org") "Clipboard")
@@ -1039,7 +1046,7 @@ All org files in the directory will then be in the agenda.")
       ":LOGBOOK:\n"
       "- %U\n"
       ":END:\n"
-      "%x")
+      "%x\n")
     :immediate-finish t)))
 ;; ----------------------------------------------------------------------------
 ;;;;; Logbook.
@@ -1172,12 +1179,10 @@ All org files in the directory will then be in the agenda.")
  ("g+"            . evil-numbers/inc-at-pt)
  ("g-"            . evil-numbers/dec-at-pt)
  :map evil-motion-state-map
- ;; I don't need "n"/"N" for `evil-search'. I use `isearch'.
  ("½"             . mode-line-other-buffer)
  ("¨"             . tab-bar-new-tab)
  ("´"             . evil-set-marker) ; "m" is `backward-paragraph'.
- ("'"             . evil-goto-mark)  ; for my keyboard.
- ("`"             . counsel-evil-marks)
+ ("'"             . evil-avy-goto-char-2)
  ("<down>"        . evil-next-visual-line)     ; <up>/<down> wrapped lines.
  ("<up>"          . evil-previous-visual-line) ; j/k respect line atoms.
  ("<backtab>"     . outline-cycle-buffer)
@@ -1187,6 +1192,8 @@ All org files in the directory will then be in the agenda.")
  ("N"             . evil-search-next)
  ("S"             . isearch-forward-thing-at-point) ; This is like Vim's "*".
  ("gc"            . evilnc-comment-operator)
+ ("gv"            . er/expand-region)
+ ("gV"            . evil-visual-restore)
  ("m"             . backward-paragraph)  ; Below "k". "´" is `evil-set-marker'.
  ("n"             . forward-paragraph)   ; Below "j".
  ("s"             . isearch-forward)     ; I prefer `isearch' and "C-s" to repeat.
@@ -1244,7 +1251,7 @@ All org files in the directory will then be in the agenda.")
   "Æ"           #'org-agenda-backward-block
   "æ"           #'org-agenda-forward-block
   "Å"           #'my-org-capture-idea
-  "å"           #'org-agenda-capture)
+  "å"           #'org-agenda-quit)
 (evil-define-key 'normal dired-mode-map
   (kbd "SPC") nil
   ")"           #'dired-omit-mode ; "(" is toggle `dired-hide-details-mode'.
