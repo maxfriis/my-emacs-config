@@ -59,7 +59,7 @@
   :doc "My <spc> prefix keys."
   "."   #'org-time-stamp
   "A"   #'org-archive-subtree-default
-  "E"   #'org-export-dispatch
+  "E"   #'org-latex-export-to-pdf
   "F"   #'org-agenda-file-to-front
   "G"   #'org-goto
   "I"   #'org-clock-in
@@ -74,7 +74,7 @@
   "b"   #'org-insert-structure-template
   "c"   #'org-capture
   "d"   #'org-deadline
-  "e"   #'org-latex-export-to-pdf
+  "e"   #'org-export-dispatch
   "g"   #'counsel-org-goto-all
   "l"   #'org-insert-link
   "n"   #'org-add-note
@@ -258,7 +258,7 @@
   (which-key-add-keymap-based-replacements my-o-spc-map
     "."   '("Timestamp"    . org-time-stamp)
     "A"   '("Archive"      . org-archive-subtree-default)
-    "E"   '("Export"       . org-export-dispatch)
+    "E"   '("Latex pdf"    . org-latex-export-to-pdf)
     "F"   '("Agenda file"  . org-agenda-file-to-front)
     "G"   '("Goto"         . org-goto)
     "I"   '("Clock in"     . org-clock-in)
@@ -273,7 +273,7 @@
     "b"   '("Block"        . org-insert-structure-template)
     "c"   '("Capture"      . org-capture)
     "d"   '("Deadline"     . org-deadline)
-    "e"   '("Latex pdf"    . org-latex-export-to-pdf)
+    "e"   '("Export"       . org-export-dispatch)
     "g"   '("Goto head"    . counsel-org-goto-all)
     "l"   '("Ins. link"    . org-insert-link)
     "n"   '("Add note"     . org-add-note)
@@ -326,7 +326,7 @@
     "t"   '("Truncate"     . toggle-truncate-lines))
   (which-key-add-keymap-based-replacements my-t-spc-map
     "a"   '("Auto save"    . auto-save-visited-mode)
-    "c"   '("colorful"     . colorful-mode)
+    "c"   '("Colorful"     . colorful-mode)
     "d"   '("Date/time"    . display-time-mode)
     "e"   '("Emacs cursor" . evil-emacs-cursor-model-mode)
     "f"   '("Font pitch"   . mixed-pitch-mode)

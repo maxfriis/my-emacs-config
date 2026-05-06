@@ -6,11 +6,11 @@
 (when (display-graphic-p)
   (if (find-font (font-spec :name "Liberation Mono 16"))
       (set-face-font 'default "Liberation Mono 16")
-    (message "The font is set to %s" (font-get-system-font)))
+    (message "The monospace font is set to %s" (font-get-system-font)))
   (when (find-font (font-spec :name "Verdana 32"))
     (set-face-font 'variable-pitch "Verdana 32")))
 ;; ----------------------------------------------------------------------------
-;; Themes.
+;; Color themes.
 (when (file-newer-than-file-p
        (locate-user-emacs-file "themes/8color-ansi-theme.el")
        (locate-user-emacs-file "themes/8color-ansi-theme.elc"))
@@ -72,7 +72,7 @@ This does the opposite of the `shrink' face."
 (setq-default ; `mode-line-format' is buffer local so `setq-default'.
  mode-line-format
  ;; ----------------------------------------------------------------------------
- ;; `ace-window-display-mode' start the mode line with a window number.
+ ;; `ace-window-display-mode' is enabled latter prepending a window number.
  '((:eval ; Eval and list everything.
     `(;; Indicators.
       ,(if (and (= (user-uid) 0) ; I link ~/.emacs.d in /root.
@@ -317,16 +317,16 @@ This does the opposite of the `shrink' face."
 ;;;; Native hooks
 ;; ============================================================================
 (add-hook 'after-save-hook #'vc-refresh-state)        ; Version control.
-(add-hook 'text-mode-hook  #'visual-line-mode)        ; Wrap lines at words.
-(add-hook 'prog-mode-hook  #'outline-minor-mode)      ; Cycle with "<backtab>".
 (add-hook 'dired-mode-hook #'dired-omit-mode)         ; Toggle with ")".
 (add-hook 'dired-mode-hook #'dired-hide-details-mode) ; Toggle with "(".
+(add-hook 'text-mode-hook  #'visual-line-mode)        ; Wrap lines at words.
+(add-hook 'prog-mode-hook  #'outline-minor-mode)      ; Cycle with "<backtab>".
 ;; Visual line numbers when `outline-cycle-buffer' or `outline-cycle' fold.
 (add-hook 'outline-view-change-hook ; This is obsolete. Why?
           #'(lambda ()
               (when display-line-numbers
                 (if (or (outline-invisible-p (pos-bol))
-                        (outline-invisible-p (pos-eol)))
+                        (outline-invisible-p (pos-eol)))    ; Not perfect.
                     (setq display-line-numbers 'visual)     ; Folded lines.
                   (setq display-line-numbers 'relative))))) ; Wrapped lines.
 (add-hook 'emacs-startup-hook
@@ -353,7 +353,8 @@ This does the opposite of the `shrink' face."
 ;; Toggle my faces.
 (defun my-toggle-themes (&optional arg)
   "Cycle between brown, ansi and light faces respectively.
-\nAny non-nil ARG will load the brown faces."
+\nA number prefix ARG will load a specific theme.
+`universal-argument' will initiate a theme dialog."
   (interactive "P")
   (unless arg (setq arg 0)) ; if nil.
   (cond ((not (numberp arg)) ; `universal-argument'.
@@ -371,7 +372,8 @@ This does the opposite of the `shrink' face."
 ;; ----------------------------------------------------------------------------
 ;; Dired in new tab.
 (defun my-split-dired-tab (directory)
-  "Split dired in new tab with home directory in right window."
+  "Split dired in a new tab with the home directory in the right window.
+\nPrompt for DIRECTORY in left window."
   (interactive "DDirectory: ")
   (dired-other-tab directory)
   (split-window-right)
@@ -722,9 +724,9 @@ and focus the window you swapped to."
 ;; `evil-emacs-cursor-model-mode'.
 (if (file-exists-p (locate-user-emacs-file
                     "evil-emacs-cursor-model/evil-emacs-cursor-model-mode.el"))
-    (load (locate-user-emacs-file
+    (load (locate-user-emacs-file ; For local development.
            "evil-emacs-cursor-model/evil-emacs-cursor-model-mode.el") nil t)
-  (require 'evil-emacs-cursor-model-mode))
+  (require 'evil-emacs-cursor-model-mode)) ; From repository.
 (evil-emacs-cursor-model-mode 1)
 ;; ============================================================================
 ;;;; Hooks to suspend `global-hl-line-mode'
@@ -733,8 +735,7 @@ and focus the window you swapped to."
 ;; ----------------------------------------------------------------------------
 ;; The buffer-local `hl-line-mode' doesn't properly respect "specificity" so it
 ;; will only override `global-hl-line-mode' when called interactively?
-(add-hook 'evil-visual-state-entry-hook
-          #'(lambda () (global-hl-line-mode 0)))
+(add-hook 'evil-visual-state-entry-hook #'(lambda () (global-hl-line-mode 0)))
 (add-hook 'evil-visual-state-exit-hook #'global-hl-line-mode)
 ;; ----------------------------------------------------------------------------
 ;; Suspend the `hl-line' and have absolute line numbers in "input" states.
@@ -770,7 +771,7 @@ and focus the window you swapped to."
 (defvar org-agenda-directory (concat org-directory "agenda/")
   "Default `org-agenda' directory.
 \nI include this directory in the list `org-agenda-files'.
-All org files in the directory will then be in the agenda.")
+All org files in the directory will be scanned by the agenda.")
 (unless (file-exists-p org-directory)
   (make-directory org-directory))
 (unless (file-exists-p org-agenda-directory)
@@ -821,15 +822,15 @@ All org files in the directory will then be in the agenda.")
  org-priority-default ?C
  org-list-allow-alphabetical t
  org-list-demote-modify-bullet
- '(("+" . "*")
-   ("*" . "-")
-   ("-" . "+"))
+ '(("+" . "-")
+   ("-" . "*")
+   ("*" . "+"))
  org-emphasis-alist
  '(("*" bold)
    ("/" italic)
    ("_" underline)
-   ("=" org-verbatim)
    ("~" org-code)
+   ("=" org-verbatim)
    ("+" '(shadow shrink)))
  org-tags-column -75 ; Right aligned.
  org-tag-alist
@@ -881,7 +882,7 @@ All org files in the directory will then be in the agenda.")
    (holiday-fixed  3 14    "π dag")
    (holiday-fixed  4  1    "Aprilsnar")
    (holiday-fixed  5  1    "Arbejdernes kamp dag")
-   (holiday-fixed  6  5    "Grundlovs og fars dag")
+   (holiday-fixed  6  5    "Fars og Grundlovsdag")
    (holiday-fixed  6 23    "Sanct Hans")
    (holiday-fixed 12 24    "Juleaften")))
 ;; ============================================================================
@@ -1160,7 +1161,7 @@ All org files in the directory will then be in the agenda.")
  ("C-g"           . evil-normal-state)
  ("<escape>"      . keyboard-escape-quit)
  ("<Scroll_Lock>" . centered-cursor-mode)
- ("M-p"           . consult-yank-pop) ; Paste with `kill-ring' dialog.
+ ("M-p"           . consult-yank-pop) ; `kill-ring' dialog paste.
  ("C-,"           . embark-act)
  ("M-,"           . embark-dwim)
  :map evil-operator-state-map
@@ -1168,7 +1169,7 @@ All org files in the directory will then be in the agenda.")
  ("å"             . keyboard-escape-quit) ; Danish keyboard.
  :map evil-visual-state-map
  ;; "S" is used by `evil-surround'. Use "C-s" for normal `isearch'.
- ("s"             . isearch-forward-thing-at-point) ; Input the region.
+ ("s"             . isearch-forward-thing-at-point) ; `isearch' the region.
  ;; Don't use "v" to exit visual state. <escape> or a command works.
  ("v"             . exchange-point-and-mark)
  :map evil-normal-state-map
@@ -1325,7 +1326,7 @@ All org files in the directory will then be in the agenda.")
   (keymap-set isearch-mode-map       "<f8>" #'casual-isearch-tmenu))
 (with-eval-after-load 'org-agenda
   (keymap-set org-agenda-mode-map    "<f8>" #'casual-agenda-tmenu))
-(with-eval-after-load 'tmr
+(with-eval-after-load 'tmr ; `which-key'
   (keymap-set tmr-tabulated-mode-map "<f8>" tmr-prefix-map))
 
 ;; ============================================================================
