@@ -359,14 +359,14 @@ This does the opposite of the `shrink' face."
   (unless arg (setq arg 0)) ; if nil.
   (cond ((not (numberp arg)) ; `universal-argument'.
          (counsel-load-theme))
-        ((= arg 3)
-         (load-theme '8color-beige t))
+        ((= arg 1)
+         (load-theme '8color-brown t))
         ((= arg 2)
          (load-theme '8color-ansi t))
-        ((or (= arg 1) (string-equal (face-background 'default) "#fed"))
-         (load-theme '8color-brown t))
-        ((string-equal (face-background 'default) "#000")
+        ((or (= arg 3) (string-equal (face-background 'default) "#000"))
          (load-theme '8color-beige t))
+        ((string-equal (face-background 'default) "#edc")
+         (load-theme '8color-brown t))
         (t (load-theme '8color-ansi t)))
   (message "%s background faces" (face-background 'default)))
 ;; ----------------------------------------------------------------------------
