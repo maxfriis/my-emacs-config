@@ -24,9 +24,11 @@
        (locate-user-emacs-file "themes/8color-brown-theme.elc"))
   (byte-compile-file (locate-user-emacs-file "themes/8color-brown-theme.el")))
 (add-to-list 'custom-theme-load-path (locate-user-emacs-file "themes/"))
-(if (and (/= (user-uid) 0) (display-graphic-p))
-    (load-theme '8color-brown t)
-  (load-theme '8color-ansi t))
+(cond ((= (user-uid) 0)
+       (load-theme '8color-beige t))
+      ((display-graphic-p)
+       (load-theme '8color-brown t))
+      (t (load-theme '8color-ansi t)))
 ;; ----------------------------------------------------------------------------
 ;; Additional coloring.
 (font-lock-add-keywords
@@ -360,12 +362,12 @@ This does the opposite of the `shrink' face."
   (cond ((not (numberp arg)) ; `universal-argument'.
          (counsel-load-theme))
         ((= arg 1)
-         (load-theme '8color-brown t))
-        ((= arg 2)
          (load-theme '8color-ansi t))
-        ((or (= arg 3) (string-equal (face-background 'default) "#000"))
+        ((= arg 2)
+         (load-theme '8color-brown t))
+        ((or (= arg 3) (string-equal (face-background 'default) "#210"))
          (load-theme '8color-beige t))
-        ((string-equal (face-background 'default) "#edc")
+        ((string-equal (face-background 'default) "#000")
          (load-theme '8color-brown t))
         (t (load-theme '8color-ansi t)))
   (message "%s background faces" (face-background 'default)))
@@ -390,7 +392,7 @@ This does the opposite of the `shrink' face."
   (find-file (locate-user-emacs-file "init.el")))
 ;; ----------------------------------------------------------------------------
 ;; Open theme files.
-(defun my-find-my-faces-file ()
+(defun my-find-theme-file ()
   "Open my theme file 8color-ansi-theme.el.
 \nThe `previous-buffer' will be 8color-brown-theme.el."
   (interactive)
@@ -431,7 +433,7 @@ The function will organize the `buffer-list' and focus note.org."
   (org-capture nil "i")
   (org-save-all-org-buffers)
   (when (eq major-mode 'org-agenda-mode)
-    (org-agenda-redo-all) ; Might turn `global-hl-line-mode' off for some reason?
+    (org-agenda-redo-all) ; Might turn `global-hl-line-mode' off?!
     (global-hl-line-mode 1)
     (goto-char (point-min)))) ; Jump to the new NEXT item.
 ;; ----------------------------------------------------------------------------
@@ -525,7 +527,7 @@ and focus the window you swapped to."
    ("melpa-stable" . "https://stable.melpa.org/packages/")
    ("melpa"        . "https://melpa.org/packages/"))
  package-archive-priorities
- '(("elpa"   . 3)  ; Prefer older versions from elpa.
+ '(("elpa"   . 3)  ; Prefer potentially older versions from elpa.
    ("melpa"  . 2)
    ("nongnu" . 1)) ; Other archives have priority 0.
  package-selected-packages
@@ -566,7 +568,7 @@ and focus the window you swapped to."
 (require 'avy)
 (setq avy-timeout-seconds 1.5)
 (require 'recursive-narrow)
-(put 'narrow-to-region 'disabled nil) ; Disable a warning somehow?
+(put 'narrow-to-region 'disabled nil) ; Disable a warning somehow?!
 (require 'mixed-pitch)
 (dolist (face '(org-date
                 org-priority
@@ -620,6 +622,7 @@ and focus the window you swapped to."
 (global-centered-cursor-mode 1) ; Toggle with `Scroll_Lock'.
 (require 'transpose-frame)
 (require 'ace-window)
+(setq aw-display-mode-overlay nil)
 (ace-window-display-mode 1)
 (tmr-mode-line-mode 1)
 ;; ============================================================================
@@ -731,10 +734,14 @@ and focus the window you swapped to."
 ;; ============================================================================
 ;;;; Hooks to suspend `global-hl-line-mode'
 ;; ============================================================================
-;; Suspend the `hl-line' so `region' can use the same background color.
-;; ----------------------------------------------------------------------------
 ;; The buffer-local `hl-line-mode' doesn't properly respect "specificity" so it
-;; will only override `global-hl-line-mode' when called interactively?
+;; will only override `global-hl-line-mode' when called interactively?!
+;; ----------------------------------------------------------------------------
+;; Suspend the `hl-line' as an extra alert about operator state.
+(add-hook 'evil-operator-state-entry-hook #'(lambda () (global-hl-line-mode 0)))
+(add-hook 'evil-operator-state-exit-hook #'global-hl-line-mode)
+;; ----------------------------------------------------------------------------
+;; Suspend the `hl-line' so `region' can use the same background color.
 (add-hook 'evil-visual-state-entry-hook #'(lambda () (global-hl-line-mode 0)))
 (add-hook 'evil-visual-state-exit-hook #'global-hl-line-mode)
 ;; ----------------------------------------------------------------------------
@@ -944,7 +951,7 @@ All org files in the directory will be scanned by the agenda.")
       "TODO" ; Sort [/] cookies on top. This is typically categories.
       ;; I would prefer to use `org-agenda-sorting-strategy' but I have not
       ;; figured out `org-agenda-cmp-user-defined'. This works though.
-      ((org-agenda-overriding-header "No timestamp TODO or HOLD:")
+      ((org-agenda-overriding-header "No timestamp or on HOLD:")
        (org-agenda-skip-function
         '(org-agenda-skip-entry-if
           'notregexp "\\[[0-9]*/[0-9]*\\]"
@@ -965,7 +972,7 @@ All org files in the directory will be scanned by the agenda.")
       ((org-agenda-overriding-header "") ; Same block.
        (org-agenda-block-separator nil)))
      (todo
-      "DONE" ; Only when prioritized.
+      "DONE" ; Only show prioritized.
       ((org-agenda-overriding-header "") ; Same block.
        (org-agenda-block-separator nil)
        (org-agenda-skip-function
@@ -1087,7 +1094,7 @@ All org files in the directory will be scanned by the agenda.")
 (add-to-list 'org-modules 'org-habit)
 (add-hook 'org-mode-hook #'org-appear-mode)
 ;; ----------------------------------------------------------------------------
-;; Present.
+;; Present. (work in progress)
 (setq olivetti-body-width .75)
 (require 'org-present)
 (setq-local
@@ -1180,7 +1187,7 @@ All org files in the directory will be scanned by the agenda.")
  ("g+"            . evil-numbers/inc-at-pt)
  ("g-"            . evil-numbers/dec-at-pt)
  :map evil-motion-state-map
- ("½"             . mode-line-other-buffer)
+ ("½"             . mode-line-other-buffer) ; Toggle the last two buffers.
  ("¨"             . tab-bar-new-tab)
  ("´"             . evil-set-marker) ; "m" is `backward-paragraph'.
  ("'"             . evil-avy-goto-char-2)
@@ -1188,9 +1195,11 @@ All org files in the directory will be scanned by the agenda.")
  ("<up>"          . evil-previous-visual-line) ; j/k respect line atoms.
  ("<backtab>"     . outline-cycle-buffer)
  ("C-i"           . outline-cycle) ; "C-i" = <tab>.
- ("C-S-o"         . evil-jump-forward)
+ ("C-o"           . evil-jump-forward)
+ ("C-S-o"         . evil-jump-backward)
+ ("C-n"           . evil-search-next)
  ("C-S-n"         . evil-search-previous)
- ("N"             . evil-search-next)
+ ("C-S-p"         . evil-paste-pop-next)
  ("S"             . isearch-forward-thing-at-point) ; This is like Vim's "*".
  ("gc"            . evilnc-comment-operator)
  ("gv"            . er/expand-region)
@@ -1209,7 +1218,7 @@ All org files in the directory will be scanned by the agenda.")
  ("C-0"           . beginning-of-line)
  ("C-S-b"         . evil-backward-WORD-begin)
  ("C-b"           . evil-backward-word-begin)
- ("C-d"           . backward-kill-word) ; In evil this is bound "C-w".
+ ("C-d"           . backward-kill-word) ; In evil the equivalent is bound "C-w".
  ("C-e"           . forward-word) ; Not from `evil-emacs-cursor-model-mode'.
  ("C-p"           . yank) ; "M-p" is in the `global-map'.
  ("C-v"           . set-mark-command)
@@ -1218,6 +1227,7 @@ All org files in the directory will be scanned by the agenda.")
  ("C-S-ø"         . back-to-indentation)
  ("C-ø"           . end-of-line)
  :map org-present-mode-keymap
+ ("<f5>"          . org-present-beginning)
  ("<f6>"          . org-present-prev)
  ("<f7>"          . org-present-next)
  :map isearch-mode-map

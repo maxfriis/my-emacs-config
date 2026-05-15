@@ -11,7 +11,7 @@ It is my configuration after all.
 ** Version requirement
 
 Most of the configuration is fine with Emacs version 29.1, but my which-key configuration requires version 30.1.
-I think which-key was made native in that version because I know the package is much older.
+I think which-key was made native in that version because I know the package is older.
 
 ** Early init
 
@@ -128,7 +128,7 @@ I do swap the two paste bindings =p= and =P= to avoid using the capitalized one.
 
 *** Two ways of pasting
 
-Vim's cursor on character model requires two ways of pasting.
+Vim's cursor on top of character model requires two ways of pasting.
 One is layered with =<shift>= and really counts as two keystrokes.
 You can mimic this behavior by using a "correction-motion" before paste in the cursor between characters model.
 This means that from a strict efficiency perspective it is not clear what is gained from two paste commands.

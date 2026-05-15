@@ -34,7 +34,7 @@
   "p"   #'find-file-at-point
   "r"   #'recentf-open-files
   "s"   #'basic-save-buffer
-  "t"   #'my-find-my-faces-file
+  "t"   #'my-find-theme-file
   "w"   #'write-file)
 (defvar-keymap my-g-spc-map
   :doc "My <spc> prefix keys."
@@ -237,7 +237,7 @@
     "p"   '("At point"     . find-file-at-point)
     "r"   '("Recent"       . recentf-open-files)
     "s"   '("Save"         . basic-save-buffer)
-    "t"   '("My themes"    . my-find-my-faces-file)
+    "t"   '("My themes"    . my-find-theme-file)
     "w"   '("Write"        . write-file))
   (which-key-add-keymap-based-replacements my-g-spc-map
     "b"   '("Blame"        . magit-blame)
