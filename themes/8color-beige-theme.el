@@ -3,18 +3,18 @@
 ;; ============================================================================
 ;;; Vanilla faces
 ;; ============================================================================
-;; 8 colors: #???.
-;; |------+-----------------+------+-----------------|
-;; | #edc | background      | #210 | default text    |
-;; |------+-----------------+------+-----------------|
-;; | #987 | shadow/hl-line  | #00f | comment/tag     |
-;; | #090 | success/done    | #f00 | error/todo      |
-;; | #b0b | link/timestamp  | #840 | warning/heading |
-;; |------+-----------------+------+-----------------|
 ;; The colors are based on f, b, 7 and 0 adjusting grays to brownish.
 ;; Unspecified faces are handled by the light part of the vanilla theme.
 ;; ----------------------------------------------------------------------------
-(deftheme 8color-beige)
+(deftheme 8color-beige
+  "8 #??? color light theme.
+\n| #edc | background      | #210 | default text    |
+| #987 | shadow/hl-line  | #00f | comment/tag     |
+| #090 | success/done    | #f00 | error/todo      |
+| #b0b | link/timestamp  | #840 | warning/heading |"
+  :background-mode 'light
+  :kind 'color-scheme
+  :family '8color)
 
 (let ((class '((class color) (min-colors 89))))
   (custom-theme-set-faces
@@ -73,7 +73,7 @@
    `(line-number
      ((,class (:foreground "#987" :background "#edc" :height .8))))
    `(line-number-current-line
-     ((,class (:foreground "#edc" :background "#987" :weight bold))))
+     ((,class (:foreground "#edc" :background "#987" :weight bold :height .8))))
    `(mode-line
      ((,class (:foreground "#edc" :background "#987" :box nil :height .8))))
    `(mode-line-inactive

@@ -3,23 +3,18 @@
 ;; ============================================================================
 ;;; Vanilla faces
 ;; ============================================================================
-;; 8 #??? color theme combining f and 0.
-;; |------+-----------------+------+-----------------|
-;; | #000 | background      | #fff | default text    |
-;; |------+-----------------+------+-----------------|
-;; | #f00 | shadow/hl-line  | #0ff | comment/tag     |
-;; | #0f0 | success/done    | #f0f | error/todo      |
-;; | #00f | link/timestamp  | #ff0 | warning/heading |
-;; |------+-----------------+------+-----------------|
 ;; These colors will display in an 8 or 16 color ansi terminal.
 ;; Unspecified faces are handled by the dark vanilla theme.
 (deftheme 8color-ansi
   "8 #??? color theme combining f and 0.
-
-| #000 | background      | #fff | default text    |
+\n| #000 | background      | #fff | default text    |
 | #f00 | shadow/hl-line  | #0ff | comment/tag     |
 | #0f0 | success/done    | #f0f | error/todo      |
-| #00f | link/timestamp  | #ff0 | warning/heading |")
+| #00f | link/timestamp  | #ff0 | warning/heading |"
+  :background-mode 'dark
+  :kind 'color-scheme
+  :family '8color)
+
 (let ((class '((class color) (min-colors 89))))
   (custom-theme-set-faces
    '8color-ansi

@@ -6,11 +6,9 @@
 ;; Dark, warm, systematic, simple and aesthetically pleasing.  No #73f.
 ;; Unspecified faces are handled by the dark part of the vanilla theme.
 ;; ----------------------------------------------------------------------------
-;;;###theme-autoload
 (deftheme 8color-brown
   "8 #??? colors: combining f(15), 7 and 3 plus some dusty brownish colors.
-
-| #210 | background      | #dcb | default text    |
+\n| #210 | background      | #dcb | default text    |
 | #f37 | error/todo      | #f73 | warning/heading |
 | #7f3 | success/done    | #3f7 | comment/tag     |
 | #37f | link/timestamp  | #432 | shadow/hl-line  |"
