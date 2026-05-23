@@ -104,6 +104,8 @@ I feel this logic is easier to comprehend and internalize if you are not a power
 Compared to Vim the efficiency is roughly the same with this mode.
 If you need to work with the next line you will need weakly more keystrokes.
 When dealing with the current line nugget you might need fewer.
+
+A few keystroke combinations like Vim's =wa= are unavailable but is this something you need prioritized with an easy binding?
 In most situations you will probably solve whatever you want to do, with roughly the same number of keystrokes.
 
 Using a layer increase complexity because it does not only require that you use two keys.
@@ -141,7 +143,7 @@ Note that evil-mode's behavior is still available so e.g. =~= (evil-invert-char)
 ** Touching delimiters
 
 If you have touching delimiters like "(...)(...)" and your cursor is between them, then =%= will jump back to the first "(".
-In this mode there is no evil-mode way to toggle back and forth between the second set of delimiters when the two sets are touching.
+In this mode there is no way to determine what set of delimiters the cursor is pointing at when the sets are touching.
 
 ** Visual block
 
@@ -153,13 +155,13 @@ If =C-v= fails I suggest you fall back on marking with =v= and use the =C-x r= b
 
 * Raison d'être speculation
 
-The /line nugget/ mindset will use less operations and the logic is easier to learn and internalize.
+The reason for the mode might be to introduce Vim or evil-mode.
+The mode can make it a better experience to pick up Vim's /modal framework/ without dealing with an unusual cursor model.
 
-Alternatively the reason for the mode might be to introduce Vim or evil-mode.
-The mode can make it a better experience to pick up the /modal framework/.
+Alternatively the /line nugget/ mindset will use less operations and the logic is easier to learn and internalize.
 
 Last Emacs pinky is a real thing and /fewer layers/ might be important.
 This will also be helpful to people who use "sticky keys" accessibility.
 
 To me all three reasons are important.
-I like line nuggets in a modal framework with few layers.
+I like few layers and line nugget atoms in a modal framework.
