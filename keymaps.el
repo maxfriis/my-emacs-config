@@ -30,7 +30,6 @@
   "f"   #'counsel-find-file
   "g"   #'consult-ripgrep
   "i"   #'my-find-init-file
-  "n"   #'my-find-note-file
   "p"   #'find-file-at-point
   "r"   #'recentf-open-files
   "s"   #'basic-save-buffer
@@ -129,7 +128,7 @@
   "t"   #'keycast-tab-bar-mode)
 (defvar-keymap my-tl-spc-map
   :doc "My <spc> prefix keys."
-  "l"   #'visual-line-mode
+  "v"   #'visual-line-mode
   "n"   #'display-line-numbers-mode
   "t"   #'toggle-truncate-lines)
 (defvar-keymap my-t-spc-map
@@ -233,7 +232,6 @@
     "f"   '("Find"         . counsel-find-file)
     "g"   '("Grep"         . consult-ripgrep)
     "i"   '("Init"         . my-find-init-file)
-    "n"   '("Notes"        . my-find-note-file)
     "p"   '("At point"     . find-file-at-point)
     "r"   '("Recent"       . recentf-open-files)
     "s"   '("Save"         . basic-save-buffer)
@@ -321,7 +319,7 @@
     "m"   '("Mode line"    . keycast-mode-line-mode)
     "t"   '("Tab bar"      . keycast-tab-bar-mode))
   (which-key-add-keymap-based-replacements my-tl-spc-map
-    "l"   '("Visual"       . visual-line-mode)
+    "v"   '("Visual"       . visual-line-mode)
     "n"   '("Numbers"      . display-line-numbers-mode)
     "t"   '("Truncate"     . toggle-truncate-lines))
   (which-key-add-keymap-based-replacements my-t-spc-map

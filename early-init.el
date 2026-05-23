@@ -13,7 +13,7 @@
  frame-inhibit-implied-resize t
  ;; Trigger fewer garbage collections but use more memory.
  inhibit-compacting-font-caches t
- ;; Clean defaults I don't want.
+ ;; Clean defaults.
  inhibit-startup-message t
  mode-line-format nil
  frame-title-format "GNU Emacs"

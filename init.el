@@ -12,6 +12,10 @@
 ;; ----------------------------------------------------------------------------
 ;; Color themes.
 (when (file-newer-than-file-p
+       (locate-user-emacs-file "themes/8color-brown-theme.el")
+       (locate-user-emacs-file "themes/8color-brown-theme.elc"))
+  (byte-compile-file (locate-user-emacs-file "themes/8color-brown-theme.el")))
+(when (file-newer-than-file-p
        (locate-user-emacs-file "themes/8color-ansi-theme.el")
        (locate-user-emacs-file "themes/8color-ansi-theme.elc"))
   (byte-compile-file (locate-user-emacs-file "themes/8color-ansi-theme.el")))
@@ -19,10 +23,6 @@
        (locate-user-emacs-file "themes/8color-beige-theme.el")
        (locate-user-emacs-file "themes/8color-beige-theme.elc"))
   (byte-compile-file (locate-user-emacs-file "themes/8color-beige-theme.el")))
-(when (file-newer-than-file-p
-       (locate-user-emacs-file "themes/8color-brown-theme.el")
-       (locate-user-emacs-file "themes/8color-brown-theme.elc"))
-  (byte-compile-file (locate-user-emacs-file "themes/8color-brown-theme.el")))
 (add-to-list 'custom-theme-load-path (locate-user-emacs-file "themes/"))
 (cond ((= (user-uid) 0)
        (load-theme '8color-beige t))
@@ -202,7 +202,7 @@ This does the opposite of the `shrink' face."
            (-3 "%o")))))))
 
 ;; ============================================================================
-;;; Vanilla stuff
+;;; Native stuff
 ;; ============================================================================
 ;; Variables.
 (setq-default
@@ -215,9 +215,10 @@ This does the opposite of the `shrink' face."
     (if (buffer-file-name)
         (abbreviate-file-name (buffer-file-name))
       "%b")))
+ warning-minimum-level :error
  frame-background-mode 'dark
  tab-width 4
- warning-minimum-level :error
+ truncate-partial-width-windows 59 ; Only wrap lines in wide windows.
  visible-bell t
  use-dialog-box nil
  use-short-answers t
@@ -231,7 +232,6 @@ This does the opposite of the `shrink' face."
  savehist-file         (locate-user-emacs-file ".history.eld")
  save-place-file       (locate-user-emacs-file ".places.eld")
  diary-file            (locate-user-emacs-file ".diary")
- truncate-partial-width-windows 59 ; Only wrap lines in wide windows.
  recentf-exclude
  '("\\`~/\\.backup.*\\'"               ; Don't edit backup files.
    "\\`~/\\.emacs\\.d/.*\\.el[cd]?\\'" ; Elisp config and data files.
@@ -316,7 +316,7 @@ This does the opposite of the `shrink' face."
      display-buffer-below-selected)
     (body-function . select-window))))
 ;; ============================================================================
-;;;; Native hooks
+;;;; Hooks
 ;; ============================================================================
 (add-hook 'after-save-hook #'vc-refresh-state)        ; Version control.
 (add-hook 'dired-mode-hook #'dired-omit-mode)         ; Toggle with ")".
@@ -340,7 +340,7 @@ This does the opposite of the `shrink' face."
                 (float-time (time-subtract after-init-time before-init-time)))
                gcs-done)))
 ;; ============================================================================
-;;;; Native global minor modes
+;;;; Global minor modes
 ;; ============================================================================
 (auto-save-visited-mode 1) ; Almost edit files rather than buffers.
 (save-place-mode 1)
@@ -352,26 +352,6 @@ This does the opposite of the `shrink' face."
 ;; ============================================================================
 ;;; Custom stuff
 ;; ============================================================================
-;; Toggle my faces.
-(defun my-toggle-themes (&optional arg)
-  "Cycle between brown, ansi and light faces respectively.
-\nA number prefix ARG will load a specific theme.
-`universal-argument' will initiate a theme dialog."
-  (interactive "P")
-  (unless arg (setq arg 0)) ; if nil.
-  (cond ((not (numberp arg)) ; `universal-argument'.
-         (counsel-load-theme))
-        ((= arg 1)
-         (load-theme '8color-ansi t))
-        ((= arg 2)
-         (load-theme '8color-brown t))
-        ((or (= arg 3) (string-equal (face-background 'default) "#210"))
-         (load-theme '8color-beige t))
-        ((string-equal (face-background 'default) "#000")
-         (load-theme '8color-brown t))
-        (t (load-theme '8color-ansi t)))
-  (message "%s background faces" (face-background 'default)))
-;; ----------------------------------------------------------------------------
 ;; Dired in new tab.
 (defun my-split-dired-tab (directory)
   "Split dired in a new tab with the home directory in the right window.
@@ -388,6 +368,7 @@ This does the opposite of the `shrink' face."
   "Open configuration file init.el.
 \nThe `previous-buffer' will be early-init.el."
   (interactive)
+  (find-file (locate-user-emacs-file "keymaps.el"))
   (find-file (locate-user-emacs-file "early-init.el"))
   (find-file (locate-user-emacs-file "init.el")))
 ;; ----------------------------------------------------------------------------
@@ -397,8 +378,8 @@ This does the opposite of the `shrink' face."
 \nThe `previous-buffer' will be 8color-brown-theme.el."
   (interactive)
   (find-file (locate-user-emacs-file "themes/8color-beige-theme.el"))
-  (find-file (locate-user-emacs-file "themes/8color-brown-theme.el"))
-  (find-file (locate-user-emacs-file "themes/8color-ansi-theme.el")))
+  (find-file (locate-user-emacs-file "themes/8color-ansi-theme.el"))
+  (find-file (locate-user-emacs-file "themes/8color-brown-theme.el")))
 ;; ----------------------------------------------------------------------------
 ;; Open agenda and plan file.
 (defun my-find-agenda-file ()
@@ -406,17 +387,9 @@ This does the opposite of the `shrink' face."
 \nThese agenda files are usually opened in buffers by `org-agenda'.
 The function will organize the `buffer-list' and focus agenda.org."
   (interactive)
+  (find-file (concat org-agenda-directory "note.org"))
   (find-file (concat org-agenda-directory "plan.org"))
   (find-file (concat org-agenda-directory "agenda.org")))
-;; ----------------------------------------------------------------------------
-;; Open note and date file.
-(defun my-find-note-file ()
-  "Open my notes file note.org.
-\nThese agenda files are usually opened in buffers by `org-agenda'.
-The function will organize the `buffer-list' and focus note.org."
-  (interactive)
-  (find-file (concat org-agenda-directory "date.org"))
-  (find-file (concat org-agenda-directory "note.org")))
 ;; ----------------------------------------------------------------------------
 ;; Custom agenda.
 (defun my-org-agenda-custom ()
@@ -437,20 +410,6 @@ The function will organize the `buffer-list' and focus note.org."
     (global-hl-line-mode 1)
     (goto-char (point-min)))) ; Jump to the new NEXT item.
 ;; ----------------------------------------------------------------------------
-;; Toggle maximized window.
-(defvar my-window-configuration nil
-  "Track window configuration, when it's suspended.")
-(defun my-toggle-window-maximize ()
-  "Toggle one maximized window and the window configuration from last maximize."
-  (interactive)
-  (if (one-window-p)
-      (when my-window-configuration
-        (set-window-configuration my-window-configuration)
-        (message "Window configuration restored"))
-    (setq my-window-configuration (current-window-configuration))
-    (delete-other-windows)
-    (message "Window maximized")))
-;; ----------------------------------------------------------------------------
 ;; Four window setup.
 (defun my-4-windows ()
   "Four windows, three on the right and the left focused.
@@ -465,8 +424,11 @@ window 2, Messages in window 3 and window 1's `previous-buffer' in window 4."
   (split-window-right) ; 4th window.
   (other-window 1)
   (next-buffer)
-  (while (memq major-mode '(dired-mode org-agenda-mode messages-buffer-mode))
-    (next-buffer)) ; `while' will loop finitely due to *scratch*.
+  (while (memq major-mode '(dired-mode
+                            ibuffer-mode
+                            org-agenda-mode
+                            messages-buffer-mode))
+    (next-buffer)) ; `while' will loop finitely due to *scratch* existing.
   (split-window-below) ; 3rd window.
   (switch-to-buffer "*Messages*")
   (split-window-below) ; 2nd window.
@@ -485,6 +447,40 @@ and focus the window you swapped to."
   (ace-swap-window)
   (aw-flip-window)
   (message "Windows swapped"))
+;; ----------------------------------------------------------------------------
+;; Toggle maximized window.
+(defvar my-window-configuration nil
+  "Track window configuration, when it's suspended.")
+(defun my-toggle-window-maximize ()
+  "Toggle one maximized window and the window configuration from last maximize."
+  (interactive)
+  (if (one-window-p)
+      (when my-window-configuration
+        (set-window-configuration my-window-configuration)
+        (message "Window configuration restored"))
+    (setq my-window-configuration (current-window-configuration))
+    (delete-other-windows)
+    (message "Window maximized")))
+;; ----------------------------------------------------------------------------
+;; Toggle my faces.
+(defun my-toggle-themes (&optional arg)
+  "Cycle between brown, ansi and light faces respectively.
+\nA number prefix ARG will load a specific theme.
+`universal-argument' will initiate a theme dialog."
+  (interactive "P")
+  (unless arg (setq arg 0)) ; if nil.
+  (cond ((not (numberp arg)) ; `universal-argument'.
+         (counsel-load-theme))
+        ((= arg 1)
+         (load-theme '8color-brown t))
+        ((= arg 2)
+         (load-theme '8color-ansi t))
+        ((or (= arg 3) (string-equal (face-background 'default) "#000"))
+         (load-theme '8color-beige t))
+        ((string-equal (face-background 'default) "#edc")
+         (load-theme '8color-brown t))
+        (t (load-theme '8color-ansi t)))
+  (message "%s background faces" (face-background 'default)))
 ;; ----------------------------------------------------------------------------
 ;; Magit stage and commit.
 (defun my-git-stage-all-and-commit (message)
@@ -522,24 +518,23 @@ and focus the window you swapped to."
  package-archives
  '(("elpa"         . "https://elpa.gnu.org/packages/")
    ("elpa-devel"   . "https://elpa.gnu.org/devel/")
-   ("nongnu"       . "https://elpa.nongnu.org/nongnu/")
-   ("org"          . "https://orgmode.org/elpa/")
+   ("melpa"        . "https://melpa.org/packages/")
    ("melpa-stable" . "https://stable.melpa.org/packages/")
-   ("melpa"        . "https://melpa.org/packages/"))
+   ("nongnu"       . "https://elpa.nongnu.org/nongnu/")
+   ("org"          . "https://orgmode.org/elpa/"))
  package-archive-priorities
  '(("elpa"   . 3)  ; Prefer potentially older versions from elpa.
    ("melpa"  . 2)
    ("nongnu" . 1)) ; Other archives have priority 0.
  package-selected-packages
- '(evil-collection evil-nerd-commenter evil-surround evil-numbers evil-org org-superstar evil-emacs-cursor-model-mode org-appear org-present auctex magit dired-subtree cape corfu nerd-icons-corfu nerd-icons-dired nerd-icons-ibuffer nerd-icons-completion avy vertico marginalia orderless embark-consult counsel tmr rainbow-delimiters colorful-mode recursive-narrow expand-region centered-cursor-mode olivetti golden-ratio ace-window transpose-frame mixed-pitch indent-guide casual-suite keycast undo-tree flycheck writegood-mode auto-package-update backup-each-save package-lint helpful))
+ '(undo-tree evil evil-collection evil-nerd-commenter evil-surround evil-numbers evil-emacs-cursor-model-mode evil-org org org-superstar org-appear org-present auctex nerd-icons nerd-icons-dired nerd-icons-ibuffer nerd-icons-completion nerd-icons-corfu corfu cape avy tmr vertico marginalia orderless embark-consult counsel helpful magit dired-subtree recursive-narrow expand-region olivetti centered-cursor-mode golden-ratio ace-window transpose-frame mixed-pitch rainbow-delimiters colorful-mode keycast indent-guide flycheck writegood-mode casual-suite auto-package-update backup-each-save package-lint))
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents nil))
 (package-install-selected-packages t)
 ;; ============================================================================
-;;;; Files, backup and undo
+;;;; Files and undo
 ;; ============================================================================
-(require 'dired-subtree)
 (require 'auto-package-update)
 (setq
  auto-package-update-interval 30
@@ -548,6 +543,7 @@ and focus the window you swapped to."
 (require 'backup-each-save)
 (setq backup-each-save-mirror-location "~/.backup-emacs-save")
 (add-hook 'after-save-hook #'backup-each-save)
+(require 'dired-subtree)
 ;; ----------------------------------------------------------------------------
 ;; Magit.
 (require 'magit)
@@ -588,8 +584,7 @@ and focus the window you swapped to."
 (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
 (require 'orderless)
 (setq
- completion-category-overrides
- '((file (styles . (basic substring))))
+ completion-category-overrides '((file (styles . (basic substring))))
  completion-styles '(orderless))
 (require 'embark)
 ;; ----------------------------------------------------------------------------
@@ -669,9 +664,9 @@ and focus the window you swapped to."
   (with-eval-after-load 'corfu
     (require 'nerd-icons-corfu)
     (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
+  (require 'nerd-icons-completion)
+  (nerd-icons-completion-mode 1)
   (with-eval-after-load 'marginalia
-    (require 'nerd-icons-completion)
-    (nerd-icons-completion-mode 1)
     (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup)))
 
 ;; ============================================================================
@@ -711,6 +706,13 @@ and focus the window you swapped to."
 ;; ============================================================================
 (require 'evil-collection)
 (evil-collection-init)
+(with-eval-after-load 'org-present
+  (evil-collection-org-present-setup))
+(require 'evil-org)
+(evil-org-set-key-theme '(navigation insert textobjects additional calendar))
+(add-hook 'org-mode-hook #'evil-org-mode)
+(require 'evil-org-agenda)
+(evil-org-agenda-set-keys)
 (require 'evil-surround)
 (add-hook 'emacs-lisp-mode-hook
           #'(lambda ()
@@ -718,17 +720,12 @@ and focus the window you swapped to."
 (global-evil-surround-mode 1)
 (require 'evil-nerd-commenter)
 (require 'evil-numbers)
-(require 'evil-org)
-(evil-org-set-key-theme '(navigation insert textobjects additional calendar))
-(add-hook 'org-mode-hook #'evil-org-mode)
-(require 'evil-org-agenda)
-(evil-org-agenda-set-keys)
 ;; ----------------------------------------------------------------------------
 ;; `evil-emacs-cursor-model-mode'.
 (if (file-exists-p (locate-user-emacs-file
                     "evil-emacs-cursor-model/evil-emacs-cursor-model-mode.el"))
     (load (locate-user-emacs-file ; For local development.
-           "evil-emacs-cursor-model/evil-emacs-cursor-model-mode.el") nil t)
+           "evil-emacs-cursor-model/evil-emacs-cursor-model-mode") nil t)
   (require 'evil-emacs-cursor-model-mode)) ; From repository.
 (evil-emacs-cursor-model-mode 1)
 ;; ============================================================================
@@ -737,13 +734,14 @@ and focus the window you swapped to."
 ;; The buffer-local `hl-line-mode' doesn't properly respect "specificity" so it
 ;; will only override `global-hl-line-mode' when called interactively?!
 ;; ----------------------------------------------------------------------------
-;; Suspend the `hl-line' as an extra alert about operator state.
-(add-hook 'evil-operator-state-entry-hook #'(lambda () (global-hl-line-mode 0)))
-(add-hook 'evil-operator-state-exit-hook #'global-hl-line-mode)
-;; ----------------------------------------------------------------------------
-;; Suspend the `hl-line' so `region' can use the same background color.
-(add-hook 'evil-visual-state-entry-hook #'(lambda () (global-hl-line-mode 0)))
-(add-hook 'evil-visual-state-exit-hook #'global-hl-line-mode)
+;; Suspend the `hl-line' as an extra operator state alert and so `region' can
+;; use the `hl-line' background color in visual state.
+(dolist (hook '(evil-operator-state-entry-hook
+                evil-visual-state-entry-hook))
+  (add-hook hook #'(lambda () (global-hl-line-mode 0))))
+(dolist (hook '(evil-operator-state-exit-hook
+                evil-visual-state-exit-hook))
+  (add-hook hook #'global-hl-line-mode))
 ;; ----------------------------------------------------------------------------
 ;; Suspend the `hl-line' and have absolute line numbers in "input" states.
 (dolist (hook '(evil-insert-state-entry-hook
@@ -855,8 +853,7 @@ All org files in the directory will be scanned by the agenda.")
    ("CRYPT"    . ?C)
    ("ORDERED"  . ?O)
    ("NOEXPORT" . ?X))
- org-M-RET-may-split-line
- '((default . nil))
+ org-M-RET-may-split-line '((default . nil))
  org-insert-heading-respect-content t
  org-confirm-babel-evaluate nil
  org-cycle-hide-block-startup t
@@ -865,9 +862,8 @@ All org files in the directory will be scanned by the agenda.")
  org-html-postamble nil
  org-latex-title-command nil
  org-export-with-smart-quotes t
- ;; org-export-exclude-tags '("noexport" "NOEXPORT")
- org-export-backends
- '(ascii latex beamer html odt md)
+ org-export-exclude-tags '("noexport" "NOEXPORT")
+ org-export-backends '(ascii latex beamer html odt md)
  org-file-apps
  '(("\\.docx\\'"    . default)
    ("\\.mm\\'"      . default)
@@ -898,8 +894,9 @@ All org files in the directory will be scanned by the agenda.")
 ;; System to organize tasks and suppress out of date information.
 (setq
  org-agenda-window-setup 'current-window
- org-agenda-files `(,org-agenda-directory ; All org files in the directory.
-                    ,(concat org-directory "inbox.org"))
+ org-agenda-files
+ `(,org-agenda-directory ; All org files in the directory.
+   ,(concat org-directory "inbox.org"))
  org-archive-location (concat org-directory "archive.org::* Archive")
  org-reverse-note-order t ; Prepend refiles.
  org-refile-targets
@@ -917,23 +914,20 @@ All org files in the directory will be scanned by the agenda.")
    (todo     . "  %-6c%-12e")
    (tags     . "  %-6c%-12e")
    (search   . "  %-6c%-12e"))
- org-agenda-timerange-leaders
- '("Range" "%2d/%d")
- org-agenda-scheduled-leaders
- '("⧄" "⧄%3dx")
- org-agenda-deadline-leaders
- '("⧅" "⧅%3dd" "⧅%3dx")
+ org-agenda-timerange-leaders '("Range" "%2d/%d")
+ org-agenda-scheduled-leaders '("⧄" "⧄%3dx")
+ org-agenda-deadline-leaders '("⧅" "⧅%3dd" "⧅%3dx")
  org-deadline-warning-days 7
  org-agenda-skip-scheduled-if-done t
  org-agenda-skip-deadline-if-done t
  org-agenda-skip-deadline-prewarning-if-scheduled t
- org-columns-default-format "%30Item %Clocksum(Used) %Effort(Plan) %Category(Cat.) %Tags %Priority(#) %Todo(Todo)"
+ org-columns-default-format
+ "%30Item %Clocksum(Used) %Effort(Plan) %Category(Cat.) %Tags %Priority(#) %Todo(Todo)"
  org-global-properties
  '(("effort_all" . "0:05 0:10 0:15 0:20 0:30 0:45 1:00 1:30 2:00"))
  org-clock-in-switch-to-state "NEXT"
  org-clock-out-when-done t
- org-time-stamp-rounding-minutes
- '(15 5))
+ org-time-stamp-rounding-minutes '(15 5))
 ;; ----------------------------------------------------------------------------
 ;;;;; Custom agenda commands.
 (setq
@@ -966,6 +960,15 @@ All org files in the directory will be scanned by the agenda.")
           'regexp "\\[[0-9]*/[0-9]*\\]"
           ;; or
           'timestamp))))
+     (todo
+      "TODO" ; Prioritized with timestamps.
+      ((org-agenda-overriding-header "") ; Share heading (same block).
+       (org-agenda-block-separator nil)  ; Don't separate.
+       (org-agenda-skip-function
+        '(org-agenda-skip-entry-if
+          'notregexp org-priority-regexp
+          ;; or
+          'nottimestamp))))
      ;; Inactive states. Not in the agenda even if scheduled.
      (todo
       "HOLD" ; For third party action pending.
@@ -1077,10 +1080,10 @@ All org files in the directory will be scanned by the agenda.")
 ;;;; Addons
 ;; ============================================================================
 ;; Bullets.
+;; ⓪①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳Ⓧ
 (require 'org-superstar)
 (setq
- org-superstar-headline-bullets-list
- '(?⓪ ?① ?② ?③ ?ⓧ) ; ④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳Ⓧ
+ org-superstar-headline-bullets-list '(?⓪ ?① ?② ?③ ?ⓧ)
  org-superstar-cycle-headline-bullets nil)
 (add-hook 'org-mode-hook #'org-superstar-mode)
 ;; ----------------------------------------------------------------------------
@@ -1101,8 +1104,6 @@ All org files in the directory will be scanned by the agenda.")
  org-blank-before-new-entry
  '((heading . t)
    (plain-list-item . nil)))
-(with-eval-after-load 'evil
-  (evil-collection-org-present-setup))
 (add-hook 'org-present-mode-hook
           #'(lambda ()
               (if org-present-mode
@@ -1125,10 +1126,11 @@ All org files in the directory will be scanned by the agenda.")
                 (olivetti-mode 0))))
 ;; ----------------------------------------------------------------------------
 ;; A pictogram is often better than a word.
+;; ⧈⧇⊡⧆⊞⊟⧄⧅⊠⟏⟎ ▸▾▴◂ ☑☐☒ ✏✎✐ ×÷
 (add-hook 'org-mode-hook
           #'(lambda ()
               (setq
-               prettify-symbols-alist ; ⧈⧇⊡⧆⊞⊟⧄⧅⊠⟏⟎ ▸▾▴◂ ☑☐☒ ✏✎✐ ×÷
+               prettify-symbols-alist
                '(("[ ]"            . ?⊡)
                  ("[-]"            . ?⊟)
                  ("[X]"            . ?⊠)
@@ -1177,7 +1179,7 @@ All org files in the directory will be scanned by the agenda.")
  :map evil-visual-state-map
  ;; "S" is used by `evil-surround'. Use "C-s" for normal `isearch'.
  ("s"             . isearch-forward-thing-at-point) ; `isearch' the region.
- ;; Don't use "v" to exit visual state. <escape> or a command works.
+ ;; Don't use "v" to exit visual state. A command or <escape> works.
  ("v"             . exchange-point-and-mark)
  :map evil-normal-state-map
  ("SPC"           . nil) ; Don't override the motion map.
@@ -1206,7 +1208,7 @@ All org files in the directory will be scanned by the agenda.")
  ("gV"            . evil-visual-restore)
  ("m"             . backward-paragraph)  ; Below "k". "´" is `evil-set-marker'.
  ("n"             . forward-paragraph)   ; Below "j".
- ("s"             . isearch-forward)     ; I prefer `isearch' and "C-s" to repeat.
+ ("s"             . isearch-forward)     ; "C-s" to repeat.
  ("Æ"             . evil-scroll-up)      ; "C-u" is `universal-argument'.
  ("Ø"             . back-to-indentation) ; "^" is `evil-first-non-blank'.
  ("Å"             . my-org-capture-idea)
@@ -1259,10 +1261,10 @@ All org files in the directory will be scanned by the agenda.")
   "sd"          #'org-agenda-deadline
   "ss"          #'org-agenda-schedule
   "t"           #'org-agenda-todo
-  "Æ"           #'org-agenda-backward-block
-  "æ"           #'org-agenda-forward-block
   "Å"           #'my-org-capture-idea
-  "å"           #'org-agenda-quit)
+  "Æ"           #'org-agenda-backward-block
+  "å"           #'org-agenda-quit
+  "æ"           #'org-agenda-forward-block)
 (evil-define-key 'normal dired-mode-map
   (kbd "SPC") nil
   ")"           #'dired-omit-mode ; "(" is toggle `dired-hide-details-mode'.
@@ -1303,16 +1305,6 @@ All org files in the directory will be scanned by the agenda.")
    which-key-idle-delay 3.0)
   (which-key-setup-minibuffer))
 ;; ----------------------------------------------------------------------------
-;; Keymaps for my leader key.
-(when (file-newer-than-file-p (locate-user-emacs-file "keymaps.el")
-                              (locate-user-emacs-file "keymaps.elc"))
-  (byte-compile-file (locate-user-emacs-file "keymaps.el")))
-(load (locate-user-emacs-file "keymaps.elc") nil t)
-;; ----------------------------------------------------------------------------
-;; Leader key is <SPC> with <f9> as backup.
-(keymap-set evil-motion-state-map "SPC"  my-root-spc-map)
-(keymap-set global-map            "<f9>" my-root-spc-map)
-;; ----------------------------------------------------------------------------
 ;; Additions to existing keymaps.
 (keymap-set evil-window-map "d" #'toggle-window-dedicated)
 (keymap-set evil-window-map "g" #'golden-ratio-mode)
@@ -1323,6 +1315,16 @@ All org files in the directory will be scanned by the agenda.")
 (keymap-set help-map        "c" #'describe-char)
 (keymap-set help-map        "h" #'describe-symbol) ; Swap "h" and "o".
 (keymap-set help-map        "o" #'view-hello-file)
+;; ----------------------------------------------------------------------------
+;; Keymaps for my leader key.
+(when (file-newer-than-file-p (locate-user-emacs-file "keymaps.el")
+                              (locate-user-emacs-file "keymaps.elc"))
+  (byte-compile-file (locate-user-emacs-file "keymaps.el")))
+(load (locate-user-emacs-file "keymaps") nil t)
+;; ----------------------------------------------------------------------------
+;; Leader key is <SPC> with <f9> as backup.
+(keymap-set evil-motion-state-map "SPC"  my-root-spc-map)
+(keymap-set global-map            "<f9>" my-root-spc-map)
 ;; ----------------------------------------------------------------------------
 ;; <f8> contextual menus. Mainly `transient' from `casual-suite'.
 (with-eval-after-load 'calc
@@ -1343,4 +1345,5 @@ All org files in the directory will be scanned by the agenda.")
 ;;; Startup
 ;; ============================================================================
 (my-org-agenda-custom)
+
 ;;; init.el ends here
