@@ -163,22 +163,33 @@ Maybe fewer layers are better if you have an Emacs pinky?"
 ;; ============================================================================
 ;;; Evil commands implementing the cursor model
 ;; ============================================================================
-(evil-define-motion evil-emacs-cursor-model-find-after-char (count char)
+;;;; Vim's "f"
+(evil-define-motion evil-emacs-cursor-model-find-after-char (char &optional count)
   "Move point immediately after the next COUNT'th occurrence of CHAR.
 Movement is restricted to the current line unless `evil-cross-lines' is non-nil."
   :type inclusive
-  (interactive "<c><C>")
+  (interactive "<C><c>")
   (setq count (or count 1))
   (if (and (plusp count) (= char (char-after)))
       (evil-find-char (1- count) char)
     (evil-find-char count char))
   (when (plusp count) (forward-char)))
 
-(evil-define-motion evil-emacs-cursor-model-find-before-char (count char)
+;; ----------------------------------------------------------------------------
+;;;; Vim's "F"
+(evil-define-motion evil-emacs-cursor-model-find-before-char-backward (char &optional count)
+  "Move before the previous COUNT'th occurrence of CHAR."
+  :type inclusive
+  (interactive "<C><c>")
+  (evil-emacs-cursor-model-find-after-char char (- (or count 1))))
+
+;; ----------------------------------------------------------------------------
+;;;; Vim's "t"
+(evil-define-motion evil-emacs-cursor-model-find-before-char (char &optional count)
   "Move point immediately before the next COUNT'th occurrence of CHAR.
 Movement is restricted to the current line unless `evil-cross-lines' is non-nil."
   :type inclusive
-  (interactive "<c><C>")
+  (interactive "<C><c>")
   (setq count (or count 1))
   (if (and (plusp count) (= char (char-after)))
       (evil-find-char (1- count) char)
@@ -186,19 +197,17 @@ Movement is restricted to the current line unless `evil-cross-lines' is non-nil.
   (when (minusp count) (forward-char))
   (setq evil-last-find (list #'evil-find-char-to char (plusp count))))
 
-(evil-define-motion evil-emacs-cursor-model-find-after-char-backward (count char)
+;; ----------------------------------------------------------------------------
+;;;; Vim's "T"
+(evil-define-motion evil-emacs-cursor-model-find-after-char-backward (char &optional count)
   "Move after the previous COUNT'th occurrence of CHAR."
   :type inclusive
-  (interactive "<c><C>")
-  (evil-emacs-cursor-model-find-before-char (- (or count 1)) char))
+  (interactive "<C><c>")
+  (evil-emacs-cursor-model-find-before-char char (- (or count 1))))
 
-(evil-define-motion evil-emacs-cursor-model-find-before-char-backward (count char)
-  "Move before the previous COUNT'th occurrence of CHAR."
-  :type inclusive
-  (interactive "<c><C>")
-  (evil-emacs-cursor-model-find-after-char (- (or count 1)) char))
-
-(evil-define-motion evil-emacs-cursor-model-repeat-find-char (count)
+;; ----------------------------------------------------------------------------
+;;;; Vim's ";"
+(evil-define-motion evil-emacs-cursor-model-repeat-find-char (&optional count)
   "Repeat the last find COUNT times."
   :type inclusive
   (interactive "<c>")
@@ -207,7 +216,7 @@ Movement is restricted to the current line unless `evil-cross-lines' is non-nil.
   (let ((char (nth 1 evil-last-find))
         (find (eq (car evil-last-find) #'evil-find-char))
         case-fold-search)
-    (unless char (user-error "No previous char search"))
+    (unless char (user-error "No previous find char"))
     (unless find ; Vim does this (1=2).
       (cond ((and (= count  1) (= char (char-after)))  (incf count))
             ((and (= count -1) (= char (char-before))) (decf count))))
@@ -227,14 +236,16 @@ Movement is restricted to the current line unless `evil-cross-lines' is non-nil.
           (if (plusp count) (backward-char) (forward-char)))
       (user-error "Can't find `%c'" char))))
 
-(evil-define-motion evil-emacs-cursor-model-repeat-find-char-reverse (count)
+;; ----------------------------------------------------------------------------
+;;;; Vim's ","
+(evil-define-motion evil-emacs-cursor-model-repeat-find-char-reverse (&optional count)
   "Repeat the last find COUNT times in the opposite direction."
   :type inclusive
   (interactive "<c>")
   (evil-emacs-cursor-model-repeat-find-char (- (or count 1))))
 
 
-(defun evil-emacs-cursor-model-forward-after-end (thing &optional count)
+(defun evil-emacs-cursor-model--forward-after-end (thing &optional count)
   "Move forward to end of THING.
 The motion is repeated COUNT times."
   (setq count (or count 1))
@@ -252,12 +263,14 @@ The motion is repeated COUNT times."
         (error))
       rest)))
 
-(defun evil-emacs-cursor-model-backward-after-end (thing &optional count)
+(defun evil-emacs-cursor-model--backward-after-end  (thing &optional count)
   "Move backward to end of THING.
 The motion is repeated COUNT times.  This is the same as calling
 `evil-emacs-cursor-model-forward-after-word-end' with -COUNT."
-  (evil-emacs-cursor-model-forward-after-end thing (- (or count 1))))
+  (evil-emacs-cursor-model--forward-after-end thing (- (or count 1))))
 
+;; ----------------------------------------------------------------------------
+;;;; Vim's "e"
 (evil-define-motion evil-emacs-cursor-model-forward-after-word-end (count &optional bigword)
   "Move the cursor to the end of the COUNT'th next word.
 If BIGWORD is non-nil, move by WORDS."
@@ -265,21 +278,27 @@ If BIGWORD is non-nil, move by WORDS."
   (let ((thing (if bigword 'evil-WORD 'evil-word))
         (count (or count 1)))
     (evil-signal-at-bob-or-eob count)
-    (evil-emacs-cursor-model-forward-after-end thing count)))
+    (evil-emacs-cursor-model--forward-after-end thing count)))
 
+;; ----------------------------------------------------------------------------
+;;;; Vim's "E"
 (evil-define-motion evil-emacs-cursor-model-forward-after-WORD-end (count)
   "Move the cursor to the end of the COUNT'th next WORD."
   :type inclusive
   (evil-emacs-cursor-model-forward-after-word-end count t))
 
+;; ----------------------------------------------------------------------------
+;;;; Vim's "ge"
 (evil-define-motion evil-emacs-cursor-model-backward-after-word-end (count &optional bigword)
   "Move the cursor to the end of the COUNT'th previous word.
 If BIGWORD is non-nil, move by WORDS."
   :type inclusive
   (let ((thing (if bigword 'evil-WORD 'evil-word)))
     (evil-signal-at-bob-or-eob (- (or count 1)))
-    (evil-emacs-cursor-model-backward-after-end thing count)))
+    (evil-emacs-cursor-model--backward-after-end  thing count)))
 
+;; ----------------------------------------------------------------------------
+;;;; Vim's "gE"
 (evil-define-motion evil-emacs-cursor-model-backward-after-WORD-end (count)
   "Move the cursor to the end of the COUNT'th previous WORD."
   :type inclusive
