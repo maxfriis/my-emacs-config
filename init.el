@@ -231,15 +231,14 @@ This does the opposite of the `shrink' face."
  recentf-save-file     (locate-user-emacs-file ".recentf.eld")
  savehist-file         (locate-user-emacs-file ".history.eld")
  save-place-file       (locate-user-emacs-file ".places.eld")
- diary-file            (locate-user-emacs-file ".diary")
+ diary-file            (locate-user-emacs-file ".diary") ; Not lisp.
  recentf-exclude
- '("\\`~/\\.backup.*\\'"               ; Don't edit backup files.
-   "\\`~/\\.emacs\\.d/.*\\.el[cd]?\\'" ; Elisp config and data files.
-   "\\`~/\\.emacs\\.d/diary\\'"
-   "\\`~/org/agenda/.*\\.org\\'"       ; Agenda files. These are buffers.
-   "\\`~/org/inbox\\.org\\'"
+ '("\\`.*\\.el\\.gz\\'"
    "\\`~/.*\\.pdf\\'"
-   ".*\\.el\\.gz\\'")
+   "\\`~/\\.backup.*\\'" ; Don't edit backup files.
+   "\\`~/\\.emacs\\.d/.*\\.el[cd]?\\'"
+   "\\`~/org/agenda/.*\\.org\\'" ; Agenda buffers.
+   "\\`~/org/inbox\\.org\\'")
  ;; ----------------------------------------------------------------------------
  ;; Dired.
  dired-kill-when-opening-new-dired-buffer t
@@ -310,7 +309,7 @@ This does the opposite of the `shrink' face."
  display-buffer-alist
  '(("\\`\\*Org Agenda\\*\\'"
     (display-buffer-same-window)
-    (body-function . select-window))
+    (dedicated . t))
    ("\\`\s?\\*.*\\*\\'"
     (display-buffer-reuse-mode-window
      display-buffer-below-selected)
@@ -318,11 +317,12 @@ This does the opposite of the `shrink' face."
 ;; ============================================================================
 ;;;; Hooks
 ;; ============================================================================
-(add-hook 'after-save-hook #'vc-refresh-state)        ; Version control.
+(add-hook 'after-save-hook #'vc-refresh-state)        ; Version control (git).
 (add-hook 'dired-mode-hook #'dired-omit-mode)         ; Toggle with ")".
 (add-hook 'dired-mode-hook #'dired-hide-details-mode) ; Toggle with "(".
 (add-hook 'text-mode-hook  #'visual-line-mode)        ; Wrap lines at words.
 (add-hook 'prog-mode-hook  #'outline-minor-mode)      ; Cycle with "<backtab>".
+;; ----------------------------------------------------------------------------
 ;; Visual line numbers when `outline-cycle-buffer' or `outline-cycle' fold.
 (add-hook 'outline-view-change-hook ; This is obsolete. Why?
           #'(lambda ()
@@ -348,165 +348,6 @@ This does the opposite of the `shrink' face."
 (recentf-mode 1)
 (global-hl-line-mode 1)
 (global-display-line-numbers-mode 1)
-
-;; ============================================================================
-;;; Custom stuff
-;; ============================================================================
-;; Dired in new tab.
-(defun my-split-dired-tab (directory)
-  "Split dired in a new tab with the home directory in the right window.
-\nPrompt for DIRECTORY in left window."
-  (interactive "DDirectory: ")
-  (dired-other-tab directory)
-  (split-window-right)
-  (find-file "~/")
-  (ace-swap-window)
-  (aw-flip-window))
-;; ----------------------------------------------------------------------------
-;; Open init files.
-(defun my-find-init-file ()
-  "Open configuration file init.el.
-\nThe `previous-buffer' will be early-init.el."
-  (interactive)
-  (find-file (locate-user-emacs-file "keymaps.el"))
-  (find-file (locate-user-emacs-file "early-init.el"))
-  (find-file (locate-user-emacs-file "init.el")))
-;; ----------------------------------------------------------------------------
-;; Open theme files.
-(defun my-find-theme-file ()
-  "Open my theme file 8color-ansi-theme.el.
-\nThe `previous-buffer' will be 8color-brown-theme.el."
-  (interactive)
-  (find-file (locate-user-emacs-file "themes/8color-beige-theme.el"))
-  (find-file (locate-user-emacs-file "themes/8color-ansi-theme.el"))
-  (find-file (locate-user-emacs-file "themes/8color-brown-theme.el")))
-;; ----------------------------------------------------------------------------
-;; Open agenda and plan file.
-(defun my-find-agenda-file ()
-  "Open my agenda file agenda.org.
-\nThese agenda files are usually opened in buffers by `org-agenda'.
-The function will organize the `buffer-list' and focus agenda.org."
-  (interactive)
-  (find-file (concat org-agenda-directory "note.org"))
-  (find-file (concat org-agenda-directory "plan.org"))
-  (find-file (concat org-agenda-directory "agenda.org")))
-;; ----------------------------------------------------------------------------
-;; Custom agenda.
-(defun my-org-agenda-custom ()
-  "Custom agenda with NEXT items, this week's agenda and TODO/HOLD items."
-  (interactive)
-  (org-agenda nil "c")
-  (unless (eq (char-after) ?\s) ; Stay on a NEXT item that start with a space.
-    (org-agenda-goto-today)))   ; If on a heading that don't.
-;; ----------------------------------------------------------------------------
-;; Capture idea.
-(defun my-org-capture-idea ()
-  "Capture an idea to inbox.org and make it a NEXT item."
-  (interactive)
-  (org-capture nil "i")
-  (org-save-all-org-buffers)
-  (when (eq major-mode 'org-agenda-mode)
-    (org-agenda-redo-all) ; Might turn `global-hl-line-mode' off?!
-    (global-hl-line-mode 1)
-    (goto-char (point-min)))) ; Jump to the new NEXT item.
-;; ----------------------------------------------------------------------------
-;; Four window setup.
-(defun my-4-windows ()
-  "Four windows, three on the right and the left focused.
-\nThis nice window setup is surprisingly hard to create without this function.
-\nThe content of window 1 will be unchanged.  By default the day-agenda goes in
-window 2, Messages in window 3 and window 1's `previous-buffer' in window 4."
-  (interactive)
-  (delete-other-windows)
-  (when (eq major-mode 'org-agenda-mode) ; Would affect `org-agenda-list'.
-    (org-agenda-quit)
-    (ibuffer))
-  (split-window-right) ; 4th window.
-  (other-window 1)
-  (next-buffer)
-  (while (memq major-mode '(dired-mode
-                            ibuffer-mode
-                            org-agenda-mode
-                            messages-buffer-mode))
-    (next-buffer)) ; `while' will loop finitely due to *scratch* existing.
-  (split-window-below) ; 3rd window.
-  (switch-to-buffer "*Messages*")
-  (split-window-below) ; 2nd window.
-  (org-agenda-list)
-  (set-window-dedicated-p nil t)
-  (set-window-dedicated-p (next-window) t) ; 3rd.
-  (other-window -1)
-  (message "Four window setup"))
-;; ----------------------------------------------------------------------------
-;; Ace window swap.
-(defun my-ace-swap-window ()
-  "Swap two window contents (prompt if 3+).  Keep focus on the current window.
-\nThe normal `ace-swap-window' swap two windows, but stays with the current buffer
-and focus the window you swapped to."
-  (interactive)
-  (ace-swap-window)
-  (aw-flip-window)
-  (message "Windows swapped"))
-;; ----------------------------------------------------------------------------
-;; Toggle maximized window.
-(defvar my-window-configuration nil
-  "Track window configuration, when it's suspended.")
-(defun my-toggle-window-maximize ()
-  "Toggle one maximized window and the window configuration from last maximize."
-  (interactive)
-  (if (one-window-p)
-      (when my-window-configuration
-        (set-window-configuration my-window-configuration)
-        (message "Window configuration restored"))
-    (setq my-window-configuration (current-window-configuration))
-    (delete-other-windows)
-    (message "Window maximized")))
-;; ----------------------------------------------------------------------------
-;; Toggle my faces.
-(defun my-toggle-themes (&optional arg)
-  "Cycle between brown, ansi and light faces respectively.
-\nA number prefix ARG will load a specific theme.
-`universal-argument' will initiate a theme dialog."
-  (interactive "P")
-  (unless arg (setq arg 0)) ; if nil.
-  (cond ((not (numberp arg)) ; `universal-argument'.
-         (counsel-load-theme))
-        ((= arg 1)
-         (load-theme '8color-brown t))
-        ((= arg 2)
-         (load-theme '8color-ansi t))
-        ((or (= arg 3) (string-equal (face-background 'default) "#000"))
-         (load-theme '8color-beige t))
-        ((string-equal (face-background 'default) "#edc")
-         (load-theme '8color-brown t))
-        (t (load-theme '8color-ansi t)))
-  (message "%s background faces" (face-background 'default)))
-;; ----------------------------------------------------------------------------
-;; Magit stage and commit.
-(defun my-git-stage-all-and-commit (message)
-  "Stage and commit everything with a commit MESSAGE.
-\nWill respect what is configured to be ignored."
-  (interactive "sCommit Message: ")
-  (save-some-buffers t)
-  (call-process-shell-command (format "git commit -a -m \"%s\"" message))
-  (vc-refresh-state))
-;; ----------------------------------------------------------------------------
-;; Save and quit.
-(defun my-save-all-kill-emacs-no-prompt ()
-  "Save all and quit without a prompt.
-\nUse something like `backup-each-save' to make this less risky."
-  (interactive)
-  (save-some-buffers t)
-  (when (file-newer-than-file-p (locate-user-emacs-file "early-init.el")
-                                (locate-user-emacs-file "early-init.elc"))
-    (byte-compile-file (locate-user-emacs-file "early-init.el")))
-  (when (file-newer-than-file-p (locate-user-emacs-file "init.el")
-                                (locate-user-emacs-file "init.elc"))
-    (when (file-readable-p (locate-user-emacs-file "init.elc"))
-      (copy-file (locate-user-emacs-file "init.elc")
-                 (locate-user-emacs-file "init.elc~") t t)) ; Overwrite.
-    (byte-compile-file (locate-user-emacs-file "init.el")))
-  (kill-emacs))
 
 ;; ============================================================================
 ;;; Package.el
@@ -676,7 +517,7 @@ and focus the window you swapped to."
  evil-undo-system 'undo-tree ; Set before loading evil!
  evil-want-keybinding nil    ; `evil-collection' need this.
  evil-want-integration t
- evil-want-C-i-jump nil)     ; I rebind jump forward to "C-S-o".
+ evil-want-C-i-jump nil)     ; I rebind jump to "C-o" and "C-S-o".
 (require 'evil)
 ;; ----------------------------------------------------------------------------
 ;; Cursor colors. I combine f and 0 to indicate the evil state.
@@ -734,8 +575,8 @@ and focus the window you swapped to."
 ;; The buffer-local `hl-line-mode' doesn't properly respect "specificity" so it
 ;; will only override `global-hl-line-mode' when called interactively?!
 ;; ----------------------------------------------------------------------------
-;; Suspend the `hl-line' as an extra operator state alert and so `region' can
-;; use the `hl-line' background color in visual state.
+;; Suspend the `hl-line' as an extra operator state alert and to use the
+;; background color for the `region' in visual state.
 (dolist (hook '(evil-operator-state-entry-hook
                 evil-visual-state-entry-hook))
   (add-hook hook #'(lambda () (global-hl-line-mode 0))))
@@ -1108,14 +949,16 @@ All org files in the directory will be scanned by the agenda.")
           #'(lambda ()
               (if org-present-mode
                   (progn (set-face-font 'default "Ubuntu Mono")
+                         (unless (one-window-p)
+                           (my-toggle-window-maximize))
                          (org-present-read-only)
                          (org-present-big)
                          (org-display-inline-images t)
                          (display-line-numbers-mode 0)
                          (tab-line-mode 0)
                          (tab-bar-mode 0)
-                         (setq header-line-format
-                               (propertize " " 'face '(:height 5.0)))
+                         (setq-local header-line-format
+                                     (propertize " " 'face '(:height 5.0)))
                          (olivetti-mode 1))
                 (set-face-font 'default "Liberation Mono")
                 (org-present-read-write)
@@ -1163,6 +1006,165 @@ All org files in the directory will be scanned by the agenda.")
   (add-hook 'org-log-buffer-setup-hook #'evil-insert-state))
 
 ;; ============================================================================
+;;; Custom functions
+;; ============================================================================
+;; Dired in new tab.
+(defun my-split-dired-tab (directory)
+  "Split dired in a new tab with the home directory in the right window.
+\nPrompt for DIRECTORY in left window."
+  (interactive "DDirectory: ")
+  (dired-other-tab directory)
+  (split-window-right)
+  (find-file "~/")
+  (ace-swap-window)
+  (aw-flip-window))
+;; ----------------------------------------------------------------------------
+;; Open init files.
+(defun my-find-init-file ()
+  "Open configuration file init.el.
+\nThe `previous-buffer' will be early-init.el."
+  (interactive)
+  (find-file (locate-user-emacs-file "leadermaps.el"))
+  (find-file (locate-user-emacs-file "early-init.el"))
+  (find-file (locate-user-emacs-file "init.el")))
+;; ----------------------------------------------------------------------------
+;; Open theme files.
+(defun my-find-theme-file ()
+  "Open my theme file 8color-ansi-theme.el.
+\nThe `previous-buffer' will be 8color-brown-theme.el."
+  (interactive)
+  (find-file (locate-user-emacs-file "themes/8color-beige-theme.el"))
+  (find-file (locate-user-emacs-file "themes/8color-ansi-theme.el"))
+  (find-file (locate-user-emacs-file "themes/8color-brown-theme.el")))
+;; ----------------------------------------------------------------------------
+;; Open agenda files.
+(defun my-find-agenda-file ()
+  "Open my agenda file agenda.org.
+\nThese agenda files are usually opened in buffers by `org-agenda'.
+The function will organize the `buffer-list' and focus agenda.org."
+  (interactive)
+  (find-file (concat org-agenda-directory "note.org"))
+  (find-file (concat org-agenda-directory "plan.org"))
+  (find-file (concat org-agenda-directory "agenda.org")))
+;; ----------------------------------------------------------------------------
+;; Capture idea.
+(defun my-org-capture-idea ()
+  "Capture an idea to inbox.org and make it a NEXT item."
+  (interactive)
+  (org-capture nil "i")
+  (org-save-all-org-buffers)
+  (when (eq major-mode 'org-agenda-mode)
+    (org-agenda-redo-all) ; Might turn `global-hl-line-mode' off?!
+    (global-hl-line-mode 1)
+    (goto-char (point-min)))) ; Jump to the new NEXT item.
+;; ----------------------------------------------------------------------------
+;; Custom agenda.
+(defun my-org-agenda-custom ()
+  "Custom agenda with NEXT items, this week's agenda and TODO/HOLD items."
+  (interactive)
+  (org-agenda nil "c")
+  (unless (eq (char-after) ?\s) ; Stay on a NEXT item that start with a space.
+    (org-agenda-goto-today)))   ; If on a heading that don't.
+;; ----------------------------------------------------------------------------
+;; Four window setup.
+(defun my-4-windows ()
+  "Four windows, three on the right and the left focused.
+\nThis nice window setup is surprisingly hard to create without this function.
+\nThe content of window 1 will be unchanged.  By default the day-agenda goes in
+window 2, Messages in window 3 and window 1's `previous-buffer' in window 4."
+  (interactive)
+  (delete-other-windows)
+  (when (eq major-mode 'org-agenda-mode) ; Would affect `org-agenda-list'.
+    (org-agenda-quit)
+    (ibuffer))
+  (split-window-right) ; 4th window.
+  (other-window 1)
+  (next-buffer)
+  (while (memq major-mode '(dired-mode
+                            ibuffer-mode
+                            org-agenda-mode
+                            messages-buffer-mode))
+    (next-buffer)) ; `while' will loop finitely due to *scratch* existing.
+  (split-window-below) ; 3rd window.
+  (switch-to-buffer "*Messages*")
+  (split-window-below) ; 2nd window.
+  (org-agenda-list)
+  (set-window-dedicated-p nil t)
+  (set-window-dedicated-p (next-window) t) ; 3rd.
+  (other-window -1)
+  (message "Four window setup"))
+;; ----------------------------------------------------------------------------
+;; Ace window swap.
+(defun my-ace-swap-window ()
+  "Swap two window contents (prompt if 3+).  Keep focus on the current window.
+\nThe normal `ace-swap-window' swap two windows, but stays with the current buffer
+and focus the window you swapped to."
+  (interactive)
+  (ace-swap-window)
+  (aw-flip-window)
+  (message "Windows swapped"))
+;; ----------------------------------------------------------------------------
+;; Toggle maximized window.
+(defvar my-window-configuration nil
+  "Track window configuration, when it's suspended.")
+(defun my-toggle-window-maximize ()
+  "Toggle one maximized window and the window configuration from last maximize."
+  (interactive)
+  (if (one-window-p)
+      (when my-window-configuration
+        (set-window-configuration my-window-configuration)
+        (message "Window configuration restored"))
+    (setq my-window-configuration (current-window-configuration))
+    (delete-other-windows)
+    (message "Window maximized")))
+;; ----------------------------------------------------------------------------
+;; Toggle my faces.
+(defun my-toggle-themes (&optional arg)
+  "Cycle between brown, ansi and light faces respectively.
+\nA number prefix ARG will load a specific theme.
+`universal-argument' will initiate a theme dialog."
+  (interactive "P")
+  (unless arg (setq arg 0)) ; if nil.
+  (cond ((not (numberp arg)) ; `universal-argument'.
+         (counsel-load-theme))
+        ((= arg 1)
+         (load-theme '8color-brown t))
+        ((= arg 2)
+         (load-theme '8color-ansi t))
+        ((or (= arg 3) (string-equal (face-background 'default) "#000"))
+         (load-theme '8color-beige t))
+        ((string-equal (face-background 'default) "#edc")
+         (load-theme '8color-brown t))
+        (t (load-theme '8color-ansi t)))
+  (message "%s background faces" (face-background 'default)))
+;; ----------------------------------------------------------------------------
+;; Magit stage and commit.
+(defun my-git-stage-all-and-commit (message)
+  "Stage and commit everything with a commit MESSAGE.
+\nWill respect what is configured to be ignored."
+  (interactive "sCommit Message: ")
+  (save-some-buffers t)
+  (call-process-shell-command (format "git commit -a -m \"%s\"" message))
+  (vc-refresh-state))
+;; ----------------------------------------------------------------------------
+;; Save and quit.
+(defun my-save-all-kill-emacs-no-prompt ()
+  "Save all and quit without a prompt.
+\nUse something like `backup-each-save' to make this less risky."
+  (interactive)
+  (save-some-buffers t)
+  (when (file-newer-than-file-p (locate-user-emacs-file "early-init.el")
+                                (locate-user-emacs-file "early-init.elc"))
+    (byte-compile-file (locate-user-emacs-file "early-init.el")))
+  (when (file-newer-than-file-p (locate-user-emacs-file "init.el")
+                                (locate-user-emacs-file "init.elc"))
+    (when (file-readable-p (locate-user-emacs-file "init.elc"))
+      (copy-file (locate-user-emacs-file "init.elc")
+                 (locate-user-emacs-file "init.elc~") t t)) ; Overwrite.
+    (byte-compile-file (locate-user-emacs-file "init.el")))
+  (kill-emacs))
+
+;; ============================================================================
 ;;; Keybindings
 ;; ============================================================================
 (bind-keys
@@ -1182,7 +1184,7 @@ All org files in the directory will be scanned by the agenda.")
  ;; Don't use "v" to exit visual state. A command or <escape> works.
  ("v"             . exchange-point-and-mark)
  :map evil-normal-state-map
- ("SPC"           . nil) ; Don't override the motion map.
+ ("SPC"           . nil) ; Don't override `evil-motion-state-map'.
  ("S"             . nil)
  ("m"             . nil)
  ("s"             . nil)
@@ -1193,51 +1195,53 @@ All org files in the directory will be scanned by the agenda.")
  ("¨"             . tab-bar-new-tab)
  ("´"             . evil-set-marker) ; "m" is `backward-paragraph'.
  ("'"             . evil-avy-goto-char-2)
+ ("<backtab>"     . outline-cycle-buffer)
  ("<down>"        . evil-next-visual-line)     ; <up>/<down> wrapped lines.
  ("<up>"          . evil-previous-visual-line) ; j/k respect line atoms.
- ("<backtab>"     . outline-cycle-buffer)
- ("C-i"           . outline-cycle) ; "C-i" = <tab>.
- ("C-o"           . evil-jump-forward)
- ("C-S-o"         . evil-jump-backward)
- ("C-n"           . evil-search-next)
  ("C-S-n"         . evil-search-previous)
+ ("C-S-o"         . evil-jump-backward)
  ("C-S-p"         . evil-paste-pop-next)
+ ("C-i"           . outline-cycle) ; "C-i" = <tab>.
+ ("C-n"           . evil-search-next)
+ ("C-o"           . evil-jump-forward)
+ ("C-å"           . org-cycle-agenda-files)
  ("S"             . isearch-forward-thing-at-point) ; This is like Vim's "*".
+ ("gV"            . evil-visual-restore)
  ("gc"            . evilnc-comment-operator)
  ("gv"            . er/expand-region)
- ("gV"            . evil-visual-restore)
  ("m"             . backward-paragraph)  ; Below "k". "´" is `evil-set-marker'.
  ("n"             . forward-paragraph)   ; Below "j".
  ("s"             . isearch-forward)     ; "C-s" to repeat.
+ ("Å"             . my-org-capture-idea)
  ("Æ"             . evil-scroll-up)      ; "C-u" is `universal-argument'.
  ("Ø"             . back-to-indentation) ; "^" is `evil-first-non-blank'.
- ("Å"             . my-org-capture-idea)
+ ("å"             . my-org-agenda-custom)
  ("æ"             . evil-scroll-down)
  ("ø"             . end-of-line)         ; "$" is `evil-end-of-line'.
- ("å"             . my-org-agenda-custom)
- ("C-å"           . org-cycle-agenda-files)
  :map evil-insert-state-map
  ("C-0"           . beginning-of-line)
  ("C-S-b"         . evil-backward-WORD-begin)
+ ("C-S-w"         . evil-forward-WORD-begin)
+ ("C-S-ø"         . back-to-indentation)
  ("C-b"           . evil-backward-word-begin)
  ("C-d"           . backward-kill-word) ; In evil the equivalent is bound "C-w".
  ("C-e"           . forward-word) ; Not from `evil-emacs-cursor-model-mode'.
  ("C-p"           . yank) ; "M-p" is in the `global-map'.
  ("C-v"           . set-mark-command)
- ("C-S-w"         . evil-forward-WORD-begin)
  ("C-w"           . evil-forward-word-begin) ; Not `evil-delete-backward-word'.
- ("C-S-ø"         . back-to-indentation)
  ("C-ø"           . end-of-line)
  :map org-present-mode-keymap
  ("<f5>"          . org-present-beginning)
  ("<f6>"          . org-present-prev)
  ("<f7>"          . org-present-next)
+ ;; :map org-agenda-keymap
+ ;; ("SPC"           . nil)
  :map isearch-mode-map
- ("C-S-s"         . isearch-query-replace) ; "C-S" does not work.
+ ("C-S-s"         . isearch-query-replace)
  :map corfu-map
+ ("<backtab>"     . corfu-previous)
  ("C-,"           . corfu-insert-separator) ; Fuzzy completion.
  ("C-i"           . corfu-next) ; "C-i" = <tab>.
- ("<backtab>"     . corfu-previous)
  :map minibuffer-local-map
  ("<backtab>"     . marginalia-cycle))
 ;; ============================================================================
@@ -1249,9 +1253,6 @@ All org files in the directory will be scanned by the agenda.")
   "Æ"           #'org-previous-visible-heading
   "æ"           #'org-next-visible-heading)
 (evil-define-key 'motion org-agenda-mode-map
-  (kbd "<S-left>")  #'org-agenda-earlier
-  (kbd "<S-right>") #'org-agenda-later
-  (kbd "SPC") nil ; Use <SPC> as a leader key.
   "A"           #'org-agenda-archive-default
   "R"           #'org-agenda-refile
   "T"           #'org-agenda-todo-yesterday
@@ -1264,15 +1265,15 @@ All org files in the directory will be scanned by the agenda.")
   "Å"           #'my-org-capture-idea
   "Æ"           #'org-agenda-backward-block
   "å"           #'org-agenda-quit
-  "æ"           #'org-agenda-forward-block)
-(evil-define-key 'normal dired-mode-map
-  (kbd "SPC") nil
-  ")"           #'dired-omit-mode ; "(" is toggle `dired-hide-details-mode'.
-  "h"           #'dired-up-directory
-  "l"           #'dired-find-file)
+  "æ"           #'org-agenda-forward-block
+  (kbd "<S-left>")  #'org-agenda-earlier
+  (kbd "<S-right>") #'org-agenda-later
+  (kbd "SPC") nil) ; Use <SPC> as a leader key.
+(evil-define-key 'normal org-agenda-mode-map
+  (kbd "SPC") nil) ; For some reason normal state is sometimes a bug in Agenda.
 (evil-define-key 'normal tmr-tabulated-mode-map
-  "+"           #'tmr
   "*"           #'tmr-with-details
+  "+"           #'tmr
   "T"           #'tmr-with-details
   "a"           #'tmr-toggle-acknowledge
   "c"           #'tmr-clone
@@ -1283,20 +1284,28 @@ All org files in the directory will be scanned by the agenda.")
   "s"           #'tmr-reschedule
   "t"           #'tmr
   "x"           #'tmr-remove)
+(evil-define-key 'normal dired-mode-map
+  ")"           #'dired-omit-mode ; "(" is toggle `dired-hide-details-mode'.
+  "h"           #'dired-up-directory
+  "l"           #'dired-find-file
+  (kbd "SPC") nil)
 (evil-define-key 'normal debugger-mode-map
-  (kbd "SPC") nil
-  (kbd "<escape>") #'quit-window)
+  (kbd "<escape>") #'quit-window
+  (kbd "SPC") nil)
 (evil-define-key 'normal help-mode-map
-  (kbd "SPC") nil
-  (kbd "<escape>") #'quit-window)
+  (kbd "<escape>") #'quit-window
+  (kbd "SPC") nil)
+(evil-define-key 'normal helpful-mode-map
+  (kbd "<escape>") #'quit-window
+  (kbd "SPC") nil)
 (evil-define-key 'normal Info-mode-map
-  (kbd "SPC") nil
-  (kbd "<escape>") #'quit-window)
+  (kbd "<escape>") #'quit-window
+  (kbd "SPC") nil)
 
 ;; ============================================================================
 ;;; Leader key
 ;; ============================================================================
-;; I use `which-key' rather than `transient'.
+;; I use `which-key'.
 (unless (version< emacs-version "30.1")
   (which-key-mode 1)
   (setq
@@ -1317,10 +1326,10 @@ All org files in the directory will be scanned by the agenda.")
 (keymap-set help-map        "o" #'view-hello-file)
 ;; ----------------------------------------------------------------------------
 ;; Keymaps for my leader key.
-(when (file-newer-than-file-p (locate-user-emacs-file "keymaps.el")
-                              (locate-user-emacs-file "keymaps.elc"))
-  (byte-compile-file (locate-user-emacs-file "keymaps.el")))
-(load (locate-user-emacs-file "keymaps") nil t)
+(when (file-newer-than-file-p (locate-user-emacs-file "leadermaps.el")
+                              (locate-user-emacs-file "leadermaps.elc"))
+  (byte-compile-file (locate-user-emacs-file "leadermaps.el")))
+(load (locate-user-emacs-file "leadermaps") nil t)
 ;; ----------------------------------------------------------------------------
 ;; Leader key is <SPC> with <f9> as backup.
 (keymap-set evil-motion-state-map "SPC"  my-root-spc-map)

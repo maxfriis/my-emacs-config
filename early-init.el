@@ -6,14 +6,15 @@
 (setq
  ;; The recommended max read chunk for my system.
  read-process-output-max (* 1024 1024)
- ;; Garbage collection start at 50MB rather than 800k etc.
+ ;; Garbage collection start at 50MB rather than 800k.
  gc-cons-threshold (* 50 1024 1024)
  gc-cons-percentage .5
- ;; Recalculating frame size is expencive if fonts/modeline change.
- frame-inhibit-implied-resize t
  ;; Trigger fewer garbage collections but use more memory.
  inhibit-compacting-font-caches t
- ;; Clean defaults.
+ ;; Recalculating frame size is expencive if fonts/modeline change.
+ frame-inhibit-implied-resize t
+ ;; ----------------------------------------------------------------------------
+ ;; Defaults I don't want to see.
  inhibit-startup-message t
  mode-line-format nil
  frame-title-format "GNU Emacs"
@@ -33,4 +34,5 @@
 (tooltip-mode      -1)
 (defalias 'yes-or-no-p 'y-or-n-p)
 (set-default-coding-systems 'utf-8)
+
 ;;; early-init.el ends here
