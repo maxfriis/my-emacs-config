@@ -8,10 +8,10 @@
 ;; ----------------------------------------------------------------------------
 (deftheme 8color-beige
   "8 #??? color light theme.
-\n| #edc | background      | #210 | default text    |
+\n| #fed | background      | #432 | default text    |
 | #987 | shadow/hl-line  | #00f | comment/tag     |
 | #090 | success/done    | #f00 | error/todo      |
-| #b0b | link/timestamp  | #840 | warning/heading |"
+| #b0b | other/timestamp | #840 | warning/heading |"
   :background-mode 'light
   :kind 'color-scheme
   :family '8color)
@@ -19,17 +19,18 @@
 (let ((class '((class color) (min-colors 89))))
   (custom-theme-set-faces
    '8color-beige
-;;;; Special faces.
+   ;; ----------------------------------------------------------------------------
+   ;; Special faces.
    `(default
-     ((,class (:foreground "#210" :background "#edc"))))
+     ((,class (:foreground "#432" :background "#fed"))))
    `(error
-     ((,class (:foreground "#f00" :underline t))))
+     ((,class (:foreground "#f00" :underline (:style wave :color "#840")))))
    `(warning
      ((,class (:foreground "#840"))))
    `(success
      ((,class (:foreground "#090"))))
    ;; ----------------------------------------------------------------------------
-;;;; font-lock.
+   ;; font-lock.
    `(font-lock-comment-face
      ((,class (:foreground "#00f" :slant italic))))
    `(font-lock-string-face
@@ -51,7 +52,7 @@
    `(font-lock-warning-face
      ((,class (:underline nil))))
    ;; ----------------------------------------------------------------------------
-;;;; Decorations.
+   ;; Decorations.
    `(vertical-border
      ((,class (:foreground "#987"))))
    `(scroll-bar
@@ -67,17 +68,19 @@
    `(lazy-highlight
      ((,class (:background "#987"))))
    `(isearch
-     ((,class (:foreground "#edc" :background "#210"))))
+     ((,class (:foreground "#fed" :background "#432"))))
+   `(isearch-fail
+     ((,class (:foreground "#210" :background "#840"))))
    `(fringe
-     ((,class (:foreground "#987" :background "#edc"))))
+     ((,class (:foreground "#987" :background "#fed"))))
    `(line-number
-     ((,class (:foreground "#987" :background "#edc" :height .8))))
+     ((,class (:foreground "#987" :background "#fed" :height .8))))
    `(line-number-current-line
-     ((,class (:foreground "#edc" :background "#987" :weight bold :height .8))))
+     ((,class (:inherit 'line-number :foreground "#fed" :background "#987" :weight bold))))
    `(mode-line
-     ((,class (:foreground "#edc" :background "#987" :box nil :height .8))))
+     ((,class (:foreground "#fed" :background "#987" :box nil :height .8))))
    `(mode-line-inactive
-     ((,class (:foreground "#987" :background "#edc" :box nil :overline t :height .8))))
+     ((,class (:foreground "#987" :background "#fed" :box nil :overline t :height .8))))
    `(mode-line-highlight
      ((,class (:box (:line-width 1 :color "#00f" :style released-button)))))
 
@@ -115,7 +118,7 @@
    `(org-special-keyword
      ((,class (:foreground "#00f" :weight normal :height .8))))
    `(org-checkbox
-     ((,class (:foreground "#00f" :background "#edc" :box nil :height .8))))
+     ((,class (:foreground "#00f" :background "#fed" :box nil :height .8))))
    `(org-tag
      ((,class (:foreground "#00f" :weight normal))))
    `(org-code
@@ -127,7 +130,7 @@
    `(org-formula
      ((,class (:foreground "#00f" :height .8))))
    `(org-block
-     ((,class (:foreground "#210"))))
+     ((,class (:foreground "#432"))))
    `(org-block-begin-line
      ((,class (:foreground "#b0f" :height .8))))
    `(org-block-end-line
@@ -143,7 +146,7 @@
    `(org-link
      ((,class (:foreground "#b0f"))))
    ;; ----------------------------------------------------------------------------
-;;;; Bullets.
+   ;; Bullets.
    `(org-superstar-leading
      ((,class (:foreground "#987" :height .8))))
    `(org-superstar-header-bullet
@@ -155,11 +158,11 @@
 ;;; Agenda
    ;; ============================================================================
    `(header-line
-     ((,class (:foreground "#840" :background "#edc" :weight bold :height 1.25))))
+     ((,class (:foreground "#840" :background "#fed" :weight bold :height 1.25))))
    `(org-agenda-structure
-     ((,class (:foreground "#840" :background "#edc" :box nil :weight bold :height 1.25))))
+     ((,class (:foreground "#840" :background "#fed" :box nil :weight bold :height 1.25))))
    `(org-column
-     ((,class (:background "#edc"))))
+     ((,class (:background "#fed"))))
    `(org-warning
      ((,class (:foreground "#f00"))))
    `(org-agenda-done
@@ -169,15 +172,15 @@
    `(calendar-weekday-header
      ((,class (:foreground "#00f"))))
    `(org-agenda-calendar-event
-     ((,class (:foreground "#210"))))
+     ((,class (:foreground "#432"))))
    `(org-agenda-clocking
      ((,class (:foreground "#00f" :background "#987"))))
    `(org-agenda-date
-     ((,class (:foreground "#b0f" :background "#edc" :box nil :weight normal))))
+     ((,class (:foreground "#00f" :background "#fed" :box nil :weight normal))))
    `(org-agenda-date-weekend
-     ((,class (:foreground "#b0f" :background "#edc" :box nil :weight normal :underline nil))))
+     ((,class (:foreground "#00f" :background "#fed" :box nil :weight normal :underline nil))))
    `(org-agenda-date-today
-     ((,class (:foreground "#840" :background "#edc" :box nil :weight normal :slant normal :inverse-video nil))))
+     ((,class (:foreground "#b0f" :background "#fed" :box nil :weight normal :underline nil :slant normal :inverse-video nil))))
    `(org-upcoming-distant-deadline
      ((,class (:foreground "#090"))))
    `(org-upcoming-deadline
@@ -191,96 +194,99 @@
    `(org-scheduled-previously
      ((,class (:foreground "#840"))))
    ;; ----------------------------------------------------------------------------
-;;;; Habit.
+   ;; Habit.
    `(org-habit-alert-face
-     ((,class (:foreground "#f00" :background "#840" :weight bold))))
+     ((,class (:foreground "#00f" :background "#840" :weight bold))))
    `(org-habit-alert-future-face
      ((,class (:background "#840"))))
    `(org-habit-overdue-face
-     ((,class (:foreground "#840" :background "#f00" :weight bold))))
+     ((,class (:foreground "#00f" :background "#f00" :weight bold))))
    `(org-habit-overdue-future-face
-     ((,class (:background "#987"))))
+     ((,class (:background "#b0f"))))
    `(org-habit-ready-face
-     ((,class (:foreground "#840" :background "#090" :weight bold))))
+     ((,class (:foreground "#00f" :background "#090" :weight bold))))
    `(org-habit-ready-future-face
      ((,class (:background "#090"))))
    `(org-habit-clear-face
-     ((,class (:foreground "#840" :background "#987" :weight bold))))
+     ((,class (:foreground "#00f" :background "#987" :weight bold))))
    `(org-habit-clear-future-face
      ((,class (:background "#987"))))
 
    ;; ============================================================================
 ;;; Misc. other packages
    ;; ============================================================================
+   `(help-key-binding
+     ((,class (:foreground "#432" :background "#987" :weight bold))))
    `(show-paren-match
-     ((,class (:foreground "#210" :background "#987" :weight bold))))
+     ((,class (:foreground "#432" :background "#987" :weight bold))))
    `(keycast-key
-     ((,class (:foreground "#edc" :background "#987" :box t :height .8))))
+     ((,class (:foreground "#fed" :background "#987" :box t :height .8))))
    `(corfu-default
-     ((,class (:foreground "#987" :background "#edc"))))
+     ((,class (:foreground "#987" :background "#fed"))))
    `(corfu-current
-     ((,class (:foreground "#edc" :background "#987"))))
+     ((,class (:foreground "#fed" :background "#987"))))
    `(aw-leading-char-face
      ((,class (:foreground "#840" :height 1.0))))
    `(ivy-current-match ; `counsel' use this face.
      ((,class (:foreground "#090" :background "#987"))))
    `(indent-guide-face
-     ((,class (:foreground "#987"))))
+     ((,class (:inherit 'shadow))))
    `(dired-ignored
      ((,class (:foreground "#00f"))))
    `(dired-subtree-depth-1-face
      ((,class (:background "#987"))))
    `(dired-subtree-depth-2-face
-     ((,class (:background "#edc"))))
+     ((,class (:background "#fed"))))
    `(dired-subtree-depth-3-face
      ((,class (:background "#987"))))
    `(dired-subtree-depth-4-face
-     ((,class (:background "#edc"))))
+     ((,class (:background "#fed"))))
    `(dired-subtree-depth-5-face
      ((,class (:background "#987"))))
    `(marginalia-documentation
      ((,class (:foreground "#00f"))))
    `(corfu-default
-     ((,class (:foreground "#987" :background "#edc"))))
+     ((,class (:foreground "#987" :background "#fed"))))
    `(corfu-current
-     ((,class (:foreground "#edc" :background "#987"))))
+     ((,class (:foreground "#fed" :background "#987"))))
    `(flyspell-duplicate
      ((,class (:underline (:style wave :color "#840")))))
    `(flyspell-incorrect
      ((,class (:underline (:style wave :color "#f00")))))
    `(rainbow-delimiters-base-error-face
-     ((,class (:foreground "#210" :background "#f00" :weight bold))))
+     ((,class (:foreground "#432" :background "#f00" :weight bold))))
    `(rainbow-delimiters-depth-1-face
      ((,class (:foreground "#090"))))
    `(rainbow-delimiters-depth-2-face
-     ((,class (:foreground "#b0f"))))
-   `(rainbow-delimiters-depth-3-face
      ((,class (:foreground "#840"))))
+   `(rainbow-delimiters-depth-3-face
+     ((,class (:foreground "#b0f"))))
    `(tab-bar
-     ((,class (:foreground "#987" :background "#edc" :weight bold :box nil :height .8 :inherit default))))
+     ((,class (:foreground "#987" :background "#fed" :weight bold :box nil :height .8))))
    `(tab-bar-tab
-     ((,class (:foreground "#edc" :background "#987" :box t))))
+     ((,class (:foreground "#fed" :background "#987" :box t))))
    `(tab-bar-tab-inactive
-     ((,class (:foreground "#987" :background "#edc" :box nil))))
+     ((,class (:foreground "#987" :background "#fed" :box nil))))
    (unless (version<= emacs-version "31.0")
      `(tab-bar-tab-highlight
-       ((,class (:foreground "#edc" :background "#987" :box (:line-width 1 :color "#00f" :style released-button))))))
+       ((,class (:foreground "#fed" :background "#987" :box (:line-width 1 :color "#00f" :style released-button))))))
    `(tab-line
-     ((,class (:foreground "#987" :background "#edc" :overline t :box nil))))
+     ((,class (:foreground "#987" :background "#fed" :overline t :box nil))))
    `(tab-line-tab ;; active tab in another frame
      ((,class (:box nil :inherit tab-line))))
    `(tab-line-tab-current
-     ((,class (:foreground "#edc" :background "#987" :box nil))))
+     ((,class (:foreground "#fed" :background "#987" :box nil))))
    `(tab-line-tab-modified
-     ((,class (:foreground "#edc" :background "#987" :box nil))))
+     ((,class (:foreground "#fed" :background "#987" :box nil))))
    `(tab-line-tab-inactive
-     ((,class (:foreground "#987" :background "#edc" :box nil))))
+     ((,class (:foreground "#987" :background "#fed" :box nil))))
    `(tab-line-highlight ;; mouseover
-     ((,class (:foreground "#987" :background "#edc" :box (:line-width 1 :color "#00f" :style released-button)))))))
+     ((,class (:foreground "#987" :background "#fed" :box (:line-width 1 :color "#00f" :style released-button)))))))
 
 (custom-theme-set-variables
  '8color-beige
  '(ansi-color-names-vector ["#000" "#f00" "#0f0" "#ff0" "#00f" "#f0f" "#0ff" "#fff"]))
 
 (provide-theme '8color-beige)
+
 ;;; 8color-beige-theme.el ends here
