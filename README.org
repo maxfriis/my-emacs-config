@@ -49,9 +49,9 @@ As root, in terminal and sometimes on my laptop I use 8 ansi colors for the them
 |-------+----------------+---+-------+-----------------|
 | #000  | background     |   | #fff  | default text    |
 |-------+----------------+---+-------+-----------------|
-| #f00  | shadow/hl-line |   | #0ff  | comment/tags    |
+| #f00  | shadow/hl-line |   | #0ff  | link/timestamp  |
 | #0f0  | success/done   |   | #f0f  | error/todo      |
-| #00f  | link/timestamp |   | #ff0  | warning/heading |
+| #00f  | comment/tags   |   | #ff0  | warning/heading |
 |-------+----------------+---+-------+-----------------|
 The red operator state is inverse when shown on the red hl-line background.
 The idea is to have something clearly indicating that I have root privileges and have a fallback theme I can use with an ansi color terminal.
@@ -219,9 +219,6 @@ Note that some of the videos are old and I have modified my init files after I m
 My configuration is constantly evolving.
 
 * Clone
-:LOGBOOK:
-- State "DONE" from           [2026-02-20 Fri 09:00]
-:END:
 
 If you have an /empty/ or deleted ~/.emacs.d directory and have git installed you can clone this configuration with:
 #+begin_src bash

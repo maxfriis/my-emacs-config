@@ -27,11 +27,11 @@
 ;; ============================================================================
 ;;; Default modes
 ;; ============================================================================
-(blink-cursor-mode -1)
-(menu-bar-mode     -1)
-(scroll-bar-mode   -1)
-(tool-bar-mode     -1)
-(tooltip-mode      -1)
+(blink-cursor-mode 0)
+(menu-bar-mode     0)
+(scroll-bar-mode   0)
+(tool-bar-mode     0)
+(tooltip-mode      0)
 (defalias 'yes-or-no-p 'y-or-n-p)
 (set-default-coding-systems 'utf-8)
 

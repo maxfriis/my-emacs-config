@@ -1,5 +1,19 @@
 ;;; leadermaps.el --- My leader keymaps -*- lexical-binding: t; -*-
 
+;; ----------------------------------------------------------------------------
+;; Additions to existing keymaps.
+(keymap-set evil-window-map "d" #'toggle-window-dedicated)
+(keymap-set evil-window-map "g" #'golden-ratio-mode)
+(keymap-set help-map        "B" #'embark-bindings)
+(keymap-set help-map        "F" #'describe-face)
+(keymap-set help-map        "G" #'Info-goto-emacs-command-node)
+(keymap-set help-map        "M" #'helpful-macro)
+(keymap-set help-map        "c" #'describe-char)
+(keymap-set help-map        "h" #'describe-symbol) ; Swap "h" and "o".
+(keymap-set help-map        "o" #'view-hello-file)
+
+;; ----------------------------------------------------------------------------
+;; New keymaps.
 (defvar-keymap my-a-spc-map
   :doc "My <spc> prefix keys."
   "A"   #'tmr-tabulated-view
@@ -63,12 +77,13 @@
   "G"   #'org-goto
   "I"   #'org-clock-in
   "L"   #'org-store-link
+  "M"   #'orgtbl-mode
   "N"   #'org-num-mode
   "O"   #'org-clock-out
-  "P"   #'org-set-property
+  "P"   #'org-present
   "R"   #'org-refile
   "S"   #'org-sort
-  "T"   #'orgtbl-mode
+  "T"   #'org-insert-structure-template
   "a"   #'org-agenda
   "b"   #'org-insert-structure-template
   "c"   #'org-capture
@@ -78,7 +93,7 @@
   "l"   #'org-insert-link
   "n"   #'org-add-note
   "o"   #'org-open-at-point
-  "p"   #'org-present
+  "p"   #'org-set-property
   "s"   #'org-schedule
   "t"   #'evil-org-org-insert-todo-heading-respect-content-below)
 (defvar-keymap my-q-spc-map
@@ -203,12 +218,12 @@
   "z"   my-z-spc-map)
 
 ;; ----------------------------------------------------------------------------
-;; `which-key' leader key replacements.
+;; `which-key' replacements.
 (unless (version< emacs-version "30.1")
   (which-key-add-keymap-based-replacements my-a-spc-map
     "A"   '("View alarms"  . tmr-tabulated-view)
-    "a"   '("Alarm"        . tmr)
     "C"   '("Calc"         . calc)
+    "a"   '("Alarm"        . tmr)
     "c"   '("Full calc"    . full-calc)
     "i"   '("irc chat"     . erc-tls)
     "s"   '("Eshell"       . eshell)
@@ -261,12 +276,13 @@
     "G"   '("Goto"         . org-goto)
     "I"   '("Clock in"     . org-clock-in)
     "L"   '("Store link"   . org-store-link)
+    "M"   '("Table mode"   . orgtbl-mode)
     "N"   '("Number heads" . org-num-mode)
     "O"   '("Clock out"    . org-clock-out)
-    "P"   '("Property"     . org-set-property)
+    "P"   '("Present"      . org-present)
     "R"   '("Refile"       . org-refile)
     "S"   '("Sort"         . org-sort)
-    "T"   '("Tables"       . orgtbl-mode)
+    "T"   '("Template"     . org-insert-structure-template)
     "a"   '("Agenda"       . org-agenda)
     "b"   '("Block"        . org-insert-structure-template)
     "c"   '("Capture"      . org-capture)
@@ -276,7 +292,7 @@
     "l"   '("Ins. link"    . org-insert-link)
     "n"   '("Add note"     . org-add-note)
     "o"   '("Open link"    . org-open-at-point)
-    "p"   '("Present"      . org-present)
+    "p"   '("Property"     . org-set-property)
     "s"   '("Schedule"     . org-schedule)
     "t"   '("New todo"     . evil-org-org-insert-todo-heading-respect-content-below))
   (which-key-add-keymap-based-replacements my-q-spc-map
